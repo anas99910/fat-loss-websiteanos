@@ -5,128 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anas 3-Day Fat Loss Gym Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Base styles inspired by modern, premium design */
         body {
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden; /* Prevent horizontal scrollbars */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased; /* Smoother fonts on WebKit browsers */
+            -moz-osx-font-smoothing: grayscale; /* Smoother fonts on Firefox */
         }
-        .plan-bg {
-            background-color: #1a202c; /* Dark background for the page */
-        }
-        .content-card { /* General card styling for sections */
-            background-color: #2d3748; /* Darker card background */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        /* Removed hover effect on content-card as it might be distracting with tabs */
-        /* .content-card:hover {
-            transform: translateY(-5px);
-        } */
 
-        /* Specific border colors for different day/section cards */
-        .day-1-border { border-left: 4px solid #f56565; } /* Red */
-        .day-2-border { border-left: 4px solid #4299e1; } /* Blue */
-        .day-3-border { border-left: 4px solid #48bb78; } /* Green */
-        .essentials-border { border-left: 4px solid #63b3ed; } /* Light Blue */
-        .tips-border { border-left: 4px solid #f6e05e; } /* Yellow */
+        /* --- NEW: Apple-inspired Dark Palette --- */
+        .plan-bg {
+            background-color: #000000; /* Pure black background for high contrast */
+        }
+
+        .content-card {
+            background-color: #1c1c1e; /* Dark grey for content cards, common in iOS */
+            border-radius: 1.25rem; /* Softer, more modern rounded corners (rounded-2xl) */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for definition */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2); /* Softer shadow */
+        }
+        
+        /* --- NEW: Refined Accent Colors --- */
+        .day-1-border { border-left: 4px solid #ff453a; } /* More vibrant SF Red */
+        .day-2-border { border-left: 4px solid #0a84ff; } /* More vibrant SF Blue */
+        .day-3-border { border-left: 4px solid #30d158; } /* More vibrant SF Green */
+        .essentials-border { border-left: 4px solid #64d2ff; } /* More vibrant SF Light Blue */
+        .tips-border { border-left: 4px solid #ffd60a; } /* More vibrant SF Yellow */
 
         .section-title {
-            border-bottom: 2px solid #4a5568; /* Separator line for titles */
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
+            border-bottom: 1px solid #3a3a3c; /* Thinner, subtler separator */
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
         }
-        .emoji-bullet::before { /* Custom bullet points using emojis */
+
+        .emoji-bullet::before {
             content: attr(data-emoji);
-            margin-right: 0.5em;
+            margin-right: 0.75em;
             font-size: 1.1em;
             vertical-align: middle;
         }
 
-        /* Animation Styles for elements appearing on scroll */
+        /* --- Animation remains the same --- */
         .animated-item {
             opacity: 0;
             transform: translateY(30px);
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-            transition-delay: var(--delay, 0s); /* Customizable delay for staggered animations */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out; /* Slightly smoother transition */
+            transition-delay: var(--delay, 0s);
         }
-        .is-visible { /* Class added by JavaScript when item is in viewport */
+        .is-visible {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Custom Checkbox styling */
+        /* --- NEW: Refined Checkbox Styling --- */
         .custom-checkbox {
-            appearance: none; -webkit-appearance: none; /* Remove default browser styling */
-            height: 1.25em; width: 1.25em;
-            background-color: #4a5568; /* Default background of checkbox */
-            border-radius: 0.25rem; margin-right: 0.75em;
+            appearance: none; -webkit-appearance: none;
+            height: 1.3em; width: 1.3em;
+            background-color: #3a3a3c; /* Darker grey checkbox */
+            border: 1px solid #545458;
+            border-radius: 0.375rem; /* rounded-md */
+            margin-right: 0.75em;
             cursor: pointer; display: inline-block;
             vertical-align: middle; position: relative;
-            flex-shrink: 0; /* Prevent checkbox from shrinking in flex layouts */
+            flex-shrink: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
         .custom-checkbox:checked {
-            background-color: #48bb78; border-color: #38a169; /* Green when checked */
+            background-color: #30d158; /* Use the vibrant green for checked state */
+            border-color: #30d158;
         }
-        .custom-checkbox:checked::after { /* Checkmark style */
-            content: '✔'; font-size: 0.9em; color: white;
+        .custom-checkbox:checked::after {
+            content: '✔'; font-size: 0.9em; color: black; font-weight: 700;
             position: absolute; left: 50%; top: 50%;
             transform: translate(-50%, -50%);
         }
-        .checklist-item-label { /* Label for checklist items for better click handling */
+        .checklist-item-label {
             display: flex; align-items: center; cursor: pointer;
         }
 
-        /* Tab Button Styling */
+        /* --- NEW: Refined Tab Styling --- */
         .tab-button {
-            padding: 0.75rem 1.5rem; /* Increased padding for better touch targets */
-            border-radius: 0.5rem; /* More rounded corners */
+            padding: 0.6rem 1.2rem;
+            border-radius: 9999px; /* Pill shape */
             font-weight: 600;
-            color: #cbd5e1; /* Default text color (slate-300) */
-            background-color: #4a5568; /* Default background color (slate-600) */
+            font-size: 0.9rem;
+            color: #e5e5ea; /* Off-white for inactive text */
+            background-color: #1c1c1e; /* Match card background */
             transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-            border: 2px solid transparent; /* Transparent border for consistent sizing */
+            border: 1px solid transparent;
         }
         .tab-button:hover {
-            background-color: #718096; /* Lighter background on hover (slate-500) */
+            background-color: #2c2c2e;
             color: white;
-            transform: translateY(-2px); /* Slight lift effect on hover */
+            transform: translateY(-2px);
         }
-        .tab-button.active { /* Styling for the active tab button */
+        .tab-button.active {
             color: white;
-            /* Dynamic background and border color based on active tab, set by JS/CSS */
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        /* Specific active states for tab buttons to match card borders */
-        .tab-button.active.day-1-active-border { background-color: #f56565; border-color: #c53030; } /* Red */
-        .tab-button.active.day-2-active-border { background-color: #4299e1; border-color: #2b6cb0; } /* Blue */
-        .tab-button.active.day-3-active-border { background-color: #48bb78; border-color: #2f855a; } /* Green */
-        .tab-button.active.essentials-active-border { background-color: #63b3ed; border-color: #3182ce; } /* Light Blue */
-        .tab-button.active.tips-active-border { background-color: #f6e05e; border-color: #d69e2e; color: #1a202c; } /* Yellow, with dark text for contrast */
+        .tab-button.active.day-1-active-border { background-color: #ff453a; }
+        .tab-button.active.day-2-active-border { background-color: #0a84ff; }
+        .tab-button.active.day-3-active-border { background-color: #30d158; }
+        .tab-button.active.essentials-active-border { background-color: #64d2ff; }
+        .tab-button.active.tips-active-border { background-color: #ffd60a; color: #000; }
 
-        /* Tab Pane Styling */
         .tab-pane {
-            display: none; /* Hidden by default */
+            display: none;
         }
         .tab-pane.active-pane {
-            display: block; /* Shown when its corresponding tab is active */
+            display: block;
         }
     </style>
 </head>
-<body class="plan-bg text-slate-100 min-h-screen p-4 sm:p-6 md:p-8">
+<body class="plan-bg text-gray-100 min-h-screen p-4 sm:p-6 md:p-8">
     <div class="max-w-4xl mx-auto">
 
-        <header class="text-center mb-10 md:mb-12 animated-item is-visible" style="--delay: 0.1s;">
+        <header class="text-center mb-10 md:mb-16 animated-item is-visible" style="--delay: 0.1s;">
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold flex items-center justify-center space-x-2 sm:space-x-3 md:space-x-4 pb-2">
-                <span class="text-orange-500">🧨</span>
+                <span class="text-orange-400">🧨</span>
                 <span class="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-yellow-300 to-lime-400">
                     ANAS 3-DAY FAT LOSS GYM PLAN
                 </span>
-                <span class="text-lime-500">🥊</span>
+                <span class="text-lime-400">🥊</span>
             </h1>
-            <p class="text-lg md:text-xl text-slate-300 mt-2">📅 Schedule: Monday – Wednesday – Friday</p>
-            <p class="text-md md:text-lg text-slate-400 mt-1">🎯 Goal: Burn fat, build strength, stay explosive!</p>
+            <p class="text-lg md:text-xl text-gray-300 mt-4 font-medium">📅 Schedule: Monday – Wednesday – Friday</p>
+            <p class="text-md md:text-lg text-gray-400 mt-2">🎯 Goal: Burn fat, build strength, stay explosive!</p>
         </header>
 
-        <nav class="flex flex-wrap justify-center space-x-1 sm:space-x-2 mb-8 animated-item is-visible" style="--delay: 0.2s;">
+        <nav class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12 animated-item is-visible" style="--delay: 0.2s;">
             <button class="tab-button active day-1-active-border" data-tab="day1" data-color-class="day-1-active-border">🥇 Day 1</button>
             <button class="tab-button" data-tab="day2" data-color-class="day-2-active-border">🥈 Day 2</button>
             <button class="tab-button" data-tab="day3" data-color-class="day-3-active-border">🥉 Day 3</button>
@@ -136,18 +145,18 @@
 
         <div id="tab-content-container">
             <div id="day1" class="tab-pane active-pane">
-                <section class="content-card day-1-border rounded-lg p-4 sm:p-6 shadow-xl animated-item is-visible">
+                <section class="content-card day-1-border p-5 sm:p-8 animated-item is-visible">
                     <h2 class="text-2xl sm:text-3xl font-bold text-red-400 mb-6 section-title">🥇 DAY 1 – FULL BODY STRENGTH + CONDITIONING</h2>
                     <div>
-                        <h3 class="text-xl font-semibold text-red-300 mb-3">🟠 Warm-Up (10 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
+                        <h3 class="text-xl font-semibold text-red-300 mb-4">🟠 Warm-Up (10 min)</h3>
+                        <ul class="list-none space-y-4 text-gray-200 pl-0">
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🚶‍♂️">5 min incline treadmill walk</span></label></li>
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🔄">Arm circles – Hip mobility – Shoulder rolls</span></label></li>
                         </ul>
                     </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-red-300 mb-3">🏋️‍♂️ Strength Training (35 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
+                    <div class="mt-8">
+                        <h3 class="text-xl font-semibold text-red-300 mb-4">🏋️‍♂️ Strength Training (35 min)</h3>
+                        <ul class="list-none space-y-4 text-gray-200 pl-0">
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🟩">Goblet Squats (Dumbbell): 3 x 12-15</span></label></li>
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🟥">Incline Dumbbell Bench Press: 4 x 10</span></label></li>
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🟦">One-Arm Dumbbell Row: 3 x 12 per side</span></label></li>
@@ -155,250 +164,117 @@
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🟧">Optional: Dumbbell Romanian Deadlift: 3 x 12</span></label></li>
                         </ul>
                     </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-red-300 mb-3">🔥 Conditioning (25 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🔁">Jump Rope: 3 x 1 min (30 sec rest)</span></label></li>
+                    <div class="mt-8">
+                        <h3 class="text-xl font-semibold text-red-300 mb-4">🔥 Conditioning (25 min)</h3>
+                        <ul class="list-none space-y-4 text-gray-200 pl-0">
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="�">Jump Rope: 3 x 1 min (30 sec rest)</span></label></li>
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🥊">Boxing Bag Freestyle: 8–10 min</span></label></li>
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🧗‍♂️">Incline Treadmill Walk: 10 min (brisk pace)</span></label></li>
                         </ul>
                     </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-red-300 mb-3">🧘 Cool-Down (5 min)</h3>
-                        <p class="text-slate-300 pl-0"><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox">Stretch hamstrings, quads, shoulders, and lats</label></p>
+                    <div class="mt-8">
+                        <h3 class="text-xl font-semibold text-red-300 mb-4">🧘 Cool-Down (5 min)</h3>
+                        <p class="text-gray-200 pl-0"><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox">Stretch hamstrings, quads, shoulders, and lats</label></p>
                     </div>
                 </section>
             </div>
 
             <div id="day2" class="tab-pane">
-                <section class="content-card day-2-border rounded-lg p-4 sm:p-6 shadow-xl animated-item">
+                <section class="content-card day-2-border p-5 sm:p-8 animated-item">
                     <h2 class="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 section-title">🥈 DAY 2 – UPPER BODY + CORE + CARDIO</h2>
-                    <div>
-                        <h3 class="text-xl font-semibold text-blue-300 mb-3">🟠 Warm-Up (10 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🧍">Shoulder mobility drills</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🏃">3 min light cardio</span></label></li>
-                        </ul>
-                    </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-blue-300 mb-3">🏋️ Strength Training (40 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="💪">Push-Ups / Chest Press: 3-4 sets max reps</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🔽">Lat Pulldown / Assisted Pull-Up: 4 x 10-12</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🧱">Dumbbell Shoulder Press: 3 x 12</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="⚙️">Superset: Bicep Curls + Triceps Pushdowns: 3 x 12 each</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🎯">Core – Russian Twists: 3 x 30 reps</span></label></li>
-                        </ul>
-                    </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-blue-300 mb-3">🌊 Cardio & Recovery (20 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🏊‍♂️">Pool Swimming or Water Jog: 10–15 min</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="💨">Light Jump Rope or Bag Work: 5 min</span></label></li>
-                        </ul>
-                    </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-blue-300 mb-3">🧘 Cool-Down (5-10 min)</h3>
-                        <p class="text-slate-300 pl-0"><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox">Stretch back, shoulders, arms, and core</label></p>
-                    </div>
-                </section>
+                    </section>
             </div>
 
             <div id="day3" class="tab-pane">
-                <section class="content-card day-3-border rounded-lg p-4 sm:p-6 shadow-xl animated-item">
+                 <section class="content-card day-3-border p-5 sm:p-8 animated-item">
                     <h2 class="text-2xl sm:text-3xl font-bold text-green-400 mb-6 section-title">🥉 DAY 3 – LEGS + HIIT + BOXING</h2>
-                     <div>
-                        <h3 class="text-xl font-semibold text-green-300 mb-3">🟠 Warm-Up (10 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🦵">Dynamic leg swings & bodyweight squats</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🏃">Light jog or rope: 3 min</span></label></li>
-                        </ul>
-                    </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-green-300 mb-3">🏋️‍♂️ Leg Workout (30-35 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🟩">Dumbbell Lunges / Leg Press: 3 x 10/leg</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🪜">Step-Ups (Box or Bench): 3 x 12</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🦶">Calf Raises: 3 x 20</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🪑">Wall Sit Hold: 3 x 30–60 sec</span></label></li>
-                        </ul>
-                    </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-green-300 mb-3">💣 HIIT + Boxing (25 min)</h3>
-                        <ul class="list-none space-y-3 text-slate-300 pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="⏱">Treadmill Intervals: 1 min jog + 1 min walk x 8</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🥊">Heavy Bag Combos: 10 min</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🪀">Jump Rope Finisher: 2–3 rounds x 1 min</span></label></li>
-                        </ul>
-                    </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-green-300 mb-3">🧘 Cool-Down (5-10 min)</h3>
-                        <p class="text-slate-300 pl-0"><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox">Stretch calves, hamstrings, glutes, hips</label></p>
-                    </div>
-                </section>
+                     </section>
             </div>
 
             <div id="essentials" class="tab-pane">
-                <section class="content-card essentials-border rounded-lg p-4 sm:p-6 shadow-xl animated-item">
-                    <h2 class="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 section-title">🎒 Gym Bag Essentials</h2>
-                    <div class="md:flex md:space-x-8 items-center">
-                        <div class="w-full md:w-1/3 mb-6 md:mb-0 flex justify-center">
-                            <svg class="w-24 h-24 md:w-32 md:h-32 text-slate-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 6h-2.18c-.55-2.23-2.47-4-4.82-4S8.73 3.77 8.18 6H6c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.11 0 2.06.76 2.37 1.75H9.63C9.94 4.76 10.89 4 12 4zm8 15H6V8h1.18C7.63 9.14 8.73 10 10 10h4c1.27 0 2.37-.86 2.82-2H18v11z"/>
-                                <path fill="none" d="M0 0h24v24H0z"/>
-                            </svg>
-                            <!-- <svg class="w-24 md:w-32 h-auto text-slate-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M21 8h-2v3h-3V8h-2V5h2V2h3v3h2v3zm-6.5 1c.83 0 1.5-.67 1.5-1.5S15.33 6 14.5 6s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM9.5 9c.83 0 1.5-.67 1.5-1.5S10.33 6 9.5 6s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM5 8H3v3H0V8H-2V5H0V2H3v3h2v3z"/>
-                                <path d="M17 12h-2v2h2v-2zm-4 0H7v2h6v-2zm-4 0H3v2h2v-2zM21 14h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0H7v2h6v-2zm-4 0H3v2h2v-2z"/>
-                            </svg> -->
-                        </div>
-                        <div class="w-full md:w-2/3">
-                            <h3 class="text-xl font-semibold text-blue-300 mb-3">Don't Forget These:</h3>
-                            <ul class="list-none space-y-3 text-slate-300">
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🥊">Boxing Gloves</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🤸">Jump Rope</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="👕">T-shirt</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🩳">Shorts (Gym)</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🩴">Sandals</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🧖">Towel</span></label></li>
-                                <li class="font-semibold mt-3 text-blue-200"><span class="emoji-bullet" data-emoji="🏊">Swimming Gear:</span></li>
-                                <ul class="list-none space-y-2 text-slate-300 pl-6 pt-2">
-                                    <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🥽">Goggles</span></label></li>
-                                    <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox"><span class="emoji-bullet" data-emoji="🩳">Shorts (Swimming)</span></label></li>
-                                </ul>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
+                <section class="content-card essentials-border p-5 sm:p-8 animated-item">
+                     <h2 class="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 section-title">🎒 Gym Bag Essentials</h2>
+                     </section>
             </div>
 
             <div id="tips" class="tab-pane">
-                <section class="content-card tips-border rounded-lg p-4 sm:p-6 shadow-xl animated-item">
-                    <h2 class="text-2xl sm:text-3xl font-bold text-yellow-400 mb-6 section-title">📌 Tips for Maximum Fat Burn</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="animated-item" style="--delay: 0.1s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-2 emoji-bullet" data-emoji="🥗">Eat Smart:</h3>
-                            <ul class="list-disc list-inside space-y-1 text-slate-300 pl-4">
-                                <li>High protein (eggs, chicken, tuna)</li>
-                                <li>Lots of vegetables 🥦🥒</li>
-                                <li>Limit sugar & processed carbs</li>
-                            </ul>
-                        </div>
-                        <div class="animated-item" style="--delay: 0.2s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-2 emoji-bullet" data-emoji="💧">Hydrate:</h3>
-                            <p class="text-slate-300 pl-4">Drink 3–4 liters/day</p>
-                        </div>
-                        <div class="animated-item" style="--delay: 0.3s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-2 emoji-bullet" data-emoji="😴">Rest:</h3>
-                            <p class="text-slate-300 pl-4">Sleep 7–9 hours/night</p>
-                        </div>
-                        <div class="animated-item" style="--delay: 0.4s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-2 emoji-bullet" data-emoji="🧠">Mental Game:</h3>
-                            <ul class="list-disc list-inside space-y-1 text-slate-300 pl-4">
-                                <li>Stay consistent</li>
-                                <li>Track progress weekly</li>
-                                <li>Remind yourself: "Fat loss is not fast, but it's real if you show up!"</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
+                <section class="content-card tips-border p-5 sm:p-8 animated-item">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-yellow-300 mb-6 section-title">📌 Tips for Maximum Fat Burn</h2>
+                     </section>
             </div>
         </div>
 
-        <footer class="text-center mt-12 py-6 animated-item is-visible" style="--delay: 0.2s;">
-            <p class="text-sm text-slate-500">Stay strong, stay focused!</p>
+        <footer class="text-center mt-16 py-6 animated-item is-visible" style="--delay: 0.2s;">
+            <p class="text-sm text-gray-500">Stay strong, stay focused!</p>
         </footer>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Intersection Observer for general animations on scroll
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible'); // Make item visible
-                        // observer.unobserve(entry.target); // Optional: unobserve after first animation
+                        entry.target.classList.add('is-visible');
                     }
                 });
-            }, { threshold: 0.1 }); // Trigger when 10% of the item is visible
+            }, { threshold: 0.1 });
 
-            // Observe all elements with the .animated-item class
             document.querySelectorAll('.animated-item').forEach(item => {
                 observer.observe(item);
             });
 
-            // Tab functionality
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabPanes = document.querySelectorAll('.tab-pane');
-            // List of all possible active color classes for tabs
             const activeColorClasses = ['day-1-active-border', 'day-2-active-border', 'day-3-active-border', 'essentials-active-border', 'tips-active-border'];
 
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
-                    const targetTab = button.dataset.tab; // Get target tab ID from data-tab attribute
-                    const targetColorClass = button.dataset.colorClass; // Get color class from data-color-class
+                    const targetTab = button.dataset.tab;
+                    const targetColorClass = button.dataset.colorClass;
 
-                    // Deactivate all tab buttons and hide all tab panes
                     tabButtons.forEach(btn => {
                         btn.classList.remove('active');
-                        activeColorClasses.forEach(cls => btn.classList.remove(cls)); // Remove all specific color classes
+                        activeColorClasses.forEach(cls => btn.classList.remove(cls));
                     });
                     tabPanes.forEach(pane => {
                         pane.classList.remove('active-pane');
-                        // Re-hide items in inactive panes for re-animation if tab is switched back
                         pane.querySelectorAll('.animated-item').forEach(item => {
-                            item.classList.remove('is-visible'); // Hide item
-                            observer.unobserve(item); // Stop observing hidden items to prevent premature animation
+                            item.classList.remove('is-visible');
+                            observer.unobserve(item);
                         });
                     });
 
-                    // Activate the clicked button and its corresponding color class
                     button.classList.add('active');
                     if (targetColorClass) {
                         button.classList.add(targetColorClass);
                     }
 
-                    // Show the target tab pane
                     const activePane = document.getElementById(targetTab);
                     if (activePane) {
                         activePane.classList.add('active-pane');
-                        // Trigger animation for items in the newly active pane
                         activePane.querySelectorAll('.animated-item').forEach(item => {
-                           observer.observe(item); // Start observing items in the active pane
-                           // A small delay or forced reflow might be needed if animations don't restart reliably
-                           // Forcing reflow: void item.offsetWidth;
-                           // Then re-add 'is-visible' if observer isn't re-triggering fast enough
-                           // However, re-observing should generally handle this.
+                           observer.observe(item);
                         });
                     }
                 });
             });
 
-            // Initial setup for Intersection Observer for the items in the initially active tab
             const initiallyActivePane = document.querySelector('.tab-pane.active-pane');
             if (initiallyActivePane) {
                 initiallyActivePane.querySelectorAll('.animated-item').forEach(item => {
-                    // Items in the first tab might already be in view, so 'is-visible' is added directly
-                    // For a consistent animation even on load, we can observe them.
-                    // If they are already visible, the observer will fire immediately.
-                    if (!item.classList.contains('is-visible')) { // Check if header/nav already animated it
+                    if (!item.classList.contains('is-visible')) {
                          observer.observe(item);
                     }
                 });
             }
 
-            // Checkbox label click functionality: allows clicking the label to toggle the checkbox
             const checklistLabels = document.querySelectorAll('.checklist-item-label');
             checklistLabels.forEach(label => {
                 label.addEventListener('click', function(event) {
-                    // Prevent double-toggling if the checkbox itself was clicked
                     if (event.target.type === 'checkbox') return;
-
                     const checkbox = this.querySelector('input[type="checkbox"]');
                     if (checkbox) {
                         checkbox.checked = !checkbox.checked;
-                        // You might want to trigger a 'change' event manually if other scripts listen for it
-                        // checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 });
             });
@@ -406,3 +282,4 @@
     </script>
 </body>
 </html>
+�
