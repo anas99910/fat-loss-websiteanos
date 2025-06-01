@@ -9,102 +9,105 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevent horizontal scrollbars */
         }
         .plan-bg {
-            background-color: #1a202c;
+            background-color: #1a202c; /* Dark background for the page */
         }
-        .content-card { /* Renamed from day-card for general use */
-            background-color: #2d3748;
+        .content-card { /* General card styling for sections */
+            background-color: #2d3748; /* Darker card background */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .content-card:hover { /* Apply hover to all cards if desired, or make specific */
-            /* transform: translateY(-5px); */ /* Optional: can be distracting with tabs */
-        }
-        .day-1-border { border-left: 4px solid #f56565; }
-        .day-2-border { border-left: 4px solid #4299e1; }
-        .day-3-border { border-left: 4px solid #48bb78; }
-        .essentials-border { border-left: 4px solid #63b3ed; }
-        .tips-border { border-left: 4px solid #f6e05e; }
+        /* Removed hover effect on content-card as it might be distracting with tabs */
+        /* .content-card:hover {
+            transform: translateY(-5px);
+        } */
 
+        /* Specific border colors for different day/section cards */
+        .day-1-border { border-left: 4px solid #f56565; } /* Red */
+        .day-2-border { border-left: 4px solid #4299e1; } /* Blue */
+        .day-3-border { border-left: 4px solid #48bb78; } /* Green */
+        .essentials-border { border-left: 4px solid #63b3ed; } /* Light Blue */
+        .tips-border { border-left: 4px solid #f6e05e; } /* Yellow */
 
         .section-title {
-            border-bottom: 2px solid #4a5568;
+            border-bottom: 2px solid #4a5568; /* Separator line for titles */
             padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
-        .emoji-bullet::before {
+        .emoji-bullet::before { /* Custom bullet points using emojis */
             content: attr(data-emoji);
             margin-right: 0.5em;
             font-size: 1.1em;
             vertical-align: middle;
         }
 
-        /* Animation Styles */
+        /* Animation Styles for elements appearing on scroll */
         .animated-item {
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-            transition-delay: var(--delay, 0s);
+            transition-delay: var(--delay, 0s); /* Customizable delay for staggered animations */
         }
-        .is-visible {
+        .is-visible { /* Class added by JavaScript when item is in viewport */
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Checkbox styling */
+        /* Custom Checkbox styling */
         .custom-checkbox {
-            appearance: none; -webkit-appearance: none;
+            appearance: none; -webkit-appearance: none; /* Remove default browser styling */
             height: 1.25em; width: 1.25em;
-            background-color: #4a5568;
+            background-color: #4a5568; /* Default background of checkbox */
             border-radius: 0.25rem; margin-right: 0.75em;
             cursor: pointer; display: inline-block;
             vertical-align: middle; position: relative;
-            flex-shrink: 0;
+            flex-shrink: 0; /* Prevent checkbox from shrinking in flex layouts */
         }
         .custom-checkbox:checked {
-            background-color: #48bb78; border-color: #38a169;
+            background-color: #48bb78; border-color: #38a169; /* Green when checked */
         }
-        .custom-checkbox:checked::after {
+        .custom-checkbox:checked::after { /* Checkmark style */
             content: '✔'; font-size: 0.9em; color: white;
             position: absolute; left: 50%; top: 50%;
             transform: translate(-50%, -50%);
         }
-        .checklist-item-label {
+        .checklist-item-label { /* Label for checklist items for better click handling */
             display: flex; align-items: center; cursor: pointer;
         }
 
-        /* Tab Styling */
+        /* Tab Button Styling */
         .tab-button {
-            padding: 0.75rem 1.5rem; /* Increased padding */
-            border-radius: 0.5rem; /* More rounded */
+            padding: 0.75rem 1.5rem; /* Increased padding for better touch targets */
+            border-radius: 0.5rem; /* More rounded corners */
             font-weight: 600;
-            color: #cbd5e1; /* slate-300 */
-            background-color: #4a5568; /* slate-600 */
+            color: #cbd5e1; /* Default text color (slate-300) */
+            background-color: #4a5568; /* Default background color (slate-600) */
             transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-            border: 2px solid transparent;
+            border: 2px solid transparent; /* Transparent border for consistent sizing */
         }
         .tab-button:hover {
-            background-color: #718096; /* slate-500 */
+            background-color: #718096; /* Lighter background on hover (slate-500) */
             color: white;
-            transform: translateY(-2px);
+            transform: translateY(-2px); /* Slight lift effect on hover */
         }
-        .tab-button.active {
+        .tab-button.active { /* Styling for the active tab button */
             color: white;
-            /* Dynamic border color based on active tab */
+            /* Dynamic background and border color based on active tab, set by JS/CSS */
         }
+        /* Specific active states for tab buttons to match card borders */
         .tab-button.active.day-1-active-border { background-color: #f56565; border-color: #c53030; } /* Red */
         .tab-button.active.day-2-active-border { background-color: #4299e1; border-color: #2b6cb0; } /* Blue */
         .tab-button.active.day-3-active-border { background-color: #48bb78; border-color: #2f855a; } /* Green */
         .tab-button.active.essentials-active-border { background-color: #63b3ed; border-color: #3182ce; } /* Light Blue */
-        .tab-button.active.tips-active-border { background-color: #f6e05e; border-color: #d69e2e; color: #1a202c; } /* Yellow */
+        .tab-button.active.tips-active-border { background-color: #f6e05e; border-color: #d69e2e; color: #1a202c; } /* Yellow, with dark text for contrast */
 
-
+        /* Tab Pane Styling */
         .tab-pane {
             display: none; /* Hidden by default */
         }
         .tab-pane.active-pane {
-            display: block; /* Shown when active */
+            display: block; /* Shown when its corresponding tab is active */
         }
     </style>
 </head>
@@ -115,7 +118,7 @@
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold flex items-center justify-center space-x-2 sm:space-x-3 md:space-x-4 pb-2">
                 <span class="text-orange-500">🧨</span>
                 <span class="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-yellow-300 to-lime-400">
-                    ANAS’S 3-DAY FAT LOSS GYM PLAN
+                    ANAS 3-DAY FAT LOSS GYM PLAN
                 </span>
                 <span class="text-lime-500">🥊</span>
             </h1>
@@ -240,10 +243,14 @@
                     <h2 class="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 section-title">🎒 Gym Bag Essentials</h2>
                     <div class="md:flex md:space-x-8 items-center">
                         <div class="w-full md:w-1/3 mb-6 md:mb-0 flex justify-center">
-                            <svg class="w-24 md:w-32 h-auto text-slate-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
+                            <svg class="w-24 h-24 md:w-32 md:h-32 text-slate-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6h-2.18c-.55-2.23-2.47-4-4.82-4S8.73 3.77 8.18 6H6c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.11 0 2.06.76 2.37 1.75H9.63C9.94 4.76 10.89 4 12 4zm8 15H6V8h1.18C7.63 9.14 8.73 10 10 10h4c1.27 0 2.37-.86 2.82-2H18v11z"/>
+                                <path fill="none" d="M0 0h24v24H0z"/>
                             </svg>
+                            <!-- <svg class="w-24 md:w-32 h-auto text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21 8h-2v3h-3V8h-2V5h2V2h3v3h2v3zm-6.5 1c.83 0 1.5-.67 1.5-1.5S15.33 6 14.5 6s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM9.5 9c.83 0 1.5-.67 1.5-1.5S10.33 6 9.5 6s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM5 8H3v3H0V8H-2V5H0V2H3v3h2v3z"/>
+                                <path d="M17 12h-2v2h2v-2zm-4 0H7v2h6v-2zm-4 0H3v2h2v-2zM21 14h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0H7v2h6v-2zm-4 0H3v2h2v-2z"/>
+                            </svg> -->
                         </div>
                         <div class="w-full md:w-2/3">
                             <h3 class="text-xl font-semibold text-blue-300 mb-3">Don't Forget These:</h3>
@@ -305,15 +312,17 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Intersection Observer for general animations
+            // Intersection Observer for general animations on scroll
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
+                        entry.target.classList.add('is-visible'); // Make item visible
+                        // observer.unobserve(entry.target); // Optional: unobserve after first animation
                     }
                 });
-            }, { threshold: 0.1 });
+            }, { threshold: 0.1 }); // Trigger when 10% of the item is visible
 
+            // Observe all elements with the .animated-item class
             document.querySelectorAll('.animated-item').forEach(item => {
                 observer.observe(item);
             });
@@ -321,65 +330,75 @@
             // Tab functionality
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabPanes = document.querySelectorAll('.tab-pane');
+            // List of all possible active color classes for tabs
             const activeColorClasses = ['day-1-active-border', 'day-2-active-border', 'day-3-active-border', 'essentials-active-border', 'tips-active-border'];
-
 
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
-                    const targetTab = button.dataset.tab;
-                    const targetColorClass = button.dataset.colorClass;
+                    const targetTab = button.dataset.tab; // Get target tab ID from data-tab attribute
+                    const targetColorClass = button.dataset.colorClass; // Get color class from data-color-class
 
-                    // Deactivate all buttons and panes
+                    // Deactivate all tab buttons and hide all tab panes
                     tabButtons.forEach(btn => {
                         btn.classList.remove('active');
-                        activeColorClasses.forEach(cls => btn.classList.remove(cls)); // Remove all color classes
+                        activeColorClasses.forEach(cls => btn.classList.remove(cls)); // Remove all specific color classes
                     });
                     tabPanes.forEach(pane => {
                         pane.classList.remove('active-pane');
-                        // Re-hide items in inactive panes for re-animation
+                        // Re-hide items in inactive panes for re-animation if tab is switched back
                         pane.querySelectorAll('.animated-item').forEach(item => {
-                            item.classList.remove('is-visible');
-                            observer.unobserve(item); // Stop observing hidden items
+                            item.classList.remove('is-visible'); // Hide item
+                            observer.unobserve(item); // Stop observing hidden items to prevent premature animation
                         });
                     });
 
-                    // Activate clicked button and corresponding pane
+                    // Activate the clicked button and its corresponding color class
                     button.classList.add('active');
                     if (targetColorClass) {
                         button.classList.add(targetColorClass);
                     }
 
+                    // Show the target tab pane
                     const activePane = document.getElementById(targetTab);
                     if (activePane) {
                         activePane.classList.add('active-pane');
                         // Trigger animation for items in the newly active pane
                         activePane.querySelectorAll('.animated-item').forEach(item => {
-                           observer.observe(item); // Start observing visible items
-                           // Force reflow to restart animation if already visible due to quick tab switch
-                           // void item.offsetWidth;
-                           // item.classList.add('is-visible'); // This might be too immediate, observer is better
+                           observer.observe(item); // Start observing items in the active pane
+                           // A small delay or forced reflow might be needed if animations don't restart reliably
+                           // Forcing reflow: void item.offsetWidth;
+                           // Then re-add 'is-visible' if observer isn't re-triggering fast enough
+                           // However, re-observing should generally handle this.
                         });
                     }
                 });
             });
 
-            // Initial setup for Intersection Observer for the initially active tab's items
+            // Initial setup for Intersection Observer for the items in the initially active tab
             const initiallyActivePane = document.querySelector('.tab-pane.active-pane');
             if (initiallyActivePane) {
                 initiallyActivePane.querySelectorAll('.animated-item').forEach(item => {
-                    observer.observe(item);
+                    // Items in the first tab might already be in view, so 'is-visible' is added directly
+                    // For a consistent animation even on load, we can observe them.
+                    // If they are already visible, the observer will fire immediately.
+                    if (!item.classList.contains('is-visible')) { // Check if header/nav already animated it
+                         observer.observe(item);
+                    }
                 });
             }
 
-
-            // Checkbox label click functionality
+            // Checkbox label click functionality: allows clicking the label to toggle the checkbox
             const checklistLabels = document.querySelectorAll('.checklist-item-label');
             checklistLabels.forEach(label => {
                 label.addEventListener('click', function(event) {
+                    // Prevent double-toggling if the checkbox itself was clicked
                     if (event.target.type === 'checkbox') return;
+
                     const checkbox = this.querySelector('input[type="checkbox"]');
                     if (checkbox) {
                         checkbox.checked = !checkbox.checked;
+                        // You might want to trigger a 'change' event manually if other scripts listen for it
+                        // checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 });
             });
