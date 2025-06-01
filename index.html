@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anas 3-Day Fat Loss Gym Plan  </title>
+    <title>Anas 3-Day Fat Loss Gym Plan 🏋️</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥊</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -131,6 +132,23 @@
         }
         .text-tips-list { color: #c7c7cc; } /* Slightly dimmer for list items in tips for hierarchy */
 
+        /* Clear button styling */
+        .clear-button {
+            background-color: #ff453a; /* Red accent for destructive action */
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 9999px; /* Pill shape */
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+        .clear-button:hover {
+            background-color: #ff5c52; /* Lighter red on hover */
+            transform: translateY(-1px);
+        }
+
     </style>
 </head>
 <body class="plan-bg text-gray-100 min-h-screen p-4 sm:p-6 md:p-8">
@@ -233,7 +251,7 @@
                         <h3 class="text-xl font-semibold text-green-300 mb-4">🟠 Warm-Up (10 min)</h3>
                         <ul class="list-none space-y-4 text-main-content pl-0">
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_w1"><span class="emoji-bullet" data-emoji="🦵">Dynamic leg swings & bodyweight squats</span></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_w2"><span class="emoji-bullet" data-emoji="�">Light jog or rope: 3 min</span></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_w2"><span class="emoji-bullet" data-emoji="🏃">Light jog or rope: 3 min</span></label></li>
                         </ul>
                     </div>
                     <div class="mt-8">
@@ -324,6 +342,7 @@
         </div>
 
         <footer class="text-center mt-16 py-6 animated-item is-visible" style="--delay: 0.2s;">
+            <button id="clearAllButton" class="clear-button mb-4">🧹 Clear All Progress</button>
             <p class="text-sm text-gray-500">Stay strong, stay focused!</p>
         </footer>
     </div>
@@ -385,52 +404,61 @@
             // --- Local Storage for Checkboxes ---
             const allCheckboxes = document.querySelectorAll('input[type="checkbox"].custom-checkbox');
 
-            // Function to load all saved states from Local Storage
             const loadCheckboxStates = () => {
                 allCheckboxes.forEach(checkbox => {
-                    // Check if a saved state exists for this checkbox's ID
                     const savedState = localStorage.getItem(checkbox.id);
                     if (savedState !== null) {
-                        // If it exists, set the checkbox's 'checked' property
                         checkbox.checked = (savedState === 'true');
                     }
                 });
             };
 
-            // Function to save the state of a single checkbox to Local Storage
             const saveCheckboxState = (checkbox) => {
-                // Only save if the checkbox has an ID
                 if (checkbox.id) {
                     localStorage.setItem(checkbox.id, checkbox.checked);
                 }
             };
 
-            // Add an event listener to each checkbox to save its state on change
             allCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', () => {
                     saveCheckboxState(checkbox);
                 });
             });
-
-            // Initial label click handler to make sure only the checkbox is toggled
+            
             const checklistLabels = document.querySelectorAll('.checklist-item-label');
             checklistLabels.forEach(label => {
                 label.addEventListener('click', function(event) {
                     if (event.target.type === 'checkbox') return;
                     const checkbox = this.querySelector('input[type="checkbox"]');
                     if (checkbox) {
-                        // Manually toggle the checkbox state
                         checkbox.checked = !checkbox.checked;
-                        // Dispatch a 'change' event so our save function is triggered
                         checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 });
             });
             
-            // Load all checkbox states when the page is fully loaded
             loadCheckboxStates();
+
+            // --- Clear All Button Functionality ---
+            const clearAllButton = document.getElementById('clearAllButton');
+            if (clearAllButton) {
+                clearAllButton.addEventListener('click', () => {
+                    // Optional: Add a confirmation dialog here if desired
+                    // if (confirm("Are you sure you want to clear all your progress? This cannot be undone.")) {
+                        allCheckboxes.forEach(checkbox => {
+                            checkbox.checked = false;
+                            if (checkbox.id) {
+                                localStorage.removeItem(checkbox.id);
+                            }
+                        });
+                        // Provide some feedback to the user
+                        // For example, you could show a temporary message.
+                        // For now, the visual change of checkboxes unchecking is the feedback.
+                        console.log("All checkbox progress cleared.");
+                    // }
+                });
+            }
         });
     </script>
 </body>
 </html>
-�
