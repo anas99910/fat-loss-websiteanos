@@ -8,256 +8,209 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Base styles */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            background-color: #000000; /* Page background */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.5; /* Improved default line height */
         }
 
-        .plan-bg {
-            background-color: #000000; 
+        /* --- Dark Mode (Default) --- */
+        body.dark-mode {
+            background-color: #000000;
+            color: #e5e5ea; 
         }
-
-        .content-card { /* This now primarily acts as a container for the list within each tab */
-            background-color: #000000; /* Match page background for seamless list appearance */
-            border-radius: 0; /* Remove card-like rounding */
-            border-left: none; /* Remove specific day border, as list items will be styled */
-            box-shadow: none; /* Remove card shadow */
-            padding-top: 0; /* Adjust padding as list items will handle their own */
-            padding-bottom: 0;
+        .dark-mode .plan-bg { background-color: #000000; }
+        .dark-mode .content-card {
+            background-color: #1c1c1e;
+            border: 1px solid #38383a; /* Slightly more visible border in dark mode */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
         }
-        /* Remove specific day border styles for the card, as it's no longer a distinct card */
-        .day-1-border, .day-2-border, .day-3-border, .essentials-border, .tips-border {
-            border-left: none;
-        }
-
-        .section-title {
-            border-bottom: 1px solid #3a3a3c; 
-            padding-bottom: 0.75rem;
-            margin-bottom: 1rem; /* Reduced margin for tighter list */
-            color: #e5e5ea; /* Ensure title is visible */
-        }
-        /* Specific title colors, if needed, can be applied directly or via these classes */
-        .day-1-title-color { color: #ff453a; }
-        .day-2-title-color { color: #0a84ff; }
-        .day-3-title-color { color: #30d158; }
-        .essentials-title-color { color: #64d2ff; }
-        .tips-title-color { color: #ffd60a; }
-
-
-        .emoji-bullet::before {
-            content: attr(data-emoji);
-            margin-right: 0.75em;
-            font-size: 1.1em;
-            vertical-align: middle;
-        }
-
-        .animated-item {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-            transition-delay: var(--delay, 0s);
-        }
-        .is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .custom-checkbox {
-            appearance: none; -webkit-appearance: none;
-            height: 1.5em; width: 1.5em; /* Slightly larger for app-like feel */
-            background-color: #3a3a3c; 
-            border: 1px solid #545458;
-            border-radius: 50%; /* Circular checkbox like in image */
-            margin-right: 0.75em;
-            cursor: pointer; display: inline-block;
-            vertical-align: middle; position: relative;
-            flex-shrink: 0;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-        .custom-checkbox:checked {
-            background-color: #30d158; 
-            border-color: #30d158;
-        }
-        .custom-checkbox:checked::after {
-            content: '✔'; font-size: 1em; color: black; font-weight: 700; /* Adjusted checkmark */
-            position: absolute; left: 50%; top: 50%;
-            transform: translate(-50%, -50%);
-        }
+        .dark-mode .section-title { border-bottom-color: #3a3a3c; color: #f2f2f7; font-weight: 700;} /* Bolder section titles */
+        .dark-mode .day-1-title-color { color: #ff4d4f; } /* Adjusted for vibrancy */
+        .dark-mode .day-2-title-color { color: #389bff; }
+        .dark-mode .day-3-title-color { color: #4dd964; }
+        .dark-mode .essentials-title-color { color: #87cefa; } /* Lighter blue for essentials */
+        .dark-mode .tips-title-color { color: #ffcc00; }
+        .dark-mode .custom-checkbox { background-color: #3a3a3c; border-color: #545458; }
+        .dark-mode .custom-checkbox:checked { background-color: #4dd964; border-color: #4dd964; } /* Consistent green */
+        .dark-mode .custom-checkbox:checked::after { color: #000000; }
+        .dark-mode .checklist-item-label span.exercise-text { color: #f2f2f7; font-weight: 500; } /* Slightly bolder text */
         
-        .checklist-item-label {
-            display: flex; 
-            align-items: center; 
-            cursor: pointer;
-            padding: 0.75rem 0.5rem; /* py-3 px-2 equivalent for list items */
-            border-bottom: 1px solid #2c2c2e; /* Subtle separator for list items */
-            transition: background-color 0.2s ease;
+        .dark-mode .tab-button { 
+            color: #aeaeb2; 
+            background-color: #1c1c1e; 
+            border: 1px solid #38383a; 
+            font-weight: 500;
         }
-        .checklist-item-label:hover {
-            background-color: #1c1c1e; /* Slight hover for list items */
+        .dark-mode .tab-button:hover { 
+            background-color: #2c2c2e; 
+            border-color: #48484a; 
+            color: #ffffff; 
         }
-        .checklist-item-label span.exercise-text {
-             color: #e5e5ea;
-             flex-grow: 1;
-             font-size: 0.95rem; /* Slightly adjusted font size */
-        }
-        /* Style for sub-text like sets/reps if added later */
-        .exercise-details-subtext {
-            font-size: 0.8rem;
-            color: #8e8e93; /* Lighter grey for sub-details */
-            display: block; /* Make it appear on a new line or manage with flex */
-        }
+        .dark-mode .tab-button.active { color: #ffffff; } /* White text for active tab */
+        .dark-mode .tab-button.active.day-1-active-border { background-color: #ff4d4f; border-color: #ff4d4f; }
+        .dark-mode .tab-button.active.day-2-active-border { background-color: #389bff; border-color: #389bff;}
+        .dark-mode .tab-button.active.day-3-active-border { background-color: #4dd964; border-color: #4dd964;}
+        .dark-mode .tab-button.active.essentials-active-border { background-color: #87cefa; border-color: #87cefa; color:black;}
+        .dark-mode .tab-button.active.tips-active-border { background-color: #ffcc00; color: #000; border-color: #ffcc00;}
+        
+        .dark-mode .text-main-content { color: #f2f2f7; }
+        .dark-mode .text-tips-list { color: #aeaeb2; } /* Lighter grey for tips list */
+        .dark-mode .clear-button { background-color: #ff4d4f; color: white; border-radius: 9999px; font-weight: 600;}
+        .dark-mode .clear-button:hover { background-color: #ff6b6e; }
+        .dark-mode #motivationalQuote { color: #8e8e93; }
+        .dark-mode .exercise-info-btn { color: #8e8e93; border-color: #545458; }
+        .dark-mode .exercise-info-btn:hover { color: #aeaeb2; border-color: #636366; }
+        .dark-mode .modal-content { background-color: #1c1c1e; border-color: #38383a; }
+        .dark-mode .modal-title { color: #f2f2f7; border-bottom-color: #3a3a3c; font-weight: 700;}
+        .dark-mode .modal-body h4 { color: #aeaeb2; font-weight: 600;}
+        .dark-mode .modal-body p, .dark-mode .modal-body ul { color: #aeaeb2; }
+        .dark-mode .modal-close-button { background-color: #3a3a3c; color: #f2f2f7; font-weight: 600;}
+        .dark-mode .modal-close-button:hover { background-color: #545458; }
+        .dark-mode .header-subtitle { color: #aeaeb2; } 
+        .dark-mode .footer-text { color: #8e8e93; }
+        .dark-mode .theme-toggle-button { background-color: #3a3a3c; color: #f2f2f7; }
 
+
+        /* --- Light Mode --- */
+        body.light-mode {
+            background-color: #f2f2f7; 
+            color: #1d1d1f; 
+        }
+        .light-mode .plan-bg { background-color: #f2f2f7; }
+        .light-mode .content-card {
+            background-color: #ffffff; 
+            border: 1px solid #d1d1d6; 
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05); 
+        }
+        .light-mode .section-title { border-bottom-color: #c6c6c8; color: #000000; font-weight: 700;}
+        .light-mode .day-1-title-color { color: #d93731; } 
+        .light-mode .day-2-title-color { color: #0060f0; } 
+        .light-mode .day-3-title-color { color: #28a745; } 
+        .light-mode .essentials-title-color { color: #008ecf; } 
+        .light-mode .tips-title-color { color: #d4a017; } 
+        .light-mode .custom-checkbox { background-color: #e5e5ea; border-color: #c6c6c8; }
+        .light-mode .custom-checkbox:checked { background-color: #30d158; border-color: #30d158; }
+        .light-mode .custom-checkbox:checked::after { color: white; } 
+        .light-mode .checklist-item-label span.exercise-text { color: #1d1d1f; font-weight: 500;}
+        .light-mode .checklist-item-label:hover { background-color: #f8f8fa; }
+        
+        .light-mode .tab-button { 
+            color: #3c3c43; 
+            background-color: #e9e9eb; 
+            border: 1px solid #d1d1d6; 
+            font-weight: 500;
+        }
+        .light-mode .tab-button:hover { 
+            background-color: #dcdce0; 
+            border-color: #c6c6c8; 
+            color: #000; 
+        }
+        .light-mode .tab-button.active {}
+        .light-mode .tab-button.active.day-1-active-border { background-color: #ff4d4f; color: white; border-color: #ff4d4f;}
+        .light-mode .tab-button.active.day-2-active-border { background-color: #389bff; color: white; border-color: #389bff;}
+        .light-mode .tab-button.active.day-3-active-border { background-color: #4dd964; color: white; border-color: #4dd964;}
+        .light-mode .tab-button.active.essentials-active-border { background-color: #87cefa; color: black; border-color: #87cefa;}
+        .light-mode .tab-button.active.tips-active-border { background-color: #ffcc00; color: black; border-color: #ffcc00;}
+        
+        .light-mode .text-main-content { color: #1d1d1f; }
+        .light-mode .text-tips-list { color: #3c3c43; }
+        .light-mode .clear-button { background-color: #ff4d4f; color: white; border-radius: 9999px; font-weight: 600;}
+        .light-mode .clear-button:hover { background-color: #ff6b6e; }
+        .light-mode #motivationalQuote { color: #636366; } 
+        .light-mode .exercise-info-btn { color: #007aff; border-color: #007aff; } 
+        .light-mode .exercise-info-btn:hover { color: #005ecb; background-color: rgba(0, 122, 255, 0.05); }
+        .light-mode .modal-content { background-color: #ffffff; border-color: #d1d1d6; }
+        .light-mode .modal-title { color: #1d1d1f; border-bottom-color: #c6c6c8; font-weight: 700;}
+        .light-mode .modal-body h4 { color: #3c3c43; font-weight: 600;}
+        .light-mode .modal-body p, .light-mode .modal-body ul { color: #3c3c43; }
+        .light-mode .modal-close-button { background-color: #e5e5ea; color: #1d1d1f; font-weight: 600;}
+        .light-mode .modal-close-button:hover { background-color: #dcdce0; }
+        .light-mode .header-subtitle { color: #3c3c43; }
+        .light-mode .footer-text { color: #636366; }
+        .light-mode .theme-toggle-button { background-color: #e5e5ea; color: #1d1d1f; }
+
+        /* General styles for elements used in both modes */
+        .content-card { border-radius: 1rem; } /* Consistent rounded corners */
+        .section-title { padding-bottom: 0.75rem; margin-bottom: 1rem; }
+        .emoji-bullet::before { content: attr(data-emoji); margin-right: 0.75em; font-size: 1.1em; vertical-align: middle; }
+        .animated-item { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; transition-delay: var(--delay, 0s); } /* Softer animation */
+        .is-visible { opacity: 1; transform: translateY(0); }
+        .checklist-item-label { padding: 0.85rem 0.5rem; border-bottom: 1px solid; transition: background-color 0.2s ease; }
+        .light-mode .checklist-item-label { border-bottom-color: #e5e5ea; }
+        .dark-mode .checklist-item-label { border-bottom-color: #2c2c2e; }
+        .checklist-item-label:last-child { border-bottom: none; }
+        #essentials .checklist-item-label { padding: 0.85rem 0.5rem; }
+        #essentials .checklist-item-label:last-child { border-bottom: none; }
+        #essentials ul ul .checklist-item-label { padding-left: 1.5rem; }
+        .light-mode #essentials ul ul .checklist-item-label { border-bottom-color: #eaeaea; }
+        .dark-mode #essentials ul ul .checklist-item-label { border-bottom-color: #222427; }
+
+        /* Theme Toggle Button */
+        .theme-toggle-button { position: fixed; top: 1rem; right: 1rem; padding: 0.5rem; border-radius: 50%; border: 1px solid transparent; cursor: pointer; z-index: 1001; width: 2.75rem; height: 2.75rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 15px rgba(0,0,0,0.15); }
+        .theme-toggle-button svg { width: 1.4rem; height: 1.4rem; }
+
+        /* Modal styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear; }
+        .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s linear; }
+        .modal-content { padding: 1.75rem; border-radius: 1rem; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-title { font-size: 1.35rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; } /* Adjusted title */
+        .modal-body h4 { font-size: 1.05rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+        .modal-body p, .modal-body ul { font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.75rem; }
+        .modal-body ul { list-style-type: disc; padding-left: 1.25rem; }
+        .modal-close-button { padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; transition: background-color 0.2s ease; border: none; cursor: pointer; margin-top: 1.5rem; float: right; }
+        
+        .tab-pane { display: none; }
+        .tab-pane.active-pane { display: block; }
 
         .tab-button {
             padding: 0.6rem 1.2rem;
             border-radius: 9999px; 
             font-weight: 600;
             font-size: 0.9rem;
-            color: #e5e5ea; 
-            background-color: #1c1c1e; 
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-            border: 1px solid transparent;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+            border-width: 1px; 
+            border-style: solid;
         }
-        .tab-button:hover {
-            background-color: #2c2c2e;
-            color: white;
-            transform: translateY(-2px);
-        }
-        .tab-button.active {
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .tab-button.active.day-1-active-border { background-color: #ff453a; }
-        .tab-button.active.day-2-active-border { background-color: #0a84ff; }
-        .tab-button.active.day-3-active-border { background-color: #30d158; }
-        .tab-button.active.essentials-active-border { background-color: #64d2ff; }
-        .tab-button.active.tips-active-border { background-color: #ffd60a; color: #000; }
-
-        .tab-pane { display: none; }
-        .tab-pane.active-pane { display: block; }
-
-        .text-main-content { color: #e5e5ea; }
-        .text-tips-list { color: #c7c7cc; }
-
         .clear-button {
-            background-color: #ff453a; 
-            color: white;
-            padding: 0.6rem 1.5rem;
+            padding: 0.75rem 1.75rem; /* Increased padding */
             border-radius: 9999px; 
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem; /* Slightly larger font */
             transition: background-color 0.2s ease, transform 0.2s ease;
-            border: 1px solid transparent;
+            border: 1px solid transparent; 
             cursor: pointer;
         }
-        .clear-button:hover {
-            background-color: #ff5c52; 
-            transform: translateY(-1px);
-        }
-        
-        #motivationalQuote {
-            font-style: italic;
-            color: #8e8e93; 
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem; 
-            min-height: 1.2em; 
-        }
-
-        .exercise-info-btn {
-            background-color: transparent;
-            color: #8e8e93; /* Subtler color for info button */
-            padding: 0.2rem 0.5rem; 
-            border-radius: 0.375rem; 
-            font-weight: 500;
-            font-size: 0.9rem; 
-            transition: color 0.2s ease;
-            border: none; /* Remove border to look more like an icon button */
-            margin-left: auto; /* Push to the right */
-            cursor: pointer;
-            line-height: 1; 
-        }
-        .exercise-info-btn:hover {
-            color: #c7c7cc; /* Lighter grey on hover */
-        }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.75); 
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0s 0.3s linear;
-        }
-        .modal-overlay.active {
-            opacity: 1; visibility: visible;
-            transition: opacity 0.3s ease, visibility 0s 0s linear;
-        }
-        .modal-content {
-            background-color: #1c1c1e; 
-            padding: 1.5rem; 
-            border-radius: 1rem; 
-            width: 90%; max-width: 550px; 
-            max-height: 85vh; overflow-y: auto;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3), 0 10px 10px -5px rgba(0,0,0,0.2); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
-        .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-title {
-            font-size: 1.5rem; font-weight: 700; 
-            color: #e5e5ea; margin-bottom: 1rem; 
-            border-bottom: 1px solid #3a3a3c; padding-bottom: 0.75rem; 
-        }
-        .modal-body h4 {
-            font-size: 1.1rem; font-weight: 600;
-            color: #c7c7cc; margin-top: 1rem; margin-bottom: 0.5rem;
-        }
-        .modal-body p, .modal-body ul {
-            font-size: 0.95rem; color: #aeaeb2; 
-            line-height: 1.6; margin-bottom: 0.75rem;
-        }
-        .modal-body ul { list-style-type: disc; padding-left: 1.25rem; }
-        .modal-close-button {
-            background-color: #3a3a3c; color: #e5e5ea;
-            padding: 0.5rem 1rem; border-radius: 0.5rem; 
-            font-weight: 500; transition: background-color 0.2s ease;
-            border: none; cursor: pointer;
-            margin-top: 1.5rem; float: right;
-        }
-        .modal-close-button:hover { background-color: #545458; }
-
-        /* Ensure exercise list items in 'Essentials' tab also get list styling */
-        #essentials .checklist-item-label {
-             border-bottom: 1px solid #2c2c2e;
-             padding: 0.75rem 0.5rem;
-        }
-         #essentials .checklist-item-label:last-child {
-             border-bottom: none; /* Remove border from last item in essentials */
-        }
-        #essentials ul ul .checklist-item-label { /* For nested swimming gear */
-            padding-left: 1.5rem; /* Indent nested items */
-            border-bottom: 1px solid #222427; /* Slightly different border for nested */
+        .main-title-gradient {
+            background-image: linear-gradient(to bottom, #F87171, #9333EA); /* Example: Red to Purple */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
 
     </style>
 </head>
-<body class="plan-bg text-gray-100 min-h-screen p-4 sm:p-6 md:p-8">
+<body class="dark-mode plan-bg min-h-screen p-4 sm:p-6 md:p-8">
+
+    <button id="themeToggleBtn" class="theme-toggle-button">
+        </button>
+
     <div class="max-w-4xl mx-auto">
 
         <header class="text-center mb-10 md:mb-16 animated-item is-visible" style="--delay: 0.1s;">
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold flex items-center justify-center space-x-2 sm:space-x-3 md:space-x-4 pb-2">
-                <span class="text-orange-400">🧨</span>
-                <span class="bg-clip-text text-transparent bg-gradient-to-b from-[#FF7E9B] to-[#A060FF]">
+                <span class="main-title-gradient">
                     ANAS 3-DAY FAT LOSS GYM PLAN
                 </span>
-                <span class="text-lime-400">🥊</span>
             </h1>
-            <p class="text-lg md:text-xl text-gray-300 mt-4 font-medium">📅 Schedule: Monday – Wednesday – Friday</p>
-            <p class="text-md md:text-lg text-gray-400 mt-2">🎯 Goal: Burn fat, build strength, stay explosive!</p>
+            <p class="text-lg md:text-xl header-subtitle mt-4 font-medium">📅 Schedule: Monday – Wednesday – Friday</p>
+            <p class="text-md md:text-lg header-subtitle mt-2">🎯 Goal: Burn fat, build strength, stay explosive!</p>
         </header>
 
         <nav class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12 animated-item is-visible" style="--delay: 0.2s;">
@@ -358,7 +311,7 @@
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s1"><span class="emoji-bullet exercise-text" data-emoji="🟩">Dumbbell Lunges / Leg Press: 3 x 10/leg</span> <button class="exercise-info-btn" data-exercise-id="d3_s1">ℹ️</button></label></li>
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s2"><span class="emoji-bullet exercise-text" data-emoji="🪜">Step-Ups (Box or Bench): 3 x 12</span> <button class="exercise-info-btn" data-exercise-id="d3_s2">ℹ️</button></label></li>
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s3"><span class="emoji-bullet exercise-text" data-emoji="🦶">Calf Raises: 3 x 20</span> <button class="exercise-info-btn" data-exercise-id="d3_s3">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s4"><span class="emoji-bullet exercise-text" data-emoji="�">Wall Sit Hold: 3 x 30–60 sec</span> <button class="exercise-info-btn" data-exercise-id="d3_s4">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s4"><span class="emoji-bullet exercise-text" data-emoji="🪑">Wall Sit Hold: 3 x 30–60 sec</span> <button class="exercise-info-btn" data-exercise-id="d3_s4">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
@@ -383,13 +336,10 @@
                      <h2 class="text-2xl sm:text-3xl font-bold essentials-title-color mb-6 section-title">🎒 Gym Bag Essentials</h2>
                      <div class="md:flex md:space-x-8 items-center">
                         <div class="w-full md:w-1/3 mb-6 md:mb-0 flex justify-center">
-                            <svg class="w-24 h-24 md:w-32 md:h-32 text-gray-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 6h-2.18c-.55-2.23-2.47-4-4.82-4S8.73 3.77 8.18 6H6c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.11 0 2.06.76 2.37 1.75H9.63C9.94 4.76 10.89 4 12 4zm8 15H6V8h1.18C7.63 9.14 8.73 10 10 10h4c1.27 0 2.37-.86 2.82-2H18v11z"/>
-                                <path fill="none" d="M0 0h24v24H0z"/>
-                            </svg>
+                            <svg class="w-24 h-24 md:w-32 md:h-32 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v1H6a2 2 0 00-2 2v7a2 2 0 002 2h2v1a1 1 0 102 0v-1h4v1a1 1 0 102 0v-1h2a2 2 0 002-2V6a2 2 0 00-2-2h-3V3a1 1 0 00-1-1h-2zm0 2h2v1h3a1 1 0 011 1v7a1 1 0 01-1 1h-2v-3a1 1 0 00-1-1H7a1 1 0 00-1 1v3H4a1 1 0 01-1-1V6a1 1 0 011-1h3V4h2z" clip-rule="evenodd"></path></svg>
                         </div>
                         <div class="w-full md:w-2/3">
-                            <h3 class="text-xl font-semibold text-blue-300 mb-2">Don't Forget These:</h3>
+                            <h3 class="text-xl font-semibold text-blue-400 dark:text-blue-300 mb-2">Don't Forget These:</h3>
                             <ul class="list-none space-y-0 text-main-content">
                                 <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_1"><span class="emoji-bullet exercise-text" data-emoji="🥊">Boxing Gloves</span></label></li>
                                 <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_2"><span class="emoji-bullet exercise-text" data-emoji="🤸">Jump Rope</span></label></li>
@@ -397,7 +347,7 @@
                                 <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_4"><span class="emoji-bullet exercise-text" data-emoji="🩳">Shorts (Gym)</span></label></li>
                                 <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_5"><span class="emoji-bullet exercise-text" data-emoji="🩴">Sandals</span></label></li>
                                 <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_6"><span class="emoji-bullet exercise-text" data-emoji="🧖">Towel</span></label></li>
-                                <li class="font-semibold mt-4 text-blue-300 checklist-item-label" style="border-bottom: none; padding-bottom: 0.25rem;"><span class="emoji-bullet exercise-text" data-emoji="🏊">Swimming Gear:</span></li>
+                                <li class="font-semibold mt-4 text-blue-400 dark:text-blue-300 checklist-item-label" style="border-bottom: none; padding-bottom: 0.25rem;"><span class="emoji-bullet exercise-text" data-emoji="🏊">Swimming Gear:</span></li>
                                 <ul class="list-none space-y-0 text-main-content pl-6">
                                     <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_s1"><span class="emoji-bullet exercise-text" data-emoji="🥽">Goggles</span></label></li>
                                     <li><label class="checklist-item-label" style="border-bottom: none;"><input type="checkbox" class="custom-checkbox" id="ess_s2"><span class="emoji-bullet exercise-text" data-emoji="🩳">Shorts (Swimming)</span></label></li>
@@ -413,7 +363,7 @@
                     <h2 class="text-2xl sm:text-3xl font-bold tips-title-color mb-6 section-title">📌 Tips for Maximum Fat Burn</h2>
                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                         <div class="animated-item" style="--delay: 0.1s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-3 emoji-bullet" data-emoji="🥗">Eat Smart:</h3>
+                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="🥗">Eat Smart:</h3>
                             <ul class="list-disc list-inside space-y-2 text-tips-list pl-4">
                                 <li>High protein (eggs, chicken, tuna)</li>
                                 <li>Lots of vegetables 🥦🥒</li>
@@ -421,15 +371,15 @@
                             </ul>
                         </div>
                         <div class="animated-item" style="--delay: 0.2s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-3 emoji-bullet" data-emoji="💧">Hydrate:</h3>
+                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="💧">Hydrate:</h3>
                             <p class="text-tips-list pl-4">Drink 3–4 liters/day</p>
                         </div>
                         <div class="animated-item" style="--delay: 0.3s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-3 emoji-bullet" data-emoji="😴">Rest:</h3>
+                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="😴">Rest:</h3>
                             <p class="text-tips-list pl-4">Sleep 7–9 hours/night</p>
                         </div>
                         <div class="animated-item" style="--delay: 0.4s;">
-                            <h3 class="text-xl font-semibold text-yellow-300 mb-3 emoji-bullet" data-emoji="🧠">Mental Game:</h3>
+                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="🧠">Mental Game:</h3>
                             <ul class="list-disc list-inside space-y-2 text-tips-list pl-4">
                                 <li>Stay consistent</li>
                                 <li>Track progress weekly</li>
@@ -444,7 +394,7 @@
         <footer class="text-center mt-16 py-6 animated-item is-visible" style="--delay: 0.2s;">
             <div id="motivationalQuote" class="mb-4"></div>
             <button id="clearAllButton" class="clear-button mb-4">🧹 Clear All Progress</button>
-            <p class="text-sm text-gray-500">Stay strong, stay focused!</p>
+            <p class="text-sm footer-text">Stay strong, stay focused!</p>
         </footer>
     </div>
 
@@ -469,6 +419,40 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const body = document.body;
+
+            const sunIcon = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M12 21a9 9 0 110-18 9 9 0 010 18z" />
+                </svg>`;
+            const moonIcon = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                </svg>`;
+
+            function applyTheme(theme) {
+                if (theme === 'light') {
+                    body.classList.remove('dark-mode');
+                    body.classList.add('light-mode');
+                    themeToggleBtn.innerHTML = moonIcon;
+                } else {
+                    body.classList.remove('light-mode');
+                    body.classList.add('dark-mode');
+                    themeToggleBtn.innerHTML = sunIcon;
+                }
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+
+            const savedTheme = localStorage.getItem('theme') || 'dark'; 
+            applyTheme(savedTheme);
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -476,61 +460,59 @@
                     }
                 });
             }, { threshold: 0.1 });
-            document.querySelectorAll('.animated-item').forEach(item => observer.observe(item));
+            
+            document.querySelectorAll('header.animated-item, nav.animated-item, footer.animated-item').forEach(item => {
+                observer.observe(item);
+            });
+
 
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabPanes = document.querySelectorAll('.tab-pane');
             const activeColorClasses = ['day-1-active-border', 'day-2-active-border', 'day-3-active-border', 'essentials-active-border', 'tips-active-border'];
 
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetTab = button.dataset.tab;
-                    const targetColorClass = button.dataset.colorClass;
-                    tabButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                        activeColorClasses.forEach(cls => btn.classList.remove(cls));
-                    });
-                    tabPanes.forEach(pane => {
-                        pane.classList.remove('active-pane');
-                        pane.querySelectorAll('.animated-item').forEach(item => {
-                            if (!item.classList.contains('content-card')) { // Keep main card visible
-                                item.classList.remove('is-visible');
-                            }
-                            // Re-observe items if needed, though for this design, it might not be necessary
-                            // observer.unobserve(item); 
-                        });
-                    });
-                    button.classList.add('active');
-                    if (targetColorClass) {
-                        button.classList.add(targetColorClass);
-                    }
-                    const activePane = document.getElementById(targetTab);
-                    if (activePane) {
-                        activePane.classList.add('active-pane');
-                        // Ensure items in newly activated pane are observed for animation
-                        activePane.querySelectorAll('.animated-item').forEach(item => {
-                            if(!item.classList.contains('is-visible')) { // Only observe if not already visible
-                                observer.observe(item);
-                            }
-                        });
-                         // Special handling for the main content-card of the active pane
-                        const mainContentCard = activePane.querySelector('.content-card');
-                        if (mainContentCard && !mainContentCard.classList.contains('is-visible')) {
-                             mainContentCard.classList.add('is-visible'); // Ensure it's visible immediately
+            function setActiveTab(tabId) {
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    activeColorClasses.forEach(cls => btn.classList.remove(cls));
+                    if (btn.dataset.tab === tabId) {
+                        btn.classList.add('active');
+                        if (btn.dataset.colorClass) {
+                            btn.classList.add(btn.dataset.colorClass);
                         }
-
                     }
                 });
-            });
-
-            const initiallyActivePane = document.querySelector('.tab-pane.active-pane');
-            if (initiallyActivePane) {
-                initiallyActivePane.querySelectorAll('.animated-item').forEach(item => {
-                    if (!item.classList.contains('is-visible')) {
-                         observer.observe(item);
+                tabPanes.forEach(pane => {
+                    const isTargetPane = pane.id === tabId;
+                    pane.style.display = isTargetPane ? 'block' : 'none';
+                    if (isTargetPane) {
+                        pane.classList.add('active-pane');
+                        pane.querySelectorAll('.animated-item').forEach(item => {
+                            if (item.classList.contains('content-card') && !item.classList.contains('is-visible')) {
+                                item.classList.add('is-visible'); 
+                            } else {
+                                observer.observe(item); 
+                            }
+                        });
+                    } else {
+                        pane.classList.remove('active-pane');
+                        pane.querySelectorAll('.animated-item').forEach(item => {
+                            if (!item.classList.contains('content-card')) {
+                                item.classList.remove('is-visible');
+                            }
+                            observer.unobserve(item);
+                        });
                     }
                 });
             }
+            
+            setActiveTab('day1'); 
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+                    setActiveTab(targetTab);
+                });
+            });
 
             const allCheckboxes = document.querySelectorAll('input[type="checkbox"].custom-checkbox');
             const loadCheckboxStates = () => {
@@ -608,7 +590,6 @@
             const modalCloseButton = document.getElementById('modalCloseButton');
             const exerciseInfoButtons = document.querySelectorAll('.exercise-info-btn');
 
-            // --- UPDATED: More comprehensive exercise details ---
             const exerciseDetails = {
                 'd1_w1': { name: 'Incline Treadmill Walk', description: 'Set treadmill to a 5-10% incline. Walk at a brisk, steady pace for 5 minutes. Focus on deep breaths and controlled steps.', cues: ['Keep chest up.', 'Engage core.', 'Land heel-to-toe.'], mistakes: ['Leaning on handrails.', 'Too fast too soon.', 'Shallow breathing.'] },
                 'd1_w2': { name: 'Dynamic Warm-up', description: 'Perform 10-15 reps of: Arm Circles (forward & backward), Torso Twists, Hip Circles (clockwise & counter-clockwise), Leg Swings (forward & side-to-side), and Shoulder Rolls.', cues: ['Move smoothly.', 'Gradually increase range of motion.', 'Control each movement.'], mistakes: ['Bouncing or jerky movements.', 'Pushing past comfortable range.', 'Rushing through.'] },
@@ -646,13 +627,11 @@
 
             function openExerciseModal(exerciseId) {
                 const details = exerciseDetails[exerciseId] || exerciseDetails['default'];
-                // Try to get the name from the span next to the button first for accuracy
                 const buttonElement = document.querySelector(`button[data-exercise-id="${exerciseId}"]`);
-                let exerciseNameFromDOM = details.name; // Default to stored name
+                let exerciseNameFromDOM = details.name; 
                 if (buttonElement && buttonElement.previousElementSibling && buttonElement.previousElementSibling.classList.contains('exercise-text')) {
                     exerciseNameFromDOM = buttonElement.previousElementSibling.textContent.replace(buttonElement.previousElementSibling.dataset.emoji, '').trim();
                 }
-
 
                 modalExerciseName.textContent = exerciseNameFromDOM; 
                 modalExerciseDescription.textContent = details.description;
@@ -704,4 +683,3 @@
     </script>
 </body>
 </html>
-�
