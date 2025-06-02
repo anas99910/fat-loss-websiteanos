@@ -15,30 +15,37 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             transition: background-color 0.3s ease, color 0.3s ease;
-            line-height: 1.5; /* Improved default line height */
+            line-height: 1.6; /* iOS-like line height */
         }
 
         /* --- Dark Mode (Default) --- */
         body.dark-mode {
             background-color: #000000;
-            color: #e5e5ea; 
+            color: #f2f2f7; /* Brighter default text for dark mode (SF Pro Display Regular) */
         }
         .dark-mode .plan-bg { background-color: #000000; }
         .dark-mode .content-card {
-            background-color: #1c1c1e;
-            border: 1px solid #38383a; /* Slightly more visible border in dark mode */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+            background-color: #1c1c1e; /* Standard dark grey for cards */
+            border: 1px solid #38383a; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
         }
-        .dark-mode .section-title { border-bottom-color: #3a3a3c; color: #f2f2f7; font-weight: 700;} /* Bolder section titles */
-        .dark-mode .day-1-title-color { color: #ff4d4f; } /* Adjusted for vibrancy */
+        .dark-mode .section-title { border-bottom-color: #3a3a3c; color: #f2f2f7; font-weight: 600;} /* Semibold for titles */
+        .dark-mode .day-1-title-color { color: #ff4d4f; } 
         .dark-mode .day-2-title-color { color: #389bff; }
         .dark-mode .day-3-title-color { color: #4dd964; }
-        .dark-mode .essentials-title-color { color: #87cefa; } /* Lighter blue for essentials */
+        .dark-mode .essentials-title-color { color: #87cefa; } 
         .dark-mode .tips-title-color { color: #ffcc00; }
-        .dark-mode .custom-checkbox { background-color: #3a3a3c; border-color: #545458; }
-        .dark-mode .custom-checkbox:checked { background-color: #4dd964; border-color: #4dd964; } /* Consistent green */
+        
+        .dark-mode .custom-checkbox { /* Outline style for unchecked */
+            background-color: transparent; 
+            border: 1.5px solid #545458; 
+        }
+        .dark-mode .custom-checkbox:checked { /* Solid fill for checked */
+            background-color: #4dd964; 
+            border-color: #4dd964; 
+        }
         .dark-mode .custom-checkbox:checked::after { color: #000000; }
-        .dark-mode .checklist-item-label span.exercise-text { color: #f2f2f7; font-weight: 500; } /* Slightly bolder text */
+        .dark-mode .checklist-item-label span.exercise-text { color: #f2f2f7; font-weight: 500; } 
         
         .dark-mode .tab-button { 
             color: #aeaeb2; 
@@ -51,7 +58,7 @@
             border-color: #48484a; 
             color: #ffffff; 
         }
-        .dark-mode .tab-button.active { color: #ffffff; } /* White text for active tab */
+        .dark-mode .tab-button.active { color: #ffffff; } 
         .dark-mode .tab-button.active.day-1-active-border { background-color: #ff4d4f; border-color: #ff4d4f; }
         .dark-mode .tab-button.active.day-2-active-border { background-color: #389bff; border-color: #389bff;}
         .dark-mode .tab-button.active.day-3-active-border { background-color: #4dd964; border-color: #4dd964;}
@@ -59,17 +66,17 @@
         .dark-mode .tab-button.active.tips-active-border { background-color: #ffcc00; color: #000; border-color: #ffcc00;}
         
         .dark-mode .text-main-content { color: #f2f2f7; }
-        .dark-mode .text-tips-list { color: #aeaeb2; } /* Lighter grey for tips list */
+        .dark-mode .text-tips-list { color: #aeaeb2; } 
         .dark-mode .clear-button { background-color: #ff4d4f; color: white; border-radius: 9999px; font-weight: 600;}
         .dark-mode .clear-button:hover { background-color: #ff6b6e; }
         .dark-mode #motivationalQuote { color: #8e8e93; }
         .dark-mode .exercise-info-btn { color: #8e8e93; border-color: #545458; }
         .dark-mode .exercise-info-btn:hover { color: #aeaeb2; border-color: #636366; }
         .dark-mode .modal-content { background-color: #1c1c1e; border-color: #38383a; }
-        .dark-mode .modal-title { color: #f2f2f7; border-bottom-color: #3a3a3c; font-weight: 700;}
+        .dark-mode .modal-title { color: #f2f2f7; border-bottom-color: #3a3a3c; font-weight: 600;} /* Semibold for modal title */
         .dark-mode .modal-body h4 { color: #aeaeb2; font-weight: 600;}
         .dark-mode .modal-body p, .dark-mode .modal-body ul { color: #aeaeb2; }
-        .dark-mode .modal-close-button { background-color: #3a3a3c; color: #f2f2f7; font-weight: 600;}
+        .dark-mode .modal-close-button { background-color: #3a3a3c; color: #f2f2f7; font-weight: 500;} /* Medium weight */
         .dark-mode .modal-close-button:hover { background-color: #545458; }
         .dark-mode .header-subtitle { color: #aeaeb2; } 
         .dark-mode .footer-text { color: #8e8e93; }
@@ -87,14 +94,21 @@
             border: 1px solid #d1d1d6; 
             box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05); 
         }
-        .light-mode .section-title { border-bottom-color: #c6c6c8; color: #000000; font-weight: 700;}
+        .light-mode .section-title { border-bottom-color: #c6c6c8; color: #000000; font-weight: 600;}
         .light-mode .day-1-title-color { color: #d93731; } 
         .light-mode .day-2-title-color { color: #0060f0; } 
         .light-mode .day-3-title-color { color: #28a745; } 
         .light-mode .essentials-title-color { color: #008ecf; } 
         .light-mode .tips-title-color { color: #d4a017; } 
-        .light-mode .custom-checkbox { background-color: #e5e5ea; border-color: #c6c6c8; }
-        .light-mode .custom-checkbox:checked { background-color: #30d158; border-color: #30d158; }
+        
+        .light-mode .custom-checkbox { /* Outline style for unchecked */
+            background-color: transparent; 
+            border: 1.5px solid #c6c6c8; 
+        }
+        .light-mode .custom-checkbox:checked { /* Solid fill for checked */
+            background-color: #30d158; 
+            border-color: #30d158; 
+        }
         .light-mode .custom-checkbox:checked::after { color: white; } 
         .light-mode .checklist-item-label span.exercise-text { color: #1d1d1f; font-weight: 500;}
         .light-mode .checklist-item-label:hover { background-color: #f8f8fa; }
@@ -125,41 +139,56 @@
         .light-mode .exercise-info-btn { color: #007aff; border-color: #007aff; } 
         .light-mode .exercise-info-btn:hover { color: #005ecb; background-color: rgba(0, 122, 255, 0.05); }
         .light-mode .modal-content { background-color: #ffffff; border-color: #d1d1d6; }
-        .light-mode .modal-title { color: #1d1d1f; border-bottom-color: #c6c6c8; font-weight: 700;}
+        .light-mode .modal-title { color: #1d1d1f; border-bottom-color: #c6c6c8; font-weight: 600;}
         .light-mode .modal-body h4 { color: #3c3c43; font-weight: 600;}
         .light-mode .modal-body p, .light-mode .modal-body ul { color: #3c3c43; }
-        .light-mode .modal-close-button { background-color: #e5e5ea; color: #1d1d1f; font-weight: 600;}
+        .light-mode .modal-close-button { background-color: #e5e5ea; color: #1d1d1f; font-weight: 500;}
         .light-mode .modal-close-button:hover { background-color: #dcdce0; }
         .light-mode .header-subtitle { color: #3c3c43; }
         .light-mode .footer-text { color: #636366; }
         .light-mode .theme-toggle-button { background-color: #e5e5ea; color: #1d1d1f; }
 
-        /* General styles for elements used in both modes */
-        .content-card { border-radius: 1rem; } /* Consistent rounded corners */
+        /* General styles for elements */
+        .content-card { border-radius: 1rem; } 
         .section-title { padding-bottom: 0.75rem; margin-bottom: 1rem; }
         .emoji-bullet::before { content: attr(data-emoji); margin-right: 0.75em; font-size: 1.1em; vertical-align: middle; }
-        .animated-item { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; transition-delay: var(--delay, 0s); } /* Softer animation */
+        .animated-item { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; transition-delay: var(--delay, 0s); } 
         .is-visible { opacity: 1; transform: translateY(0); }
-        .checklist-item-label { padding: 0.85rem 0.5rem; border-bottom: 1px solid; transition: background-color 0.2s ease; }
+        
+        .custom-checkbox { /* Consistent circular checkbox */
+            appearance: none; -webkit-appearance: none;
+            height: 1.4em; width: 1.4em; /* Slightly adjusted for better visual balance */
+            border-radius: 50%; 
+            margin-right: 0.85em; /* Increased margin */
+            cursor: pointer; display: inline-block;
+            vertical-align: middle; position: relative;
+            flex-shrink: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+         .custom-checkbox:checked::after {
+            content: '✔'; font-size: 0.8em; font-weight: 700; /* Adjusted checkmark size */
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .checklist-item-label { padding: 0.9rem 0.5rem; border-bottom: 1px solid; transition: background-color 0.2s ease; font-size: 0.95rem;} /* Slightly larger font for list items */
         .light-mode .checklist-item-label { border-bottom-color: #e5e5ea; }
         .dark-mode .checklist-item-label { border-bottom-color: #2c2c2e; }
         .checklist-item-label:last-child { border-bottom: none; }
-        #essentials .checklist-item-label { padding: 0.85rem 0.5rem; }
+        #essentials .checklist-item-label { padding: 0.9rem 0.5rem; }
         #essentials .checklist-item-label:last-child { border-bottom: none; }
         #essentials ul ul .checklist-item-label { padding-left: 1.5rem; }
         .light-mode #essentials ul ul .checklist-item-label { border-bottom-color: #eaeaea; }
         .dark-mode #essentials ul ul .checklist-item-label { border-bottom-color: #222427; }
 
-        /* Theme Toggle Button */
         .theme-toggle-button { position: fixed; top: 1rem; right: 1rem; padding: 0.5rem; border-radius: 50%; border: 1px solid transparent; cursor: pointer; z-index: 1001; width: 2.75rem; height: 2.75rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 15px rgba(0,0,0,0.15); }
         .theme-toggle-button svg { width: 1.4rem; height: 1.4rem; }
 
-        /* Modal styles */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear; }
         .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s linear; }
         .modal-content { padding: 1.75rem; border-radius: 1rem; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease; }
         .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-title { font-size: 1.35rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; } /* Adjusted title */
+        .modal-title { font-size: 1.35rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; } 
         .modal-body h4 { font-size: 1.05rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
         .modal-body p, .modal-body ul { font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.75rem; }
         .modal-body ul { list-style-type: disc; padding-left: 1.25rem; }
@@ -171,23 +200,23 @@
         .tab-button {
             padding: 0.6rem 1.2rem;
             border-radius: 9999px; 
-            font-weight: 600;
+            font-weight: 500; /* Adjusted from 600 for iOS feel */
             font-size: 0.9rem;
             transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
             border-width: 1px; 
             border-style: solid;
         }
         .clear-button {
-            padding: 0.75rem 1.75rem; /* Increased padding */
+            padding: 0.75rem 1.75rem; 
             border-radius: 9999px; 
             font-weight: 600;
-            font-size: 0.95rem; /* Slightly larger font */
+            font-size: 0.95rem; 
             transition: background-color 0.2s ease, transform 0.2s ease;
             border: 1px solid transparent; 
             cursor: pointer;
         }
         .main-title-gradient {
-            background-image: linear-gradient(to bottom, #F87171, #9333EA); /* Example: Red to Purple */
+            background-image: linear-gradient(to bottom, #F87171, #9333EA); 
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
