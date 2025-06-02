@@ -15,37 +15,38 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             transition: background-color 0.3s ease, color 0.3s ease;
-            line-height: 1.6; /* iOS-like line height */
+            line-height: 1.6; 
         }
 
         /* --- Dark Mode (Default) --- */
         body.dark-mode {
             background-color: #000000;
-            color: #f2f2f7; /* Brighter default text for dark mode (SF Pro Display Regular) */
+            color: #f2f2f7; 
         }
         .dark-mode .plan-bg { background-color: #000000; }
         .dark-mode .content-card {
-            background-color: #1c1c1e; /* Standard dark grey for cards */
+            background-color: #1c1c1e; 
             border: 1px solid #38383a; 
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
         }
-        .dark-mode .section-title { border-bottom-color: #3a3a3c; color: #f2f2f7; font-weight: 600;} /* Semibold for titles */
+        .dark-mode .section-title { border-bottom-color: #3a3a3c; color: #f2f2f7; font-weight: 600;} 
         .dark-mode .day-1-title-color { color: #ff4d4f; } 
         .dark-mode .day-2-title-color { color: #389bff; }
         .dark-mode .day-3-title-color { color: #4dd964; }
         .dark-mode .essentials-title-color { color: #87cefa; } 
         .dark-mode .tips-title-color { color: #ffcc00; }
         
-        .dark-mode .custom-checkbox { /* Outline style for unchecked */
+        .dark-mode .custom-checkbox { 
             background-color: transparent; 
             border: 1.5px solid #545458; 
         }
-        .dark-mode .custom-checkbox:checked { /* Solid fill for checked */
+        .dark-mode .custom-checkbox:checked { 
             background-color: #4dd964; 
             border-color: #4dd964; 
         }
         .dark-mode .custom-checkbox:checked::after { color: #000000; }
         .dark-mode .checklist-item-label span.exercise-text { color: #f2f2f7; font-weight: 500; } 
+        .dark-mode .checklist-item-label .emoji-bullet { margin-left: 0.5em; margin-right: 0.75em;} /* Adjusted emoji margin */
         
         .dark-mode .tab-button { 
             color: #aeaeb2; 
@@ -81,9 +82,9 @@
         .dark-mode .header-subtitle { color: #aeaeb2; } 
         .dark-mode .footer-text { color: #8e8e93; }
         .dark-mode .theme-toggle-button { 
-            background-color: rgba(58, 58, 60, 0.65); /* Semi-transparent dark grey */
+            background-color: rgba(58, 58, 60, 0.65); 
             color: #f2f2f7; 
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            border: 1px solid rgba(255, 255, 255, 0.1); 
             -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
         }
@@ -117,6 +118,7 @@
         }
         .light-mode .custom-checkbox:checked::after { color: white; } 
         .light-mode .checklist-item-label span.exercise-text { color: #1d1d1f; font-weight: 500;}
+        .light-mode .checklist-item-label .emoji-bullet { margin-left: 0.5em; margin-right: 0.75em;} /* Adjusted emoji margin */
         .light-mode .checklist-item-label:hover { background-color: #f8f8fa; }
         
         .light-mode .tab-button { 
@@ -153,9 +155,9 @@
         .light-mode .header-subtitle { color: #3c3c43; }
         .light-mode .footer-text { color: #636366; }
         .light-mode .theme-toggle-button { 
-            background-color: rgba(242, 242, 247, 0.75); /* Semi-transparent light grey */
+            background-color: rgba(242, 242, 247, 0.75); 
             color: #1d1d1f; 
-            border: 1px solid rgba(0, 0, 0, 0.08); /* Subtle border */
+            border: 1px solid rgba(0, 0, 0, 0.08); 
             -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
         }
@@ -163,7 +165,18 @@
         /* General styles for elements */
         .content-card { border-radius: 1rem; } 
         .section-title { padding-bottom: 0.75rem; margin-bottom: 1rem; }
-        .emoji-bullet::before { content: attr(data-emoji); margin-right: 0.75em; font-size: 1.1em; vertical-align: middle; }
+        .section-subheading { /* For Warm-up, Strength Training etc. */
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* semibold */
+            margin-bottom: 0.75rem; /* mb-3, increased from mb-2 */
+        }
+        .dark-mode .section-subheading { color: #ff4d4f; } /* Example, will be overridden by specific day colors */
+        .light-mode .section-subheading { color: #d93731; }/* Example */
+
+        .emoji-bullet { /* No ::before needed as it's a span now */
+            font-size: 1.1em; 
+            vertical-align: middle;
+        }
         .animated-item { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; transition-delay: var(--delay, 0s); } 
         .is-visible { opacity: 1; transform: translateY(0); }
         
@@ -171,7 +184,7 @@
             appearance: none; -webkit-appearance: none;
             height: 1.4em; width: 1.4em; 
             border-radius: 50%; 
-            margin-right: 0.85em; 
+            margin-right: 0.5em; /* Reduced margin as emoji is now next to it */
             cursor: pointer; display: inline-block;
             vertical-align: middle; position: relative;
             flex-shrink: 0;
@@ -193,25 +206,9 @@
         .light-mode #essentials ul ul .checklist-item-label { border-bottom-color: #eaeaea; }
         .dark-mode #essentials ul ul .checklist-item-label { border-bottom-color: #222427; }
 
-        /* Theme Toggle Button */
-        .theme-toggle-button { 
-            position: fixed; 
-            top: 1rem; 
-            right: 1rem; 
-            padding: 0.5rem; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            z-index: 1001; 
-            width: 2.75rem; 
-            height: 2.75rem; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Softer shadow for glass */
-        }
+        .theme-toggle-button { position: fixed; top: 1rem; right: 1rem; padding: 0.5rem; border-radius: 50%; cursor: pointer; z-index: 1001; width: 2.75rem; height: 2.75rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .theme-toggle-button svg { width: 1.4rem; height: 1.4rem; }
 
-        /* Modal styles */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear; }
         .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s linear; }
         .modal-content { padding: 1.75rem; border-radius: 1rem; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease; }
@@ -250,7 +247,6 @@
             color: transparent;
         }
 
-        /* Media query for smaller screens to adjust theme toggle button position */
         @media (max-width: 640px) {
             .theme-toggle-button {
                 top: 0.75rem;
@@ -262,12 +258,12 @@
                  width: 1.2rem;
                  height: 1.2rem;
             }
-            header h1 { /* Slightly reduce title size on very small screens if needed */
-                font-size: 1.875rem; /* Equivalent to text-3xl */
+            header h1 { 
+                font-size: 1.875rem; 
                 line-height: 2.25rem;
             }
              header p {
-                font-size: 0.875rem; /* text-sm */
+                font-size: 0.875rem; 
             }
         }
 
@@ -304,32 +300,32 @@
                 <section class="content-card p-5 sm:p-8 animated-item is-visible">
                     <h2 class="text-2xl sm:text-3xl font-bold day-1-title-color mb-6 section-title">🥇 DAY 1 – FULL BODY STRENGTH + CONDITIONING</h2>
                     <div>
-                        <h3 class="text-xl font-semibold text-red-300 mb-2">🟠 Warm-Up (10 min)</h3>
+                        <h3 class="section-subheading text-red-400 dark:text-red-300">🟠 Warm-Up (10 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_w1"><span class="emoji-bullet exercise-text" data-emoji="🚶‍♂️">5 min incline treadmill walk</span> <button class="exercise-info-btn" data-exercise-id="d1_w1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_w2"><span class="emoji-bullet exercise-text" data-emoji="🔄">Arm circles – Hip mobility – Shoulder rolls</span> <button class="exercise-info-btn" data-exercise-id="d1_w2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_w1"><span class="emoji-bullet" data-emoji="🚶‍♂️"></span><span class="exercise-text">5 min incline treadmill walk</span> <button class="exercise-info-btn" data-exercise-id="d1_w1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_w2"><span class="emoji-bullet" data-emoji="🔄"></span><span class="exercise-text">Arm circles – Hip mobility – Shoulder rolls</span> <button class="exercise-info-btn" data-exercise-id="d1_w2">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-red-300 mb-2">🏋️‍♂️ Strength Training (35 min)</h3>
+                        <h3 class="section-subheading text-red-400 dark:text-red-300">🏋️‍♂️ Strength Training (35 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s1"><span class="emoji-bullet exercise-text" data-emoji="🟩">Goblet Squats (Dumbbell): 3 x 12-15</span> <button class="exercise-info-btn" data-exercise-id="d1_s1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s2"><span class="emoji-bullet exercise-text" data-emoji="🟥">Incline Dumbbell Bench Press: 4 x 10</span> <button class="exercise-info-btn" data-exercise-id="d1_s2">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s3"><span class="emoji-bullet exercise-text" data-emoji="🟦">One-Arm Dumbbell Row: 3 x 12 per side</span> <button class="exercise-info-btn" data-exercise-id="d1_s3">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s4"><span class="emoji-bullet exercise-text" data-emoji="🟨">Plank Hold: 3 x 30–60 sec</span> <button class="exercise-info-btn" data-exercise-id="d1_s4">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s5"><span class="emoji-bullet exercise-text" data-emoji="🟧">Optional: Dumbbell Romanian Deadlift: 3 x 12</span> <button class="exercise-info-btn" data-exercise-id="d1_s5">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s1"><span class="emoji-bullet" data-emoji="🟩"></span><span class="exercise-text">Goblet Squats (Dumbbell): 3 x 12-15</span> <button class="exercise-info-btn" data-exercise-id="d1_s1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s2"><span class="emoji-bullet" data-emoji="🟥"></span><span class="exercise-text">Incline Dumbbell Bench Press: 4 x 10</span> <button class="exercise-info-btn" data-exercise-id="d1_s2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s3"><span class="emoji-bullet" data-emoji="🟦"></span><span class="exercise-text">One-Arm Dumbbell Row: 3 x 12 per side</span> <button class="exercise-info-btn" data-exercise-id="d1_s3">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s4"><span class="emoji-bullet" data-emoji="🟨"></span><span class="exercise-text">Plank Hold: 3 x 30–60 sec</span> <button class="exercise-info-btn" data-exercise-id="d1_s4">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_s5"><span class="emoji-bullet" data-emoji="🟧"></span><span class="exercise-text">Optional: Dumbbell Romanian Deadlift: 3 x 12</span> <button class="exercise-info-btn" data-exercise-id="d1_s5">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-red-300 mb-2">🔥 Conditioning (25 min)</h3>
+                        <h3 class="section-subheading text-red-400 dark:text-red-300">🔥 Conditioning (25 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_c1"><span class="emoji-bullet exercise-text" data-emoji="🔁">Jump Rope: 3 x 1 min (30 sec rest)</span> <button class="exercise-info-btn" data-exercise-id="d1_c1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_c2"><span class="emoji-bullet exercise-text" data-emoji="🥊">Boxing Bag Freestyle: 8–10 min</span> <button class="exercise-info-btn" data-exercise-id="d1_c2">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_c3"><span class="emoji-bullet exercise-text" data-emoji="🧗‍♂️">Incline Treadmill Walk: 10 min (brisk pace)</span> <button class="exercise-info-btn" data-exercise-id="d1_c3">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_c1"><span class="emoji-bullet" data-emoji="🔁"></span><span class="exercise-text">Jump Rope: 3 x 1 min (30 sec rest)</span> <button class="exercise-info-btn" data-exercise-id="d1_c1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_c2"><span class="emoji-bullet" data-emoji="🥊"></span><span class="exercise-text">Boxing Bag Freestyle: 8–10 min</span> <button class="exercise-info-btn" data-exercise-id="d1_c2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_c3"><span class="emoji-bullet" data-emoji="🧗‍♂️"></span><span class="exercise-text">Incline Treadmill Walk: 10 min (brisk pace)</span> <button class="exercise-info-btn" data-exercise-id="d1_c3">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-red-300 mb-2">🧘 Cool-Down (5 min)</h3>
+                        <h3 class="section-subheading text-red-400 dark:text-red-300">🧘 Cool-Down (5 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
                             <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d1_cd1"><span class="exercise-text">Stretch hamstrings, quads, shoulders, and lats</span> <button class="exercise-info-btn" data-exercise-id="d1_cd1">ℹ️</button></label></li>
                         </ul>
@@ -341,31 +337,31 @@
                 <section class="content-card p-5 sm:p-8 animated-item">
                     <h2 class="text-2xl sm:text-3xl font-bold day-2-title-color mb-6 section-title">🥈 DAY 2 – UPPER BODY + CORE + CARDIO</h2>
                     <div>
-                        <h3 class="text-xl font-semibold text-blue-300 mb-2">🟠 Warm-Up (10 min)</h3>
+                        <h3 class="section-subheading text-blue-400 dark:text-blue-300">🟠 Warm-Up (10 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_w1"><span class="emoji-bullet exercise-text" data-emoji="🧍">Shoulder mobility drills</span> <button class="exercise-info-btn" data-exercise-id="d2_w1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_w2"><span class="emoji-bullet exercise-text" data-emoji="🏃">3 min light cardio</span> <button class="exercise-info-btn" data-exercise-id="d2_w2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_w1"><span class="emoji-bullet" data-emoji="🧍"></span><span class="exercise-text">Shoulder mobility drills</span> <button class="exercise-info-btn" data-exercise-id="d2_w1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_w2"><span class="emoji-bullet" data-emoji="🏃"></span><span class="exercise-text">3 min light cardio</span> <button class="exercise-info-btn" data-exercise-id="d2_w2">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-blue-300 mb-2">🏋️ Strength Training (40 min)</h3>
+                        <h3 class="section-subheading text-blue-400 dark:text-blue-300">🏋️ Strength Training (40 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s1"><span class="emoji-bullet exercise-text" data-emoji="💪">Push-Ups / Chest Press: 3-4 sets max reps</span> <button class="exercise-info-btn" data-exercise-id="d2_s1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s2"><span class="emoji-bullet exercise-text" data-emoji="🔽">Lat Pulldown / Assisted Pull-Up: 4 x 10-12</span> <button class="exercise-info-btn" data-exercise-id="d2_s2">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s3"><span class="emoji-bullet exercise-text" data-emoji="🧱">Dumbbell Shoulder Press: 3 x 12</span> <button class="exercise-info-btn" data-exercise-id="d2_s3">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s4"><span class="emoji-bullet exercise-text" data-emoji="⚙️">Superset: Bicep Curls + Triceps Pushdowns: 3 x 12 each</span> <button class="exercise-info-btn" data-exercise-id="d2_s4">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s5"><span class="emoji-bullet exercise-text" data-emoji="🎯">Core – Russian Twists: 3 x 30 reps</span> <button class="exercise-info-btn" data-exercise-id="d2_s5">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s1"><span class="emoji-bullet" data-emoji="💪"></span><span class="exercise-text">Push-Ups / Chest Press: 3-4 sets max reps</span> <button class="exercise-info-btn" data-exercise-id="d2_s1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s2"><span class="emoji-bullet" data-emoji="🔽"></span><span class="exercise-text">Lat Pulldown / Assisted Pull-Up: 4 x 10-12</span> <button class="exercise-info-btn" data-exercise-id="d2_s2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s3"><span class="emoji-bullet" data-emoji="🧱"></span><span class="exercise-text">Dumbbell Shoulder Press: 3 x 12</span> <button class="exercise-info-btn" data-exercise-id="d2_s3">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s4"><span class="emoji-bullet" data-emoji="⚙️"></span><span class="exercise-text">Superset: Bicep Curls + Triceps Pushdowns: 3 x 12 each</span> <button class="exercise-info-btn" data-exercise-id="d2_s4">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_s5"><span class="emoji-bullet" data-emoji="🎯"></span><span class="exercise-text">Core – Russian Twists: 3 x 30 reps</span> <button class="exercise-info-btn" data-exercise-id="d2_s5">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-blue-300 mb-2">🌊 Cardio & Recovery (20 min)</h3>
+                        <h3 class="section-subheading text-blue-400 dark:text-blue-300">🌊 Cardio & Recovery (20 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_c1"><span class="emoji-bullet exercise-text" data-emoji="🏊‍♂️">Pool Swimming or Water Jog: 10–15 min</span> <button class="exercise-info-btn" data-exercise-id="d2_c1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_c2"><span class="emoji-bullet exercise-text" data-emoji="💨">Light Jump Rope or Bag Work: 5 min</span> <button class="exercise-info-btn" data-exercise-id="d2_c2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_c1"><span class="emoji-bullet" data-emoji="🏊‍♂️"></span><span class="exercise-text">Pool Swimming or Water Jog: 10–15 min</span> <button class="exercise-info-btn" data-exercise-id="d2_c1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_c2"><span class="emoji-bullet" data-emoji="💨"></span><span class="exercise-text">Light Jump Rope or Bag Work: 5 min</span> <button class="exercise-info-btn" data-exercise-id="d2_c2">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-blue-300 mb-2">🧘 Cool-Down (5-10 min)</h3>
+                        <h3 class="section-subheading text-blue-400 dark:text-blue-300">🧘 Cool-Down (5-10 min)</h3>
                          <ul class="list-none space-y-0 text-main-content pl-0">
                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d2_cd1"><span class="exercise-text">Stretch back, shoulders, arms, and core</span> <button class="exercise-info-btn" data-exercise-id="d2_cd1">ℹ️</button></label></li>
                         </ul>
@@ -377,31 +373,31 @@
                  <section class="content-card p-5 sm:p-8 animated-item">
                     <h2 class="text-2xl sm:text-3xl font-bold day-3-title-color mb-6 section-title">🥉 DAY 3 – LEGS + HIIT + BOXING</h2>
                      <div>
-                        <h3 class="text-xl font-semibold text-green-300 mb-2">🟠 Warm-Up (10 min)</h3>
+                        <h3 class="section-subheading text-green-400 dark:text-green-300">🟠 Warm-Up (10 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_w1"><span class="emoji-bullet exercise-text" data-emoji="🦵">Dynamic leg swings & bodyweight squats</span> <button class="exercise-info-btn" data-exercise-id="d3_w1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_w2"><span class="emoji-bullet exercise-text" data-emoji="🏃">Light jog or rope: 3 min</span> <button class="exercise-info-btn" data-exercise-id="d3_w2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_w1"><span class="emoji-bullet" data-emoji="🦵"></span><span class="exercise-text">Dynamic leg swings & bodyweight squats</span> <button class="exercise-info-btn" data-exercise-id="d3_w1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_w2"><span class="emoji-bullet" data-emoji="🏃"></span><span class="exercise-text">Light jog or rope: 3 min</span> <button class="exercise-info-btn" data-exercise-id="d3_w2">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-green-300 mb-2">🏋️‍♂️ Leg Workout (30-35 min)</h3>
+                        <h3 class="section-subheading text-green-400 dark:text-green-300">🏋️‍♂️ Leg Workout (30-35 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s1"><span class="emoji-bullet exercise-text" data-emoji="🟩">Dumbbell Lunges / Leg Press: 3 x 10/leg</span> <button class="exercise-info-btn" data-exercise-id="d3_s1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s2"><span class="emoji-bullet exercise-text" data-emoji="🪜">Step-Ups (Box or Bench): 3 x 12</span> <button class="exercise-info-btn" data-exercise-id="d3_s2">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s3"><span class="emoji-bullet exercise-text" data-emoji="🦶">Calf Raises: 3 x 20</span> <button class="exercise-info-btn" data-exercise-id="d3_s3">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s4"><span class="emoji-bullet exercise-text" data-emoji="🪑">Wall Sit Hold: 3 x 30–60 sec</span> <button class="exercise-info-btn" data-exercise-id="d3_s4">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s1"><span class="emoji-bullet" data-emoji="🟩"></span><span class="exercise-text">Dumbbell Lunges / Leg Press: 3 x 10/leg</span> <button class="exercise-info-btn" data-exercise-id="d3_s1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s2"><span class="emoji-bullet" data-emoji="🪜"></span><span class="exercise-text">Step-Ups (Box or Bench): 3 x 12</span> <button class="exercise-info-btn" data-exercise-id="d3_s2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s3"><span class="emoji-bullet" data-emoji="🦶"></span><span class="exercise-text">Calf Raises: 3 x 20</span> <button class="exercise-info-btn" data-exercise-id="d3_s3">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_s4"><span class="emoji-bullet" data-emoji="🪑"></span><span class="exercise-text">Wall Sit Hold: 3 x 30–60 sec</span> <button class="exercise-info-btn" data-exercise-id="d3_s4">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-green-300 mb-2">💣 HIIT + Boxing (25 min)</h3>
+                        <h3 class="section-subheading text-green-400 dark:text-green-300">💣 HIIT + Boxing (25 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_c1"><span class="emoji-bullet exercise-text" data-emoji="⏱">Treadmill Intervals: 1 min jog + 1 min walk x 8</span> <button class="exercise-info-btn" data-exercise-id="d3_c1">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_c2"><span class="emoji-bullet exercise-text" data-emoji="🥊">Heavy Bag Combos: 10 min</span> <button class="exercise-info-btn" data-exercise-id="d3_c2">ℹ️</button></label></li>
-                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_c3"><span class="emoji-bullet exercise-text" data-emoji="🪀">Jump Rope Finisher: 2–3 rounds x 1 min</span> <button class="exercise-info-btn" data-exercise-id="d3_c3">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_c1"><span class="emoji-bullet" data-emoji="⏱"></span><span class="exercise-text">Treadmill Intervals: 1 min jog + 1 min walk x 8</span> <button class="exercise-info-btn" data-exercise-id="d3_c1">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_c2"><span class="emoji-bullet" data-emoji="🥊"></span><span class="exercise-text">Heavy Bag Combos: 10 min</span> <button class="exercise-info-btn" data-exercise-id="d3_c2">ℹ️</button></label></li>
+                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_c3"><span class="emoji-bullet" data-emoji="🪀"></span><span class="exercise-text">Jump Rope Finisher: 2–3 rounds x 1 min</span> <button class="exercise-info-btn" data-exercise-id="d3_c3">ℹ️</button></label></li>
                         </ul>
                     </div>
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-green-300 mb-2">🧘 Cool-Down (5-10 min)</h3>
+                        <h3 class="section-subheading text-green-400 dark:text-green-300">🧘 Cool-Down (5-10 min)</h3>
                         <ul class="list-none space-y-0 text-main-content pl-0">
                            <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="d3_cd1"><span class="exercise-text">Stretch calves, hamstrings, glutes, hips</span> <button class="exercise-info-btn" data-exercise-id="d3_cd1">ℹ️</button></label></li>
                         </ul>
@@ -417,18 +413,18 @@
                             <svg class="w-24 h-24 md:w-32 md:h-32 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v1H6a2 2 0 00-2 2v7a2 2 0 002 2h2v1a1 1 0 102 0v-1h4v1a1 1 0 102 0v-1h2a2 2 0 002-2V6a2 2 0 00-2-2h-3V3a1 1 0 00-1-1h-2zm0 2h2v1h3a1 1 0 011 1v7a1 1 0 01-1 1h-2v-3a1 1 0 00-1-1H7a1 1 0 00-1 1v3H4a1 1 0 01-1-1V6a1 1 0 011-1h3V4h2z" clip-rule="evenodd"></path></svg>
                         </div>
                         <div class="w-full md:w-2/3">
-                            <h3 class="text-xl font-semibold text-blue-400 dark:text-blue-300 mb-2">Don't Forget These:</h3>
+                            <h3 class="section-subheading text-blue-400 dark:text-blue-300">Don't Forget These:</h3>
                             <ul class="list-none space-y-0 text-main-content">
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_1"><span class="emoji-bullet exercise-text" data-emoji="🥊">Boxing Gloves</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_2"><span class="emoji-bullet exercise-text" data-emoji="🤸">Jump Rope</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_3"><span class="emoji-bullet exercise-text" data-emoji="👕">T-shirt</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_4"><span class="emoji-bullet exercise-text" data-emoji="🩳">Shorts (Gym)</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_5"><span class="emoji-bullet exercise-text" data-emoji="🩴">Sandals</span></label></li>
-                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_6"><span class="emoji-bullet exercise-text" data-emoji="🧖">Towel</span></label></li>
-                                <li class="font-semibold mt-4 text-blue-400 dark:text-blue-300 checklist-item-label" style="border-bottom: none; padding-bottom: 0.25rem;"><span class="emoji-bullet exercise-text" data-emoji="🏊">Swimming Gear:</span></li>
+                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_1"><span class="emoji-bullet" data-emoji="🥊"></span><span class="exercise-text">Boxing Gloves</span></label></li>
+                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_2"><span class="emoji-bullet" data-emoji="🤸"></span><span class="exercise-text">Jump Rope</span></label></li>
+                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_3"><span class="emoji-bullet" data-emoji="👕"></span><span class="exercise-text">T-shirt</span></label></li>
+                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_4"><span class="emoji-bullet" data-emoji="🩳"></span><span class="exercise-text">Shorts (Gym)</span></label></li>
+                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_5"><span class="emoji-bullet" data-emoji="🩴"></span><span class="exercise-text">Sandals</span></label></li>
+                                <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_6"><span class="emoji-bullet" data-emoji="🧖"></span><span class="exercise-text">Towel</span></label></li>
+                                <li class="font-semibold mt-4 text-blue-400 dark:text-blue-300 checklist-item-label" style="border-bottom: none; padding-bottom: 0.25rem;"><span class="emoji-bullet" data-emoji="🏊"></span><span class="exercise-text">Swimming Gear:</span></li>
                                 <ul class="list-none space-y-0 text-main-content pl-6">
-                                    <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_s1"><span class="emoji-bullet exercise-text" data-emoji="🥽">Goggles</span></label></li>
-                                    <li><label class="checklist-item-label" style="border-bottom: none;"><input type="checkbox" class="custom-checkbox" id="ess_s2"><span class="emoji-bullet exercise-text" data-emoji="🩳">Shorts (Swimming)</span></label></li>
+                                    <li><label class="checklist-item-label"><input type="checkbox" class="custom-checkbox" id="ess_s1"><span class="emoji-bullet" data-emoji="🥽"></span><span class="exercise-text">Goggles</span></label></li>
+                                    <li><label class="checklist-item-label" style="border-bottom: none;"><input type="checkbox" class="custom-checkbox" id="ess_s2"><span class="emoji-bullet" data-emoji="🩳"></span><span class="exercise-text">Shorts (Swimming)</span></label></li>
                                 </ul>
                             </ul>
                         </div>
@@ -441,7 +437,7 @@
                     <h2 class="text-2xl sm:text-3xl font-bold tips-title-color mb-6 section-title">📌 Tips for Maximum Fat Burn</h2>
                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                         <div class="animated-item" style="--delay: 0.1s;">
-                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="🥗">Eat Smart:</h3>
+                            <h3 class="section-subheading text-yellow-400 dark:text-yellow-300 emoji-bullet" data-emoji="🥗">Eat Smart:</h3>
                             <ul class="list-disc list-inside space-y-2 text-tips-list pl-4">
                                 <li>High protein (eggs, chicken, tuna)</li>
                                 <li>Lots of vegetables 🥦🥒</li>
@@ -449,15 +445,15 @@
                             </ul>
                         </div>
                         <div class="animated-item" style="--delay: 0.2s;">
-                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="💧">Hydrate:</h3>
+                            <h3 class="section-subheading text-yellow-400 dark:text-yellow-300 emoji-bullet" data-emoji="💧">Hydrate:</h3>
                             <p class="text-tips-list pl-4">Drink 3–4 liters/day</p>
                         </div>
                         <div class="animated-item" style="--delay: 0.3s;">
-                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="😴">Rest:</h3>
+                            <h3 class="section-subheading text-yellow-400 dark:text-yellow-300 emoji-bullet" data-emoji="😴">Rest:</h3>
                             <p class="text-tips-list pl-4">Sleep 7–9 hours/night</p>
                         </div>
                         <div class="animated-item" style="--delay: 0.4s;">
-                            <h3 class="text-xl font-semibold text-yellow-400 dark:text-yellow-300 mb-3 emoji-bullet" data-emoji="🧠">Mental Game:</h3>
+                            <h3 class="section-subheading text-yellow-400 dark:text-yellow-300 emoji-bullet" data-emoji="🧠">Mental Game:</h3>
                             <ul class="list-disc list-inside space-y-2 text-tips-list pl-4">
                                 <li>Stay consistent</li>
                                 <li>Track progress weekly</li>
