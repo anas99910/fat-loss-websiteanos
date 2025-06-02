@@ -73,14 +73,20 @@
         .dark-mode .exercise-info-btn { color: #8e8e93; border-color: #545458; }
         .dark-mode .exercise-info-btn:hover { color: #aeaeb2; border-color: #636366; }
         .dark-mode .modal-content { background-color: #1c1c1e; border-color: #38383a; }
-        .dark-mode .modal-title { color: #f2f2f7; border-bottom-color: #3a3a3c; font-weight: 600;} /* Semibold for modal title */
+        .dark-mode .modal-title { color: #f2f2f7; border-bottom-color: #3a3a3c; font-weight: 600;} 
         .dark-mode .modal-body h4 { color: #aeaeb2; font-weight: 600;}
         .dark-mode .modal-body p, .dark-mode .modal-body ul { color: #aeaeb2; }
-        .dark-mode .modal-close-button { background-color: #3a3a3c; color: #f2f2f7; font-weight: 500;} /* Medium weight */
+        .dark-mode .modal-close-button { background-color: #3a3a3c; color: #f2f2f7; font-weight: 500;} 
         .dark-mode .modal-close-button:hover { background-color: #545458; }
         .dark-mode .header-subtitle { color: #aeaeb2; } 
         .dark-mode .footer-text { color: #8e8e93; }
-        .dark-mode .theme-toggle-button { background-color: #3a3a3c; color: #f2f2f7; }
+        .dark-mode .theme-toggle-button { 
+            background-color: rgba(58, 58, 60, 0.65); /* Semi-transparent dark grey */
+            color: #f2f2f7; 
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
 
 
         /* --- Light Mode --- */
@@ -101,11 +107,11 @@
         .light-mode .essentials-title-color { color: #008ecf; } 
         .light-mode .tips-title-color { color: #d4a017; } 
         
-        .light-mode .custom-checkbox { /* Outline style for unchecked */
+        .light-mode .custom-checkbox { 
             background-color: transparent; 
             border: 1.5px solid #c6c6c8; 
         }
-        .light-mode .custom-checkbox:checked { /* Solid fill for checked */
+        .light-mode .custom-checkbox:checked { 
             background-color: #30d158; 
             border-color: #30d158; 
         }
@@ -146,7 +152,13 @@
         .light-mode .modal-close-button:hover { background-color: #dcdce0; }
         .light-mode .header-subtitle { color: #3c3c43; }
         .light-mode .footer-text { color: #636366; }
-        .light-mode .theme-toggle-button { background-color: #e5e5ea; color: #1d1d1f; }
+        .light-mode .theme-toggle-button { 
+            background-color: rgba(242, 242, 247, 0.75); /* Semi-transparent light grey */
+            color: #1d1d1f; 
+            border: 1px solid rgba(0, 0, 0, 0.08); /* Subtle border */
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
 
         /* General styles for elements */
         .content-card { border-radius: 1rem; } 
@@ -155,23 +167,23 @@
         .animated-item { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; transition-delay: var(--delay, 0s); } 
         .is-visible { opacity: 1; transform: translateY(0); }
         
-        .custom-checkbox { /* Consistent circular checkbox */
+        .custom-checkbox { 
             appearance: none; -webkit-appearance: none;
-            height: 1.4em; width: 1.4em; /* Slightly adjusted for better visual balance */
+            height: 1.4em; width: 1.4em; 
             border-radius: 50%; 
-            margin-right: 0.85em; /* Increased margin */
+            margin-right: 0.85em; 
             cursor: pointer; display: inline-block;
             vertical-align: middle; position: relative;
             flex-shrink: 0;
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
          .custom-checkbox:checked::after {
-            content: '✔'; font-size: 0.8em; font-weight: 700; /* Adjusted checkmark size */
+            content: '✔'; font-size: 0.8em; font-weight: 700; 
             position: absolute; left: 50%; top: 50%;
             transform: translate(-50%, -50%);
         }
 
-        .checklist-item-label { padding: 0.9rem 0.5rem; border-bottom: 1px solid; transition: background-color 0.2s ease; font-size: 0.95rem;} /* Slightly larger font for list items */
+        .checklist-item-label { padding: 0.9rem 0.5rem; border-bottom: 1px solid; transition: background-color 0.2s ease; font-size: 0.95rem;} 
         .light-mode .checklist-item-label { border-bottom-color: #e5e5ea; }
         .dark-mode .checklist-item-label { border-bottom-color: #2c2c2e; }
         .checklist-item-label:last-child { border-bottom: none; }
@@ -181,9 +193,25 @@
         .light-mode #essentials ul ul .checklist-item-label { border-bottom-color: #eaeaea; }
         .dark-mode #essentials ul ul .checklist-item-label { border-bottom-color: #222427; }
 
-        .theme-toggle-button { position: fixed; top: 1rem; right: 1rem; padding: 0.5rem; border-radius: 50%; border: 1px solid transparent; cursor: pointer; z-index: 1001; width: 2.75rem; height: 2.75rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 15px rgba(0,0,0,0.15); }
+        /* Theme Toggle Button */
+        .theme-toggle-button { 
+            position: fixed; 
+            top: 1rem; 
+            right: 1rem; 
+            padding: 0.5rem; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            z-index: 1001; 
+            width: 2.75rem; 
+            height: 2.75rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Softer shadow for glass */
+        }
         .theme-toggle-button svg { width: 1.4rem; height: 1.4rem; }
 
+        /* Modal styles */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear; }
         .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s linear; }
         .modal-content { padding: 1.75rem; border-radius: 1rem; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease; }
@@ -200,7 +228,7 @@
         .tab-button {
             padding: 0.6rem 1.2rem;
             border-radius: 9999px; 
-            font-weight: 500; /* Adjusted from 600 for iOS feel */
+            font-weight: 500; 
             font-size: 0.9rem;
             transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
             border-width: 1px; 
@@ -220,6 +248,27 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+        }
+
+        /* Media query for smaller screens to adjust theme toggle button position */
+        @media (max-width: 640px) {
+            .theme-toggle-button {
+                top: 0.75rem;
+                right: 0.75rem;
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+            .theme-toggle-button svg {
+                 width: 1.2rem;
+                 height: 1.2rem;
+            }
+            header h1 { /* Slightly reduce title size on very small screens if needed */
+                font-size: 1.875rem; /* Equivalent to text-3xl */
+                line-height: 2.25rem;
+            }
+             header p {
+                font-size: 0.875rem; /* text-sm */
+            }
         }
 
 
