@@ -148,6 +148,15 @@
             background-color: #ff5c52; /* Lighter red on hover */
             transform: translateY(-1px);
         }
+        
+        /* Motivational Quote Styling */
+        #motivationalQuote {
+            font-style: italic;
+            color: #8e8e93; /* Dimmer grey, SF Text Secondary */
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem; /* Space before the "Stay strong" message */
+            min-height: 1.2em; /* Prevent layout shift if quote is short */
+        }
 
     </style>
 </head>
@@ -342,6 +351,7 @@
         </div>
 
         <footer class="text-center mt-16 py-6 animated-item is-visible" style="--delay: 0.2s;">
+            <div id="motivationalQuote" class="mb-4"></div>
             <button id="clearAllButton" class="clear-button mb-4">🧹 Clear All Progress</button>
             <p class="text-sm text-gray-500">Stay strong, stay focused!</p>
         </footer>
@@ -451,13 +461,28 @@
                                 localStorage.removeItem(checkbox.id);
                             }
                         });
-                        // Provide some feedback to the user
-                        // For example, you could show a temporary message.
-                        // For now, the visual change of checkboxes unchecking is the feedback.
                         console.log("All checkbox progress cleared.");
                     // }
                 });
             }
+
+            // --- Motivational Quotes Rotator ---
+            const quotes = [
+                "The only bad workout is the one that didn't happen.",
+                "Your body can stand almost anything. It’s your mind you have to convince.",
+                "Success isn't always about greatness. It's about consistency. Consistent hard work gains success. Greatness will come.",
+                "Strength does not come from physical capacity. It comes from an indomitable will.",
+                "The pain you feel today will be the strength you feel tomorrow.",
+                "Push yourself because no one else is going to do it for you.",
+                "Wake up with determination. Go to bed with satisfaction."
+            ];
+
+            const quoteElement = document.getElementById('motivationalQuote');
+            if (quoteElement) {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                quoteElement.textContent = `"${quotes[randomIndex]}"`;
+            }
+
         });
     </script>
 </body>
