@@ -59,6 +59,16 @@
             width: 100%; 
         }
 
+        .quote-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #CBD5E0; /* Tailwind gray-400, slightly lighter for quotes */
+            font-style: italic;
+            margin-bottom: 1.25rem; /* Space before the clear button */
+            line-height: 1.5;
+            min-height: 2.7em; /* Reserve space for ~2 lines of quote to prevent layout shift */
+        }
+
         .clear-progress-button {
             display: block;
             margin: 0.5rem auto 0 auto; 
@@ -157,7 +167,7 @@
         .general-list { list-style: none; padding-left: 0; margin-bottom: 1.5rem; }
         .general-list li {
             border-bottom: 1px solid rgba(100, 100, 110, 0.15);
-            display: flex; /* Ensure items are flex for alignment */
+            display: flex; 
             align-items: center;
             padding: 0.6rem 0.25rem; 
         }
@@ -165,13 +175,12 @@
         
 
         /* Checkbox Specific Styling */
-        .checklist label { /* Label specific styles for clickable area */
+        .checklist label { 
             display: flex;
             align-items: center;
             width: 100%;
             cursor: pointer;
-            /* Padding is now on .general-list li, so remove from label or adjust if needed */
-            padding: 0; /* Reset padding if li handles it */
+            padding: 0; 
             transition: background-color 0.2s ease;
         }
         .checklist label:hover {
@@ -225,7 +234,7 @@
         .checklist input[type="checkbox"]:checked ~ .item-text-content .details {
             color: #888b92; 
         }
-        .checklist input[type="checkbox"]:checked ~ .item-text-content .emoji { /* If emoji is part of this span */
+        .checklist input[type="checkbox"]:checked ~ .item-text-content .emoji { 
              opacity: 0.7;
         }
         
@@ -233,11 +242,10 @@
         .equipment-list-no-checkbox .item-text-content::before,
         .tips-list .item-text-content::before { 
             content: attr(data-emoji) " ";
-            margin-right: 0.75rem; /* Align with where checkboxes would be */
-            font-size: 1em; /* Ensure emoji size is consistent */
+            margin-right: 0.75rem; 
+            font-size: 1em; 
         }
-         /* For checklist items where emoji is part of the name span (if any) or needs specific styling */
-        .checklist .item-text-content .emoji-bullet { /* Example if you add a span for emoji */
+        .checklist .item-text-content .emoji-bullet { 
             margin-right: 0.75rem;
         }
 
@@ -248,10 +256,10 @@
         }
         .exercise-list .sub-item {
             font-size: 0.9rem; color: #b0b3b8; 
-            padding-left: 2.1em; /* Indent past where checkbox would be or emoji for equipment */
+            padding-left: 2.1em; 
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
-            border-bottom: none !important; /* Sub-items usually don't have a bottom border */
+            border-bottom: none !important; 
         }
         .exercise-list .sub-item::before {
             content: "› "; margin-right: 0.3em; color: #EAB308;
@@ -293,9 +301,10 @@
             .custom-checkbox { margin-right: 0.6rem; }
             .panel-footer { padding-top: 1rem;}
             .clear-progress-button { padding: 0.5rem 1rem; font-size: 0.8rem;}
-            .general-list li { padding: 0.5rem 0.1rem; } /* Adjust padding for smaller screens */
+            .general-list li { padding: 0.5rem 0.1rem; } 
             .equipment-list-no-checkbox .item-text-content::before,
             .tips-list .item-text-content::before { margin-right: 0.5rem; }
+            .quote-text { font-size: 0.85rem; margin-bottom: 1rem;}
         }
 
     </style>
@@ -450,6 +459,7 @@
         </div> 
 
         <div class="panel-footer">
+            <p id="motivationalQuote" class="quote-text"></p>
             <button id="clearAllProgressBtn" class="clear-progress-button">🧹 Clear All Progress</button>
         </div>
     </div>
@@ -461,6 +471,40 @@
             const tabContentContainer = document.getElementById('tab-content-container');
             const allCheckboxes = document.querySelectorAll('.custom-checkbox');
             const clearProgressBtn = document.getElementById('clearAllProgressBtn'); 
+            const quoteElement = document.getElementById('motivationalQuote');
+
+            const quotes = [
+                "Even shadows need light to exist.",
+                "Some storms teach more than silence ever could.",
+                "Grow roots before you bloom.",
+                "You are not lost, just becoming.",
+                "Pain carves space for deeper joy.",
+                "The moon doesn’t rush to be whole.",
+                "Grace is strength dressed in quiet.",
+                "Let your scars whisper, not scream.",
+                "Wounds are where light gets personal.",
+                "Rest is a rebellion in a world that worships speed.",
+                "Soft doesn’t mean weak. It means weathered.",
+                "The seed doesn't fear the dark.",
+                "You carry galaxies behind your gaze.",
+                "Not all fire destroys. Some fire refines.",
+                "Healing is a rhythm, not a race.",
+                "Silence is not empty. It's full of answers.",
+                "Fall in love with becoming.",
+                "You are not late. You are ripening.",
+                "Be water: patient, shapeless, strong.",
+                "The sun still rises, even after the longest night.",
+                "Your pace is sacred, not slow.",
+                "Some journeys are meant to be walked alone—so you hear your soul better.",
+                "What breaks you can also build you.",
+                "The quiet ones carry oceans.",
+                "Rise gently, like the morning.",
+                "You are allowed to begin again.",
+                "Stillness is strength disguised as peace.",
+                "Not all roots are seen—some hold mountains.",
+                "Your breath is proof you’re still becoming.",
+                "The softest hearts hold the fiercest storms."
+            ];
 
             const activeColors = {
                 day1: { background: '#EAB308', text: '#1a1a1d', border: '#EAB308' }, 
@@ -470,6 +514,13 @@
                 tips: { background: '#60A5FA', text: '#1a1a1d', border: '#60A5FA' } 
             };
             const inactiveColor = { background: 'rgba(60, 60, 65, 0.5)', text: '#D1D5DB', border: 'rgba(100, 100, 110, 0.2)'};
+
+            function displayRandomQuote() {
+                if (quoteElement && quotes.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * quotes.length);
+                    quoteElement.textContent = `"${quotes[randomIndex]}"`;
+                }
+            }
 
             function applyTabStyles(button, isActive) {
                 const tabId = button.dataset.tab;
@@ -506,7 +557,6 @@
             function loadCheckboxStates() {
                 allCheckboxes.forEach(checkbox => {
                     if (!checkbox.id) {
-                        // console.warn('Checkbox missing ID:', checkbox); // Silently ignore if no ID
                         return;
                     }
                     const savedState = localStorage.getItem(checkbox.id);
@@ -530,26 +580,33 @@
 
             if (clearProgressBtn) {
                 clearProgressBtn.addEventListener('click', () => {
-                    // For a real app, replace window.confirm with a custom modal.
-                    // const userConfirmed = window.confirm("Are you sure you want to clear all progress? This cannot be undone.");
-                    // if (userConfirmed) { // For now, let's remove the confirmation to ensure it works
                         allCheckboxes.forEach(checkbox => {
-                            if (checkbox.id) { // Process only if checkbox has an ID
+                            if (checkbox.id) { 
                                 checkbox.checked = false;
                                 localStorage.removeItem(checkbox.id);
                             }
                         });
                         console.log("All progress has been cleared.");
-                        // Add a visual confirmation message here if desired
-                    // }
+                        // Optionally, display a temporary message on the page
+                        if(quoteElement) { // Reuse quote element for a temporary message
+                            const originalQuote = quoteElement.textContent;
+                            quoteElement.textContent = "Progress cleared!";
+                            quoteElement.style.color = "#86EFAC"; // Green for success
+                            setTimeout(() => {
+                                displayRandomQuote(); // Restore a random quote
+                                quoteElement.style.color = "#CBD5E0"; // Restore original color
+                            }, 2000);
+                        }
                 });
             }
 
+            // Initial setup
             const initialActiveButton = document.querySelector('.tab-button.active') || tabButtons[0];
             if (initialActiveButton) {
                  setActiveTab(initialActiveButton.dataset.tab);
             }
             loadCheckboxStates();
+            displayRandomQuote(); // Display a quote on initial load
         });
     </script>
 </body>
