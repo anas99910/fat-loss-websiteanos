@@ -1,1864 +1,1027 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class=""> <!-- class="light" will be toggled here -->
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
-    <title>Household Expense Tracker</title>
-    <!-- Load Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleek Expense Tracker</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Chart.js for visualizations -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Custom styles */
+        /* Base styles */
+        :root {
+            --bg-primary: #1C1C1E;
+            --bg-secondary: rgba(44, 44, 46, 0.7);
+            --bg-tertiary: rgba(60, 60, 62, 0.7);
+            --bg-overlay: rgba(0, 0, 0, 0.6);
+            --text-primary: #FFFFFF;
+            --text-secondary: #E5E5E7;
+            --text-tertiary: #A1A1AA;
+            --border-primary: rgba(255, 255, 255, 0.1);
+            --border-focus: rgba(59, 130, 246, 0.7);
+            --scroll-track: #1C1C1E;
+            --scroll-thumb: #3C3C3E;
+            --scroll-thumb-hover: #5C5C5E;
+        }
+
+        .light {
+            --bg-primary: #F3F4F6;
+            --bg-secondary: rgba(255, 255, 255, 0.7);
+            --bg-tertiary: rgba(230, 230, 230, 0.7);
+            --bg-overlay: rgba(0, 0, 0, 0.4);
+            --text-primary: #111827;
+            --text-secondary: #1F2937;
+            --text-tertiary: #4B5563;
+            --border-primary: rgba(0, 0, 0, 0.1);
+            --border-focus: rgba(59, 130, 246, 0.7);
+            --scroll-track: #F3F4F6;
+            --scroll-thumb: #D1D5DB;
+            --scroll-thumb-hover: #9CA3AF;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            transition: background-color 0.3s, color 0.3s;
         }
-        /* Custom modal styles */
-        .modal {
-            transition: opacity 0.25s ease;
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--bg-secondary);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--border-primary);
+            border-radius: 1.25rem; /* 20px */
+            transition: background-color 0.3s, border-color 0.3s;
         }
-        .modal-active {
-            overflow: hidden;
+
+        /* Glassmorphism Input Style */
+        .glass-input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            color: var(--text-secondary);
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
-        .modal-content {
-            transition: transform 0.25s ease;
+        .glass-input::placeholder {
+            color: var(--text-tertiary);
         }
-        /* Simple loading spinner */
-        .loader {
-            border-top-color: #3498db;
-            animation: spin 1s linear infinite;
+        .glass-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
         }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        /* Ensure charts are responsive */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-        /* Style for color picker */
-        .category-color-picker {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            width: 2rem; /* 32px */
-            height: 2rem; /* 32px */
-            background-color: transparent;
-            border: none;
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--scroll-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+        /* Date picker icon */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: var(--bg-primary) = #1C1C1E ? invert(1) : invert(0);
             cursor: pointer;
-            border-radius: 50%;
         }
-        .category-color-picker::-webkit-color-swatch {
-            border-radius: 50%;
-            border: 1px solid #e2e8f0; /* gray-200 */
-        }
-        .category-color-picker::-moz-color-swatch {
-            border-radius: 50%;
-            border: 1px solid #e2e8f0; /* gray-200 */
-        }
-        .dark .category-color-picker::-webkit-color-swatch {
-            border: 1px solid #4b5563; /* gray-600 */
-        }
-        .dark .category-color-picker::-moz-color-swatch {
-            border: 1px solid #4b5563; /* gray-600 */
-        }
-    </style>
-    <script>
-        // On page load, apply dark mode immediately to prevent flashing
-        try {
-            const settingsData = localStorage.getItem('appSettings');
-            // Default to dark unless settings exist and explicitly set to false
-            if (settingsData && JSON.parse(settingsData).darkMode === false) {
-                document.documentElement.classList.remove('dark');
-            } else {
-                document.documentElement.classList.add('dark');
-            }
-        } catch (e) {
-            console.error('Could not apply dark mode setting from localStorage', e);
-            document.documentElement.classList.add('dark'); // Default to dark on error
-        }
-
-        // Configure Tailwind to use Inter font
-        tailwind.config = {
-            darkMode: 'class', // Enable class-based dark mode
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                },
-            },
-        };
-    </script>
-</head>
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-
-    <!-- Header -->
-    <header class="bg-white shadow-md dark:bg-gray-800 dark:border-b dark:border-gray-700">
-        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
-            <a href="#dashboard" class="nav-link">
-                <h1 class="text-3xl font-bold text-blue-600">Expense Tracker</h1>
-            </a>
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex space-x-4">
-                <a href="#dashboard" class="nav-link text-gray-700 hover:text-blue-600 font-medium dark:text-gray-300 dark:hover:text-blue-400">Dashboard</a>
-                <a href="#expenses" class="nav-link text-gray-700 hover:text-blue-600 font-medium dark:text-gray-300 dark:hover:text-blue-400">Expenses</a>
-                <a href="#recurring" class="nav-link text-gray-700 hover:text-blue-600 font-medium dark:text-gray-300 dark:hover:text-blue-400">Recurring</a>
-                <a href="#budgets" class="nav-link text-gray-700 hover:text-blue-600 font-medium dark:text-gray-300 dark:hover:text-blue-400">Budgets</a>
-                <a href="#data" class="nav-link text-gray-700 hover:text-blue-600 font-medium dark:text-gray-300 dark:hover:text-blue-400">Data</a>
-            </nav>
-        </div>
-        <!-- Mobile Navigation (hidden by default) -->
-        <nav id="mobile-menu" class="md:hidden hidden flex-col px-4 pt-2 pb-4 space-y-2 bg-white border-t dark:bg-gray-800 dark:border-gray-700">
-            <a href="#dashboard" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400">Dashboard</a>
-            <a href="#expenses" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400">Expenses</a>
-            <a href="#recurring" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400">Recurring</a>
-            <a href="#budgets" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400">Budgets</a>
-            <a href="#data" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400">Data</a>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto p-4">
-
-        <!-- Section: Dashboard -->
-        <section id="dashboard" class="app-section space-y-6">
-            <h2 class="text-2xl font-semibold mb-4 dark:text-white">Dashboard</h2>
-            
-            <!-- Filters -->
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium mb-3 dark:text-white">Filters</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label for="filter-start-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                        <input type="date" id="filter-start-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                    </div>
-                    <div>
-                        <label for="filter-end-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                        <input type="date" id="filter-end-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                    </div>
-                    <div>
-                        <label for="filter-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                        <select id="filter-category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            <option value="">All Categories</option>
-                            <!-- JS will populate this -->
-                        </select>
-                    </div>
-                </div>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <button id="quick-filter-week" class="quick-filter-btn px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">This Week</button>
-                    <button id="quick-filter-month" class="quick-filter-btn px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">This Month</button>
-                    <button id="quick-filter-last-month" class="quick-filter-btn px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Last Month</button>
-                    <button id="quick-filter-year" class="quick-filter-btn px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">This Year</button>
-                </div>
-                <hr class="my-4 dark:border-gray-600">
-                <button id="apply-filters-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Apply Filters</Cbutton>
-                <button id="reset-filters-btn" class="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Reset Filters</Cbutton>
-
-            </div>
-
-            <!-- Summaries -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400">Total Spend (Filtered)</h3>
-                    <p id="summary-total" class="text-3xl font-bold mt-2 dark:text-white">$0.00</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400">This Month's Spend</h3>
-                    <p id="summary-month" class="text-3xl font-bold mt-2 dark:text-white">$0.00</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400">Remaining Salary</h3>
-                    <p id="summary-remaining" class="text-3xl font-bold mt-2 dark:text-white">$0.00</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400">This Year's Spend</h3>
-                    <p id="summary-year" class="text-3xl font-bold mt-2 dark:text-white">$0.00</p>
-                </div>
-            </div>
-            
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Category Breakdown</h3>
-                    <div class="chart-container">
-                        <canvas id="categoryPieChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Spending Over Time</h3>
-                    <div class="chart-container">
-                        <canvas id="spendingLineChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Expenses -->
-        <section id="expenses" class="app-section space-y-6 hidden">
-            <h2 class="text-2xl font-semibold mb-4 dark:text-white">Manage Expenses</h2>
-            
-            <!-- Add/Edit Expense Form -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 id="expense-form-title" class="text-xl font-semibold mb-4 dark:text-white">Add New Expense</h3>
-                <form id="expense-form" class="space-y-4">
-                    <input type="hidden" id="expense-id">
-                    <div>
-                        <label for="expense-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
-                        <input type="date" id="expense-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                    </div>
-                    <div>
-                        <label for="expense-amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount <span id="currency-label-form" class="text-gray-500 dark:text-gray-400">(MAD)</span></label>
-                        <input type="number" id="expense-amount" step="0.01" min="0" placeholder="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" required>
-                    </div>
-                    <div>
-                        <label for="expense-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                        <select id="expense-category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                            <!-- JS will populate this -->
-                        </select>
-                    </div>
-                    <div>
-                        <label for="expense-note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note (Optional)</label>
-                        <textarea id="expense-note" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" placeholder="e.g., Dinner with friends"></textarea>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <button type="submit" id="expense-submit-btn" class="px-6 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Add Expense</button>
-                        <button type="button" id="expense-cancel-btn" class="px-6 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 hidden">Cancel Edit</button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Expense List -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                <div class="p-6 flex flex-col md:flex-row justify-between md:items-center">
-                    <h3 class="text-xl font-semibold dark:text-white mb-4 md:mb-0">Expense List</h3>
-                    <div class="relative w-full md:w-1/2 lg:w-1/3">
-                        <label for="search-bar" class="sr-only">Search by Note</label>
-                        <input type="search" id="search-bar" placeholder="Search by note..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Date</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Amount</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Category</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Note</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="expense-list" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                            <!-- JS will populate this -->
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No expenses found.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Recurring Expenses -->
-        <section id="recurring" class="app-section space-y-6 hidden">
-            <h2 class="text-2xl font-semibold mb-4 dark:text-white">Recurring Expenses</h2>
-            
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Add monthly expenses like rent or subscriptions. You can then manually add them to your expenses each month from the list below.</p>
-            </div>
-
-            <!-- Add/Edit Recurring Expense Form -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 id="recurring-form-title" class="text-xl font-semibold mb-4 dark:text-white">Add Recurring Expense</h3>
-                <form id="recurring-form" class="space-y-4">
-                    <input type="hidden" id="recurring-id">
-                    <div>
-                        <label for="recurring-amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount <span id="currency-label-recurring-form" class="text-gray-500 dark:text-gray-400">(MAD)</span></label>
-                        <input type="number" id="recurring-amount" step="0.01" min="0" placeholder="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" required>
-                    </div>
-                    <div>
-                        <label for="recurring-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                        <select id="recurring-category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                            <!-- JS will populate this -->
-                        </select>
-                    </div>
-                    <div>
-                        <label for="recurring-note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
-                        <input type="text" id="recurring-note" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" placeholder="e.g., Netflix, Rent" required>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <button type="submit" id="recurring-submit-btn" class="px-6 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Add Recurring</button>
-                        <button type="button" id="recurring-cancel-btn" class="px-6 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 hidden">Cancel Edit</button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Recurring Expense List -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                <h3 class="text-xl font-semibold p-6 dark:text-white">Recurring List</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Amount</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Category</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Note</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Last Added</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Add</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recurring-list" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                            <!-- JS will populate this -->
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No recurring expenses found.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Budgets -->
-        <section id="budgets" class="app-section space-y-6 hidden">
-            <h2 class="text-2xl font-semibold mb-4 dark:text-white">Monthly Budgets</h2>
-            
-            <!-- Set Budgets Form -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold mb-4 dark:text-white">Set Budgets & Salary</h3>
-                <form id="budget-form" class="space-y-4">
-                    <div>
-                        <label for="base-salary" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Base Monthly Salary</label>
-                        <input type="number" id="base-salary" step="0.01" min="0" placeholder="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                    </div>
-                    
-                    <hr class="my-4 dark:border-gray-600">
-                    <h4 class="text-lg font-medium text-gray-800 dark:text-white">Monthly Category Budgets</h4>
-
-                    <div id="budget-categories-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- JS will populate this -->
-                    </div>
-                    <button type="submit" id="budget-submit-btn" class="px-6 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Save Budgets</button>
-                </form>
-            </div>
-
-            <!-- Budget Status -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold mb-4 dark:text-white">This Month's Budget Status</h3>
-                <div id="budget-status-list" class="space-y-4">
-                    <!-- JS will populate this -->
-                    <p class="text-gray-500 dark:text-gray-400">Budgets not set. Go to the "Set Budgets" form to add them.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Data Management -->
-        <section id="data" class="app-section space-y-6 hidden">
-            <h2 class="text-2xl font-semibold mb-4 dark:text-white">Data Management</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Export Data -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Export Data</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">Download all your expenses as a CSV file.</p>
-                    <button id="export-csv-btn" class="px-6 py-2 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Export to CSV</button>
-                </div>
-
-                <!-- App Settings -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 dark:text-white">App Settings</h3>
-                    
-                    <!-- Currency Setting -->
-                    <form id="currency-form">
-                        <label for="currency-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Currency</label>
-                        <select id="currency-select" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            <option value="MAD">MAD (Morocco)</option>
-                            <option value="USD">USD (United States)</option>
-                            <option value="EUR">EUR (Euro)</option>
-                            <option value="GBP">GBP (Great Britain)</option>
-                            <option value="JPY">JPY (Japan)</option>
-                        </select>
-                        <button id="save-settings-btn" type="submit" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Save Currency</button>
-                    </form>
-                    
-                    <hr class="my-6 dark:border-gray-600">
-                    
-                    <!-- Dark Mode Toggle -->
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Dark Mode</span>
-                        <button id="dark-mode-toggle" type="button" class="bg-gray-200 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" role="switch" aria-checked="false">
-                            <span class="sr-only">Use dark mode</span>
-                            <span id="dark-mode-dot" aria-hidden="true" class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Import Data -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Import Data</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">Import expenses from a CSV file. The CSV must have columns: `id`, `date` (YYYY-MM-DD), `amount`, `category`, `note`.</p>
-                    <input type="file" id="import-csv-input" accept=".csv" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:hover:file:bg-blue-800">
-                    <div class="mt-4">
-                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Import Mode:</p>
-                        <div class="flex items-center space-x-4">
-                            <label class="flex items-center">
-                                <input type="radio" name="import-mode" value="merge" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" checked>
-                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">Merge (add new)</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="import-mode" value="replace" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
-                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">Replace (delete all)</span>
-                            </label>
-                        </div>
-                    </div>
-                    <button id="import-csv-btn" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" disabled>Import CSV</button>
-                </div>
-
-            </div> <!-- This div closes the grid -->
-
-                <!-- Manage Categories -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold mb-4 dark:text-white">Manage Categories</h3>
-                <form id="category-form" class="flex items-center space-x-2 mb-4">
-                    <div class="w-1/4">
-                        <label for="new-category-icon" class="sr-only">Icon</label>
-                        <input type="text" id="new-category-icon" placeholder="Icon (e.g., 🍔)" maxlength="2" class="block w-full text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                    </div>
-                    <div class="flex-grow">
-                        <label for="new-category-name" class="sr-only">New category name</label>
-                        <input type="text" id="new-category-name" placeholder="New category name" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" required>
-                    </div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </form>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Note: Deleting a category will re-assign its expenses to "Other".</p>
-                <ul id="category-list" class="space-y-2">
-                    <!-- JS will populate this -->
-                </ul>
-            </div>
-
-             <!-- Danger Zone -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-2 border-red-300 dark:border-red-700">
-                <h3 class="text-xl font-semibold mb-4 text-red-700 dark:text-red-500">Danger Zone</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Permanently delete all expenses and budgets. This action cannot be undone.</p>
-                <button id="delete-all-data-btn" class="px-6 py-2 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">Delete All Data</button>
-            </div>
-        </section>
-
-    </main>
-    
-    <!-- Footer -->
-    <footer class="bg-white mt-12 py-6 border-t border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <div class="container mx-auto px-4 text-center text-gray-500 dark:text-gray-400">
-            <p>&copy; 2025 Household Expense Tracker. All data is stored locally in your browser.</p>
-        </div>
-    </footer>
-
-    <!-- Custom Modal -->
-    <div id="custom-modal" class="modal pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0">
-        <!-- Modal Backdrop -->
-        <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
         
-        <!-- Modal Content -->
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 z-10 transform scale-95">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-title" class="text-xl font-semibold dark:text-white">Confirmation</h3>
-                <button id="modal-close-btn" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        /* Modal animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-fade-in { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-slide-in-up { animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Bar chart animation */
+        .chart-bar { transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* Budget progress bar */
+        #budget-progress-bar {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Pie chart */
+        #pie-chart {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #F9C851 0deg 90deg, #E67E22 90deg 180deg, #3498DB 180deg 270deg, #2ECC71 270deg 360deg);
+            transition: background 0.5s;
+        }
+        
+        /* Utility for hiding */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Main Application Container -->
+    <div id="app" class="max-w-6xl mx-auto p-4 md:p-8">
+
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6 md:mb-8 gap-4">
+            <div class="flex-1 flex items-center gap-4">
+                <h1 class="text-3xl md:text-4xl font-bold text-primary tracking-tight text-white">
+                    My Expenses
+                </h1>
+                <select id="month-selector" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500"></select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="theme-toggle-btn" class="p-2 rounded-full glass-input" title="Toggle Theme">
+                    <!-- Sun Icon -->
+                    <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <!-- Moon Icon -->
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
+                <button id="set-budget-btn" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg shadow-teal-600/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16v2m-6-6H3m6 0H9m6 0h3m-3 0h-3m-6 0H3m6 0H9m6 0h3m-3 0h-3" />
+                    </svg>
+                    <span class="hidden sm:inline">Budget</span>
+                </button>
+                <button id="add-expense-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg shadow-blue-600/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="hidden sm:inline">Add Expense</span>
+                </button>
             </div>
-            <p id="modal-body" class="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to perform this action?</p>
-            <div id="modal-footer" class="flex justify-end space-x-4">
-                <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
-                <button id="modal-confirm-btn" class="px-4 py-2 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">Confirm</button>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+
+            <!-- Main Column (Summary, Chart, List) -->
+            <div class="lg:col-span-2 space-y-6 md:space-y-8">
+                
+                <!-- Total Expenses Card -->
+                <section class="glass-card p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="text-sm font-medium text-tertiary mb-2">
+                                Total This Month
+                            </h2>
+                            <div class="text-4xl md:text-5xl font-bold text-primary" id="total-expenses">
+                                0.00 MAD
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <h2 class="text-sm font-medium text-tertiary mb-2">
+                                Budget
+                            </h2>
+                            <div class="text-2xl font-semibold text-primary" id="budget-display">
+                                Not Set
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Budget Progress Bar -->
+                    <div class="mt-4">
+                        <div class="w-full bg-tertiary/30 rounded-full h-2.5">
+                            <div id="budget-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p id="budget-remaining-text" class="text-sm text-tertiary text-right mt-1"></p>
+                    </div>
+                </section>
+                
+                <!-- Monthly Breakdown Card -->
+                <section class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-primary">
+                            Monthly Breakdown
+                        </h3>
+                        <div class="flex gap-2">
+                            <button id="chart-toggle-bar" class="p-2 rounded-lg glass-input bg-blue-600/30 text-blue-300" title="Bar Chart">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                            </button>
+                            <button id="chart-toggle-pie" class="p-2 rounded-lg glass-input" title="Pie Chart">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Chart Area -->
+                    <div id="bar-chart-container" class="h-48 w-full flex justify-around items-end gap-2 p-4 bg-tertiary/20 rounded-xl">
+                        <!-- Bar chart bars will be injected here -->
+                    </div>
+                    <div id="pie-chart-container" class="h-48 w-full hidden justify-center items-center gap-6 p-4 bg-tertiary/20 rounded-xl">
+                        <div id="pie-chart"></div>
+                        <div id="pie-chart-legend" class="text-sm space-y-1"></div>
+                    </div>
+                </section>
+                
+                <!-- Expense List -->
+                <section>
+                    <div class="flex justify-between items-center mb-4 gap-4 flex-wrap">
+                        <h2 class="text-2xl font-semibold text-primary">
+                            History
+                        </h2>
+                        <div class="flex gap-2 flex-wrap">
+                            <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500" placeholder="Search expenses...">
+                            <select id="filter-category" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500">
+                                <!-- Filter options will be injected here -->
+                            </select>
+                            <button id="export-csv-btn" class="glass-input p-2 rounded-lg" title="Export to CSV">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="expense-list" class="space-y-3">
+                        <!-- Expense items will be injected here -->
+                        <div id="empty-state" class="glass-card p-6 text-center text-tertiary">
+                            <p>No expenses recorded for this month yet.</p>
+                            <p class="text-sm">Click "Add Expense" to get started.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Right Column (Insights) -->
+            <div class="lg:col-span-1 space-y-6 md:space-y-8">
+                <section class="glass-card p-6">
+                    <h2 class="text-lg font-semibold text-primary mb-4">
+                        Monthly Insights
+                    </h2>
+                    <div class="space-y-4">
+                        <div id="insight-top-category">
+                            <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
+                            <p class="text-xl font-semibold text-primary">--</p>
+                        </div>
+                        <div id="insight-highest-expense">
+                            <h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3>
+                            <p class="text-xl font-semibold text-primary">0.00 MAD</p>
+                            <p class="text-sm text-tertiary truncate">--</p>
+                        </div>
+                        <div id="insight-avg-spend">
+                            <h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3>
+                            <p class="text-xl font-semibold text-primary">0.00 MAD</p>
+                        </div>
+                    </div>
+                </section>
+                <section class="glass-card p-6">
+                    <button id="manage-categories-btn" class="w-full text-center bg-blue-600/20 text-blue-300 hover:bg-blue-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
+                        Manage Categories
+                    </button>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Add/Edit Expense Modal -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="modal-backdrop"></div>
+        <div class="glass-card z-10 w-full max-w-md p-6 modal-slide-in-up">
+            <h3 id="modal-title" class="text-2xl font-semibold text-primary mb-6">Add New Expense</h3>
+            <form id="expense-form" class="space-y-4">
+                <input type="hidden" id="expense-id">
+                <div>
+                    <label for="expense-title" class="block text-sm font-medium text-tertiary mb-2">Description</label>
+                    <input type="text" id="expense-title" class="glass-input w-full rounded-lg p-3" placeholder="e.g., Weekly Groceries" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="expense-amount" class="block text-sm font-medium text-tertiary mb-2">Amount (MAD)</label>
+                        <input type="number" id="expense-amount" class="glass-input w-full rounded-lg p-3" placeholder="150.00" min="0.01" step="0.01" required>
+                    </div>
+                    <div>
+                        <label for="expense-category" class="block text-sm font-medium text-tertiary mb-2">Category</label>
+                        <select id="expense-category" class="glass-input w-full rounded-lg p-3 h-[46px]" required>
+                            <!-- Category options will be injected here -->
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="expense-date" class="block text-sm font-medium text-tertiary mb-2">Date</label>
+                    <input type="date" id="expense-date" class="glass-input w-full rounded-lg p-3" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <label for="expense-recurring" class="flex items-center gap-2 text-sm text-tertiary cursor-pointer">
+                        <input type="checkbox" id="expense-recurring" class="glass-input rounded text-blue-600 focus:ring-blue-500">
+                        Set as recurring (monthly)
+                    </label>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" id="cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
+                    <button type="submit" id="save-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-blue-600/30">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Set Budget Modal -->
+    <div id="budget-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="budget-modal-backdrop"></div>
+        <div class="glass-card z-10 w-full max-w-sm p-6 modal-slide-in-up">
+            <h3 class="text-2xl font-semibold text-primary mb-6">Set Monthly Budget</h3>
+            <form id="budget-form" class="space-y-4">
+                <div>
+                    <label for="budget-amount" class="block text-sm font-medium text-tertiary mb-2">Budget Amount (MAD)</label>
+                    <input type="number" id="budget-amount" class="glass-input w-full rounded-lg p-3" placeholder="5000.00" min="0" step="100">
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" id="budget-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
+                    <button type="submit" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-teal-600/30">Set Budget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="delete-modal-backdrop"></div>
+        <div class="glass-card z-10 w-full max-w-sm p-6 modal-slide-in-up">
+            <h3 class="text-xl font-semibold text-primary mb-4">Delete Expense</h3>
+            <p class="text-tertiary mb-6">Are you sure you want to delete this expense? This action cannot be undone.</p>
+            <div class="flex justify-end gap-3">
+                <button type="button" id="delete-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
+                <button type="button" id="delete-confirm-btn" class="bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-red-600/30">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manage Categories Modal -->
+    <div id="category-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="category-modal-backdrop"></div>
+        <div class="glass-card z-10 w-full max-w-md p-6 modal-slide-in-up">
+            <h3 class="text-2xl font-semibold text-primary mb-6">Manage Categories</h3>
+            <form id="category-form" class="flex gap-2 mb-4">
+                <input type="text" id="category-name-input" class="glass-input w-full rounded-lg p-3" placeholder="New category name" required>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">Add</button>
+            </form>
+            <div id="category-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                <!-- Category list will be injected here -->
+            </div>
+            <div class="flex justify-end gap-3 pt-6">
+                <button type="button" id="category-close-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Done</button>
             </div>
         </div>
     </div>
 
-    <!-- Loading Spinner -->
-    <div id="loading-spinner" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32"></div>
-    </div>
-
-
     <!-- JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <script type="module">
+        // --- STORAGE KEYS ---
+        const KEYS = {
+            EXPENSES: 'householdExpenses',
+            RECURRING: 'recurringExpenses',
+            BUDGET: 'monthlyBudget',
+            THEME: 'appTheme',
+            CATEGORIES: 'expenseCategories'
+        };
 
-            // --- STATE & CONSTANTS ---
-            let expenses = [];
-            let budgets = {};
-            let appSettings = {};
-            let filters = {
-                startDate: '',
-                endDate: '',
-                category: '',
-                searchTerm: ''
-            };
+        // --- DEFAULT CATEGORIES (if storage is empty) ---
+        const DEFAULT_CATEGORIES = {
+            food: { label: 'Food', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2zm0 0h18M5 7h14M5 11h7" /></svg>` },
+            water: { label: 'Water', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.472 15.03L3 12.56C3 12.23 3.23 12 3.56 12H5.44C5.77 12 6 12.23 6 12.56L8.53 15.03C8.72 15.22 9 15.09 9 14.82V3.5C9 3.22 8.78 3 8.5 3H3.5C3.22 3 3 3.22 3 3.5V14.82C3 15.09 3.28 15.22 3.47 15.03L5.472 15.03zM18.53 15.03L21 12.56C21 12.23 20.77 12 20.44 12H18.56C18.23 12 18 12.23 18 12.56L15.47 15.03C15.28 15.22 15 15.09 15 14.82V3.5C15 3.22 15.22 3 15.5 3H20.5C20.78 3 21 3.22 21 3.5V14.82C21 15.09 20.72 15.22 20.53 15.03L18.53 15.03zM12 10.5C12.83 10.5 13.5 9.83 13.5 9C13.5 8.17 12.83 7.5 12 7.5S10.5 8.17 10.5 9C10.5 9.83 11.17 10.5 12 10.5zM12 21C15.31 21 18 18.31 18 15V12H6V15C6 18.31 8.69 21 12 21z" /></svg>` },
+            electricity: { label: 'Electricity', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>` },
+            rent: { label: 'Rent', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2a1 1 0 01-1-1v-4z" /></svg>` },
+            transport: { label: 'Transport', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>` },
+            other: { label: 'Other', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 5.523-4.477 10-10 10S1 17.523 1 12S5.477 2 11 2s10 4.477 10 10z" /></svg>` }
+        };
+        const GENERIC_ICON = DEFAULT_CATEGORIES.other.icon;
+
+        // --- STATE ---
+        let expenses = [];
+        let recurringExpenses = [];
+        let categories = {};
+        let currentFilter = 'all';
+        let currentSearchTerm = '';
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let currentBudget = 0;
+        let chartType = 'bar';
+        let expenseToDeleteId = null;
+
+        // --- DOM ELEMENTS ---
+        const docElement = document.documentElement;
+        const addExpenseBtn = document.getElementById('add-expense-btn');
+        const expenseListEl = document.getElementById('expense-list');
+        const totalExpensesEl = document.getElementById('total-expenses');
+        const filterCategoryEl = document.getElementById('filter-category');
+        const emptyStateEl = document.getElementById('empty-state');
+        
+        // Expense Modal
+        const modal = document.getElementById('modal');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalTitle = document.getElementById('modal-title');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const expenseForm = document.getElementById('expense-form');
+        const expenseIdField = document.getElementById('expense-id');
+        const expenseTitleField = document.getElementById('expense-title');
+        const expenseAmountField = document.getElementById('expense-amount');
+        const expenseCategoryField = document.getElementById('expense-category');
+        const expenseDateField = document.getElementById('expense-date');
+        const expenseRecurringCheckbox = document.getElementById('expense-recurring');
+
+        // Theme Toggle
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+        
+        // Month Selector
+        const monthSelector = document.getElementById('month-selector');
+        
+        // Budget
+        const setBudgetBtn = document.getElementById('set-budget-btn');
+        const budgetModal = document.getElementById('budget-modal');
+        const budgetModalBackdrop = document.getElementById('budget-modal-backdrop');
+        const budgetForm = document.getElementById('budget-form');
+        const budgetAmountField = document.getElementById('budget-amount');
+        const budgetCancelBtn = document.getElementById('budget-cancel-btn');
+        const budgetDisplayEl = document.getElementById('budget-display');
+        const budgetProgressBar = document.getElementById('budget-progress-bar');
+        const budgetRemainingTextEl = document.getElementById('budget-remaining-text');
+
+        // Delete Modal
+        const deleteModal = document.getElementById('delete-modal');
+        const deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
+        const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+        const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+        
+        // Search & Export
+        const searchBar = document.getElementById('search-bar');
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        
+        // Insights
+        const insightTopCategory = document.getElementById('insight-top-category');
+        const insightHighestExpense = document.getElementById('insight-highest-expense');
+        const insightAvgSpend = document.getElementById('insight-avg-spend');
+        
+        // Chart
+        const chartToggleBarBtn = document.getElementById('chart-toggle-bar');
+        const chartTogglePieBtn = document.getElementById('chart-toggle-pie');
+        const barChartContainer = document.getElementById('bar-chart-container');
+        const pieChartContainer = document.getElementById('pie-chart-container');
+        const pieChartEl = document.getElementById('pie-chart');
+        const pieChartLegendEl = document.getElementById('pie-chart-legend');
+        
+        // Categories
+        const manageCategoriesBtn = document.getElementById('manage-categories-btn');
+        const categoryModal = document.getElementById('category-modal');
+        const categoryModalBackdrop = document.getElementById('category-modal-backdrop');
+        const categoryCloseBtn = document.getElementById('category-close-btn');
+        const categoryForm = document.getElementById('category-form');
+        const categoryNameInput = document.getElementById('category-name-input');
+        const categoryListEl = document.getElementById('category-list');
+
+        // --- HELPER FUNCTIONS ---
+        
+        const formatCurrency = (amount) => new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' }).format(amount);
+        const formatDate = (dateString) => new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+        const getTodayString = () => new Date().toISOString().split('T')[0];
+
+        // --- LOCAL STORAGE FUNCTIONS ---
+        const getFromStorage = (key) => {
+            const data = localStorage.getItem(key);
+            try { return data ? JSON.parse(data) : null; } catch (e) { console.error(`Error parsing ${key}`, e); return null; }
+        };
+        const saveToStorage = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+        // --- DATA FUNCTIONS ---
+        const getExpensesForPeriod = (year, month) => {
+            return expenses.filter(expense => {
+                const expenseDate = new Date(expense.date + 'T00:00:00');
+                return expenseDate.getFullYear() === year && expenseDate.getMonth() === month;
+            });
+        };
+        
+        const getCategoryTotals = (expenseList) => {
+            const totals = Object.keys(categories).reduce((acc, key) => {
+                acc[key] = { total: 0, label: categories[key].label, count: 0 };
+                return acc;
+            }, {});
             
-            // This is now the default, but will be loaded from settings
-            let defaultCategories = [
-                { name: 'Food', icon: '🍔', color: '#F87171' }, // red-400
-                { name: 'Bills', icon: '🧾', color: '#60A5FA' }, // blue-400
-                { name: 'Groceries', icon: '🛒', color: '#34D399' }, // green-400
-                { name: 'Home Items', icon: '🏠', color: '#FBBF24' }, // amber-400
-                { name: 'Other', icon: '❓', color: '#A78BFA' } // violet-400
-            ];
+            // Add a safety net for expenses with orphaned categories
+            totals['other'] = totals['other'] || { total: 0, label: 'Other', count: 0 };
 
-            // Chart instances
-            let categoryPieChart = null;
-            let spendingLineChart = null;
+            let grandTotal = 0;
 
-            // --- UI ELEMENTS ---
-            const expenseForm = document.getElementById('expense-form');
-            const expenseFormTitle = document.getElementById('expense-form-title');
-            const expenseSubmitBtn = document.getElementById('expense-submit-btn');
-            const expenseCancelBtn = document.getElementById('expense-cancel-btn');
-            const expenseIdInput = document.getElementById('expense-id');
-            const expenseDateInput = document.getElementById('expense-date');
-            const expenseAmountInput = document.getElementById('expense-amount');
-            const expenseCategoryInput = document.getElementById('expense-category');
-            const expenseNoteInput = document.getElementById('expense-note');
-            const expenseListEl = document.getElementById('expense-list');
-            const searchBar = document.getElementById('search-bar');
-            
-            const budgetForm = document.getElementById('budget-form');
-            const baseSalaryInput = document.getElementById('base-salary');
-            const budgetCategoriesFormEl = document.getElementById('budget-categories-form');
-            const budgetStatusListEl = document.getElementById('budget-status-list');
-            
-            const filterStartDate = document.getElementById('filter-start-date');
-            const filterEndDate = document.getElementById('filter-end-date');
-            const filterCategory = document.getElementById('filter-category');
-            const applyFiltersBtn = document.getElementById('apply-filters-btn');
-            const resetFiltersBtn = document.getElementById('reset-filters-btn');
-            const quickFilterWeekBtn = document.getElementById('quick-filter-week');
-            const quickFilterMonthBtn = document.getElementById('quick-filter-month');
-            const quickFilterLastMonthBtn = document.getElementById('quick-filter-last-month');
-            const quickFilterYearBtn = document.getElementById('quick-filter-year');
-
-            const summaryTotalEl = document.getElementById('summary-total');
-            const summaryMonthEl = document.getElementById('summary-month');
-            const summaryRemainingEl = document.getElementById('summary-remaining');
-            const summaryYearEl = document.getElementById('summary-year');
-
-            const exportCsvBtn = document.getElementById('export-csv-btn');
-            const importCsvInput = document.getElementById('import-csv-input');
-            const importCsvBtn = document.getElementById('import-csv-btn');
-            const deleteAllDataBtn = document.getElementById('delete-all-data-btn');
-            
-            const currencyForm = document.getElementById('currency-form');
-            const currencySelect = document.getElementById('currency-select');
-            const saveSettingsBtn = document.getElementById('save-settings-btn');
-            const currencyLabelForm = document.getElementById('currency-label-form');
-            
-            const darkModeToggle = document.getElementById('dark-mode-toggle');
-            const darkModeDot = document.getElementById('dark-mode-dot');
-
-            const modal = document.getElementById('custom-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalBody = document.getElementById('modal-body');
-            const modalCloseBtn = document.getElementById('modal-close-btn');
-            const modalCancelBtn = document.getElementById('modal-cancel-btn');
-            const modalConfirmBtn = document.getElementById('modal-confirm-btn');
-            
-            const loadingSpinner = document.getElementById('loading-spinner');
-
-            const navLinks = document.querySelectorAll('.nav-link');
-            const appSections = document.querySelectorAll('.app-section');
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            // New Recurring Elements
-            const recurringForm = document.getElementById('recurring-form');
-            const recurringFormTitle = document.getElementById('recurring-form-title');
-            const recurringSubmitBtn = document.getElementById('recurring-submit-btn');
-            const recurringCancelBtn = document.getElementById('recurring-cancel-btn');
-            const recurringIdInput = document.getElementById('recurring-id');
-            const recurringAmountInput = document.getElementById('recurring-amount');
-            const recurringCategoryInput = document.getElementById('recurring-category');
-            const recurringNoteInput = document.getElementById('recurring-note');
-            const recurringListEl = document.getElementById('recurring-list');
-            const currencyLabelRecurringForm = document.getElementById('currency-label-recurring-form');
-
-            // New Category Mgmt Elements
-            const categoryForm = document.getElementById('category-form');
-            const newCategoryNameInput = document.getElementById('new-category-name');
-            const categoryListEl = document.getElementById('category-list');
-            const newCategoryIconInput = document.getElementById('new-category-icon');
-
-
-            // --- MODAL HELPER ---
-            const showModal = (title, body, confirmText = 'Confirm', confirmClass = 'bg-red-600 hover:bg-red-700', showCancel = true) => {
-                return new Promise((resolve) => {
-                    modalTitle.textContent = title;
-                    modalBody.innerHTML = body; // Use innerHTML to allow for formatted messages
-                    
-                    modalConfirmBtn.textContent = confirmText;
-                    modalConfirmBtn.className = `px-4 py-2 text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${confirmClass}`;
-                    
-                    modalCancelBtn.style.display = showCancel ? 'inline-block' : 'none';
-
-                    modal.classList.remove('opacity-0', 'pointer-events-none');
-                    document.body.classList.add('modal-active');
-                    
-                    const onConfirm = () => {
-                        closeModal();
-                        resolve(true);
-                    };
-                    
-                    const onCancel = () => {
-                        closeModal();
-                        resolve(false);
-                    };
-
-                    modalConfirmBtn.onclick = onConfirm;
-                    modalCancelBtn.onclick = onCancel;
-                    modalCloseBtn.onclick = onCancel;
-                    modal.querySelector('.modal-backdrop').onclick = onCancel;
-                });
-            };
-
-            const closeModal = () => {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                document.body.classList.remove('modal-active');
-                // Clean up listeners
-                modalConfirmBtn.onclick = null;
-                modalCancelBtn.onclick = null;
-                modalCloseBtn.onclick = null;
-                modal.querySelector('.modal-backdrop').onclick = null;
-            };
-
-            // Show a simple info message
-            const showMessage = (title, body) => {
-                showModal(title, body, 'OK', 'bg-blue-600 hover:bg-blue-700', false);
-            };
-
-            // --- LOADING SPINNER HELPER ---
-            const showLoader = () => loadingSpinner.classList.remove('hidden');
-            const hideLoader = () => loadingSpinner.classList.add('hidden');
-            
-            // --- DATA & STORAGE ---
-            const saveExpenses = () => {
-                localStorage.setItem('expenses', JSON.stringify(expenses));
-            };
-
-            const loadExpenses = () => {
-                const expensesData = localStorage.getItem('expenses');
-                expenses = expensesData ? JSON.parse(expensesData) : [];
-            };
-
-            const saveBudgets = () => {
-                localStorage.setItem('budgets', JSON.stringify(budgets));
-            };
-
-            const loadBudgets = () => {
-                const budgetsData = localStorage.getItem('budgets');
-                budgets = budgetsData ? JSON.parse(budgetsData) : { baseSalary: 0, categories: {} };
-                // Ensure structure is valid
-                if (!budgets.categories) {
-                    budgets = { baseSalary: budgets.baseSalary || 0, categories: {} };
+            expenseList.forEach(expense => {
+                const category = expense.category;
+                if (totals[category]) {
+                    totals[category].total += parseFloat(expense.amount);
+                    totals[category].count += 1;
+                } else {
+                    // If category was deleted, assign to 'other'
+                    totals['other'].total += parseFloat(expense.amount);
+                    totals['other'].count += 1;
                 }
-            };
+                grandTotal += parseFloat(expense.amount);
+            });
+            return { totals, grandTotal };
+        };
 
-            const saveSettings = () => {
-                localStorage.setItem('appSettings', JSON.stringify(appSettings));
-            };
+        // --- RENDER FUNCTIONS (THE BIG ONES) ---
+        
+        /** Main render function, triggers all sub-renders */
+        const render = () => {
+            const periodExpenses = getExpensesForPeriod(currentYear, currentMonth);
+            
+            renderExpenseList(periodExpenses);
+            renderSummary(periodExpenses);
+            renderChart(periodExpenses);
+            renderInsights(periodExpenses);
+        };
 
-            const loadSettings = () => {
-                const settingsData = localStorage.getItem('appSettings');
-                appSettings = settingsData ? JSON.parse(settingsData) : { 
-                    currency: 'MAD', 
-                    darkMode: true, // Default to dark mode
-                    categories: defaultCategories,
-                    recurringExpenses: []
-                };
-                if (!appSettings.currency) appSettings.currency = 'MAD';
-                if (appSettings.darkMode === undefined) appSettings.darkMode = true; // Default to dark mode
+        /** Renders the summary (total + budget) */
+        const renderSummary = (periodExpenses) => {
+            const total = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            totalExpensesEl.textContent = formatCurrency(total);
+            
+            if (currentBudget > 0) {
+                budgetDisplayEl.textContent = formatCurrency(currentBudget);
+                const percentage = Math.min((total / currentBudget) * 100, 100);
+                budgetProgressBar.style.width = `${percentage}%`;
                 
-                // --- MIGRATION: simple string categories to object categories ---
-                if (appSettings.categories && typeof appSettings.categories[0] === 'string') {
-                    appSettings.categories = appSettings.categories.map(name => ({
-                        name: name,
-                        color: CATEGORY_COLORS[name] || getRandomColor()
-                    }));
-                    
-                    // Ensure 'Other' exists
-                    if (!appSettings.categories.find(c => c.name === 'Other')) {
-                        appSettings.categories.push({ name: 'Other', color: '#A78BFA' });
-                    }
-                    saveSettings(); // Save the migrated structure
-                }
-                // --- END MIGRATION ---
-
-                // --- MIGRATION: Add icons if missing ---
-                if (appSettings.categories && appSettings.categories.length > 0 && appSettings.categories[0].icon === undefined) {
-                    const defaultIconMap = { 'Food': '🍔', 'Bills': '🧾', 'Groceries': '🛒', 'Home Items': '🏠', 'Other': '❓' };
-                    appSettings.categories.forEach(cat => {
-                        cat.icon = defaultIconMap[cat.name] || '❓';
-                    });
-                    saveSettings(); // Save the migrated structure
-                }
-                // --- END MIGRATION ---
-
-
-                if (!appSettings.categories || appSettings.categories.length === 0) appSettings.categories = defaultCategories;
-                if (!appSettings.recurringExpenses) appSettings.recurringExpenses = [];
-            };
-
-            // --- DATE HELPERS ---
-            const getISODate = (date, dayOffset = 0) => {
-                const newDate = new Date(date);
-                newDate.setDate(newDate.getDate() + dayOffset);
-                return newDate.toISOString().split('T')[0];
-            };
-
-            const formatCurrency = (amount) => {
-                const currency = appSettings.currency || 'MAD';
-                try {
-                    return new Intl.NumberFormat('en-US', { 
-                        style: 'currency', 
-                        currency: currency,
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }).format(amount);
-                } catch (e) {
-                    // Fallback for invalid currency codes
-                    return `${amount.toFixed(2)} ${currency}`;
-                }
-            };
-            
-            // --- NEW: COLOR HELPER ---
-            const getRandomColor = () => {
-                const letters = '0123456789ABCDEF';
-                let color = '#';
-                for (let i = 0; i < 6; i++) {
-                    color += letters[Math.floor(Math.random() * 16)];
-                }
-                return color;
-            };
-
-            // --- RENDERING ---
-
-            const renderAll = () => {
-                // Must run first as other renders depend on it
-                populateCategoryDropdowns(); 
-                renderExpenseList();
-                renderBudgetForms();
-                renderBudgetStatus();
-                renderDashboard();
-                renderRecurringExpensesList();
-                renderCategoryList();
-            };
-
-            const renderExpenseList = () => {
-                expenseListEl.innerHTML = '';
-                const filteredExpenses = getFilteredExpenses();
-
-                if (filteredExpenses.length === 0) {
-                    expenseListEl.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No expenses found for the selected filters.</td></tr>`;
-                    return;
-                }
+                // Change color based on percentage
+                if (percentage > 90) budgetProgressBar.className = 'bg-red-600 h-2.5 rounded-full';
+                else if (percentage > 70) budgetProgressBar.className = 'bg-yellow-500 h-2.5 rounded-full';
+                else budgetProgressBar.className = 'bg-blue-600 h-2.5 rounded-full';
                 
-                // Sort by date descending
-                filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+                const remaining = currentBudget - total;
+                budgetRemainingTextEl.textContent = remaining >= 0 ? `${formatCurrency(remaining)} remaining` : `${formatCurrency(Math.abs(remaining))} over budget`;
+            } else {
+                budgetDisplayEl.textContent = 'Not Set';
+                budgetProgressBar.style.width = '0%';
+                budgetRemainingTextEl.textContent = 'Set a budget to track spending.';
+            }
+        };
+        
+        /** Renders the chart (Bar or Pie) */
+        const renderChart = (periodExpenses) => {
+            if (chartType === 'bar') {
+                barChartContainer.classList.remove('hidden');
+                pieChartContainer.classList.add('hidden');
+                renderBarChart(periodExpenses);
+            } else {
+                barChartContainer.classList.add('hidden');
+                pieChartContainer.classList.remove('hidden');
+                renderPieChart(periodExpenses);
+            }
+        };
+        
+        /** Renders the bar chart */
+        const renderBarChart = (periodExpenses) => {
+            barChartContainer.innerHTML = '';
+            const { totals } = getCategoryTotals(periodExpenses);
+            const categoryKeys = Object.keys(categories);
+            
+            let maxTotal = Math.max(...categoryKeys.map(key => totals[key].total));
+            if (maxTotal === 0) maxTotal = 1; // Avoid division by zero
 
-                filteredExpenses.forEach(expense => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
+            categoryKeys.forEach(key => {
+                const total = totals[key].total;
+                const heightPercentage = (total / maxTotal) * 100;
+                
+                const barEl = document.createElement('div');
+                barEl.className = "flex flex-col items-center justify-end w-full h-full";
+                barEl.innerHTML = `
+                    <div class="chart-bar w-1/2 md:w-3/5 bg-blue-600 rounded-t-md" style="height: ${heightPercentage}%" title="${categories[key].label}: ${formatCurrency(total)}"></div>
+                    <span class="text-xs text-tertiary mt-2">${categories[key].label}</span>
+                `;
+                barChartContainer.appendChild(barEl);
+            });
+        };
+        
+        /** Renders the pie chart */
+        const renderPieChart = (periodExpenses) => {
+            const { totals, grandTotal } = getCategoryTotals(periodExpenses);
+            if (grandTotal === 0) {
+                pieChartEl.style.background = 'var(--bg-tertiary)';
+                pieChartLegendEl.innerHTML = '<span class="text-tertiary">No data</span>';
+                return;
+            }
 
-                    const category = appSettings.categories.find(c => c.name === expense.category);
-                    const color = category ? category.color : '#A78BFA'; // Default to purple for 'Other' or missing
-                    const icon = category ? (category.icon || '❓') : '❓';
-
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${expense.date}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${formatCurrency(expense.amount)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
-                                  style="color: ${color}; background-color: ${color}20;">
-                                ${icon} ${expense.category}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${expense.note || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            <button data-id="${expense.id}" class="edit-btn text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
-                            <button data-id="${expense.id}" class="delete-btn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</button>
-                        </td>
+            const pieColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1', '#F9C851', '#E67E22', '#3498DB', '#2ECC71'];
+            let gradientString = 'conic-gradient(';
+            let currentAngle = 0;
+            let legendHTML = '';
+            
+            let colorIndex = 0;
+            Object.keys(totals).forEach(key => {
+                const { total, label } = totals[key];
+                if (total > 0) {
+                    const percentage = (total / grandTotal) * 100;
+                    const angle = (percentage / 100) * 360;
+                    const color = pieColors[colorIndex % pieColors.length];
+                    
+                    gradientString += `${color} ${currentAngle}deg ${currentAngle + angle}deg, `;
+                    legendHTML += `
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full" style="background-color: ${color}"></div>
+                            <span class="text-secondary">${label} (${percentage.toFixed(0)}%)</span>
+                        </div>
                     `;
-                    expenseListEl.appendChild(tr);
-                });
-            };
-            
-            const renderBudgetForms = () => {
-                budgetCategoriesFormEl.innerHTML = '';
-                baseSalaryInput.value = budgets.baseSalary || '';
-                
-                appSettings.categories.forEach(category => {
-                    const div = document.createElement('div');
-                    const budgetValue = budgets.categories[category.name] || '';
-                    div.innerHTML = `
-                        <label for="budget-${category.name.toLowerCase().replace(' ', '-')}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${category.icon || '❓'} ${category.name}</label>
-                        <input type="number" id="budget-${category.name.toLowerCase().replace(' ', '-')}" 
-                               data-category="${category.name}"
-                               step="0.01" min="0" value="${budgetValue}" placeholder="0.00" 
-                               class="budget-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                    `;
-                    budgetCategoriesFormEl.appendChild(div);
-                });
-            };
-
-            const renderBudgetStatus = () => {
-                budgetStatusListEl.innerHTML = '';
-                const today = new Date();
-                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-                const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
-
-                const monthlyExpenses = expenses.filter(e => e.date >= startOfMonth && e.date <= endOfMonth);
-                
-                let hasBudgets = false;
-
-                appSettings.categories.forEach(category => {
-                    const budgetAmount = budgets.categories[category.name] || 0;
-                    if (budgetAmount > 0) {
-                        hasBudgets = true;
-                        const spentAmount = monthlyExpenses
-                            .filter(e => e.category === category.name)
-                            .reduce((sum, e) => sum + e.amount, 0);
-                        
-                        const remaining = budgetAmount - spentAmount;
-                        const progress = Math.min(100, (spentAmount / budgetAmount) * 100);
-                        
-                        let progressBarClass = 'bg-blue-600';
-                        let remainingTextClass = 'text-green-600';
-                        let remainingText = `${formatCurrency(remaining)} remaining`;
-
-                        if (remaining < 0) {
-                            progressBarClass = 'bg-red-600';
-                            remainingTextClass = 'text-red-600';
-                            remainingText = `${formatCurrency(Math.abs(remaining))} over budget`;
-                        } else if (progress > 80) {
-                            progressBarClass = 'bg-yellow-500';
-                        }
-                        
-                        const budgetEl = document.createElement('div');
-                        budgetEl.innerHTML = `
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-base font-medium text-gray-800 dark:text-white">${category.icon || '❓'} ${category.name}</span>
-                                <span class="text-sm font-medium ${remainingTextClass}">${remainingText}</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                <div class="${progressBarClass} h-2.5 rounded-full" style="width: ${progress}%"></div>
-                            </div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                ${formatCurrency(spentAmount)} / ${formatCurrency(budgetAmount)}
-                            </div>
-                        `;
-                        budgetStatusListEl.appendChild(budgetEl);
-                    }
-                });
-
-                if (!hasBudgets) {
-                    budgetStatusListEl.innerHTML = `<p class="text-gray-500 dark:text-gray-400">No budgets set. Go to the "Set Budgets" form to add them.</p>`;
-                }
-            };
-            
-            const renderDashboard = () => {
-                const filteredExpenses = getFilteredExpenses();
-                const today = new Date();
-                
-                const currentMonth = today.getMonth();
-                const currentYear = today.getFullYear();
-                
-                // Summaries
-                const totalFiltered = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
-                summaryTotalEl.textContent = formatCurrency(totalFiltered);
-                
-                const monthExpenses = expenses.filter(e => {
-                    const d = new Date(e.date);
-                    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-                });
-                const totalMonth = monthExpenses.reduce((sum, e) => sum + e.amount, 0);
-                summaryMonthEl.textContent = formatCurrency(totalMonth);
-
-                const baseSalary = budgets.baseSalary || 0;
-                const remainingSalary = baseSalary - totalMonth;
-                summaryRemainingEl.textContent = formatCurrency(remainingSalary);
-                if (remainingSalary < 0) {
-                    summaryRemainingEl.classList.add('text-red-600');
-                } else {
-                    summaryRemainingEl.classList.remove('text-red-600');
-                }
-
-                const yearExpenses = expenses.filter(e => new Date(e.date).getFullYear() === currentYear);
-                const totalYear = yearExpenses.reduce((sum, e) => sum + e.amount, 0);
-                summaryYearEl.textContent = formatCurrency(totalYear);
-
-                // Pie Chart
-                renderPieChart(filteredExpenses);
-                // Line Chart
-                renderLineChart(filteredExpenses);
-            };
-
-            const renderPieChart = (data) => {
-                const ctx = document.getElementById('categoryPieChart').getContext('2d');
-                
-                const categoryTotals = appSettings.categories.reduce((acc, category) => {
-                    acc[category.name] = 0;
-                    return acc;
-                }, {});
-
-                // Add 'Other' for any expenses with categories no longer in settings
-                if (!categoryTotals['Other']) {
-                    categoryTotals['Other'] = 0; 
-                }
-
-                data.forEach(e => {
-                    if (categoryTotals.hasOwnProperty(e.category)) {
-                        categoryTotals[e.category] += e.amount;
-                    } else {
-                        categoryTotals['Other'] += e.amount;
-                    }
-                });
-                
-                // Filter out categories with 0 expense
-                const chartLabels = Object.keys(categoryTotals).filter(k => categoryTotals[k] > 0);
-                const chartDataValues = chartLabels.map(k => categoryTotals[k]);
-                const chartColors = chartLabels.map(k => {
-                    const category = appSettings.categories.find(c => c.name === k);
-                    return category ? category.color : '#A78BFA'; // Default for 'Other'
-                });
-
-                const chartData = {
-                    labels: chartLabels,
-                    datasets: [{
-                        data: chartDataValues,
-                        backgroundColor: chartColors,
-                    }]
-                };
-
-                if (categoryPieChart) {
-                    categoryPieChart.data = chartData;
-                    categoryPieChart.update();
-                } else {
-                    categoryPieChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: chartData,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                    labels: {
-                                        // This will use Chart.defaults.color
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            let label = context.label || '';
-                                            if (label) {
-                                                label += ': ';
-                                            }
-                                            if (context.parsed !== null) {
-                                                label += formatCurrency(context.parsed);
-                                            }
-                                            return label;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            };
-
-            const renderLineChart = (data) => {
-                const ctx = document.getElementById('spendingLineChart').getContext('2d');
-                
-                // Group by day
-                const dailyTotals = data.reduce((acc, e) => {
-                    const date = e.date;
-                    acc[date] = (acc[date] || 0) + e.amount;
-                    return acc;
-                }, {});
-
-                const sortedDates = Object.keys(dailyTotals).sort((a,b) => new Date(a) - new Date(b));
-                
-                const chartData = {
-                    labels: sortedDates,
-                    datasets: [{
-                        label: 'Spending',
-                        data: sortedDates.map(date => dailyTotals[date]),
-                        borderColor: '#3B82F6', // blue-500
-                        backgroundColor: '#3B82F6' + '30', // blue-500 with opacity
-                        fill: true,
-                        tension: 0.1
-                    }]
-                };
-                
-                if (spendingLineChart) {
-                    spendingLineChart.data = chartData;
-                    spendingLineChart.update();
-                } else {
-                    spendingLineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: chartData,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: (value) => formatCurrency(value),
-                                        // color will be from Chart.defaults.color
-                                    },
-                                    grid: {
-                                        // color will be from Chart.defaults.borderColor
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        maxTicksLimit: 10 // Limit ticks to avoid crowding
-                                        // color will be from Chart.defaults.color
-                                    },
-                                    grid: {
-                                        // color will be from Chart.defaults.borderColor
-                                    }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            };
-            
-            // --- FILTERING ---
-            const getFilteredExpenses = () => {
-                return expenses.filter(e => {
-                    const date = new Date(e.date);
-                    const note = e.note || '';
-                    if (filters.startDate && e.date < filters.startDate) return false;
-                    if (filters.endDate && e.date > filters.endDate) return false;
-                    if (filters.category && e.category !== filters.category) return false;
-                    if (filters.searchTerm && !note.toLowerCase().includes(filters.searchTerm.toLowerCase())) return false;
-                    return true;
-                });
-            };
-
-            const handleApplyFilters = () => {
-                filters.startDate = filterStartDate.value;
-                filters.endDate = filterEndDate.value;
-                filters.category = filterCategory.value;
-                
-                // Re-render dashboard and expense list (if visible)
-                renderDashboard();
-                renderExpenseList();
-            };
-            
-            const handleResetFilters = () => {
-                filters.startDate = '';
-                filters.endDate = '';
-                filters.category = '';
-                
-                filterStartDate.value = '';
-                filterEndDate.value = '';
-                filterCategory.value = '';
-                
-                // De-activate quick filter buttons
-                document.querySelectorAll('.quick-filter-btn').forEach(btn => {
-                    btn.classList.remove('bg-blue-600', 'text-white', 'dark:bg-blue-500');
-                    btn.classList.add('bg-gray-200', 'text-gray-700', 'dark:bg-gray-700', 'dark:text-gray-300');
-                });
-
-                handleApplyFilters();
-            };
-
-            // --- EXPENSE CRUD ---
-            const handleExpenseFormSubmit = (e) => {
-                e.preventDefault();
-                
-                const id = expenseIdInput.value;
-                const expense = {
-                    date: expenseDateInput.value,
-                    amount: parseFloat(expenseAmountInput.value),
-                    category: expenseCategoryInput.value,
-                    note: expenseNoteInput.value.trim()
-                };
-
-                if (id) {
-                    // Update
-                    const index = expenses.findIndex(e => e.id === id);
-                    if (index !== -1) {
-                        expenses[index] = { ...expenses[index], ...expense };
-                    }
-                } else {
-                    // Add new
-                    expense.id = crypto.randomUUID();
-                    expenses.push(expense);
-                }
-                
-                saveExpenses();
-                renderAll();
-                resetExpenseForm();
-                showMessage('Success', `Expense successfully ${id ? 'updated' : 'added'}!`);
-            };
-
-            const resetExpenseForm = () => {
-                expenseForm.reset();
-                expenseIdInput.value = '';
-                expenseFormTitle.textContent = 'Add New Expense';
-                expenseSubmitBtn.textContent = 'Add Expense';
-                expenseCancelBtn.classList.add('hidden');
-                expenseDateInput.value = getISODate(new Date()); // Default to today
-            };
-            
-            const handleEditExpense = (id) => {
-                const expense = expenses.find(e => e.id === id);
-                if (!expense) return;
-
-                expenseIdInput.value = expense.id;
-                expenseDateInput.value = expense.date;
-                expenseAmountInput.value = expense.amount;
-                expenseCategoryInput.value = expense.category;
-                expenseNoteInput.value = expense.note;
-
-                expenseFormTitle.textContent = 'Edit Expense';
-                expenseSubmitBtn.textContent = 'Update Expense';
-                expenseCancelBtn.classList.remove('hidden');
-                
-                // Switch to expense tab and scroll to form
-                showSection('expenses');
-                expenseForm.scrollIntoView({ behavior: 'smooth' });
-            };
-
-            const handleDeleteExpense = async (id) => {
-                const confirmed = await showModal('Delete Expense', 'Are you sure you want to delete this expense? This action cannot be undone.', 'Delete', 'bg-red-600 hover:bg-red-700');
-                
-                if (confirmed) {
-                    expenses = expenses.filter(e => e.id !== id);
-                    saveExpenses();
-                    renderAll();
-                    showMessage('Deleted', 'The expense has been deleted.');
-                }
-            };
-
-            // --- BUDGETS ---
-            const handleBudgetFormSubmit = (e) => {
-                e.preventDefault();
-                
-                const newCategoryBudgets = {};
-                document.querySelectorAll('#budget-categories-form .budget-input').forEach(input => {
-                    const category = input.dataset.category;
-                    newCategoryBudgets[category] = parseFloat(input.value) || 0;
-                });
-
-                budgets = {
-                    baseSalary: parseFloat(baseSalaryInput.value) || 0,
-                    categories: newCategoryBudgets
-                };
-
-                saveBudgets();
-                renderBudgetStatus(); // Re-render status immediately
-                renderDashboard(); // Re-render dashboard summaries
-                showMessage('Success', 'Budgets have been saved.');
-            };
-
-            // --- DATA IMPORT/EXPORT ---
-            const handleExportCSV = () => {
-                if (expenses.length === 0) {
-                    showMessage('No Data', 'There are no expenses to export.');
-                    return;
-                }
-                
-                const headers = 'id,date,amount,category,note\n';
-                const csv = expenses.map(e => {
-                    const note = `"${e.note ? e.note.replace(/"/g, '""') : ''}"`;
-                    return `${e.id},${e.date},${e.amount},${e.category},${note}`;
-                }).join('\n');
-                
-                const csvBlob = new Blob([headers + csv], { type: 'text/csv;charset=utf-8;' });
-                const csvUrl = URL.createObjectURL(csvBlob);
-                const link = document.createElement('a');
-                link.setAttribute('href', csvUrl);
-                link.setAttribute('download', `expenses_${getISODate(new Date())}.csv`);
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-
-            const handleImportCSV = (file) => {
-                if (!file) return;
-                
-                showLoader();
-                const reader = new FileReader();
-                
-                reader.onload = async (e) => {
-                    const text = e.target.result;
-                    const lines = text.split('\n').filter(line => line.trim() !== '');
-                    const headers = lines.shift().trim().split(',');
-
-                    // Simple header validation
-                    const requiredHeaders = ['id', 'date', 'amount', 'category', 'note'];
-                    if (!requiredHeaders.every((h, i) => headers[i] === h)) {
-                        hideLoader();
-                        showMessage('Import Error', 'Invalid CSV format. Headers must be: `id,date,amount,category,note`');
-                        return;
-                    }
                     
-                    const newExpenses = [];
-                    let parseError = false;
-                    
-                    for (const line of lines) {
-                        // Basic CSV parsing (not robust for all edge cases, but fine for this app)
-                        const values = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)
-                                        .map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'));
-                                        
-                        if (values.length !== 5) {
-                            parseError = true;
-                            break;
-                        }
-
-                        const [id, date, amount, category, note] = values;
-                        const parsedAmount = parseFloat(amount);
-                        
-                        if (id && date && !isNaN(parsedAmount) && category) {
-                            newExpenses.push({
-                                id,
-                                date,
-                                amount: parsedAmount,
-                                category,
-                                note
-                            });
-                        } else {
-                            parseError = true;
-                            break;
-                        }
-                    }
-
-                    if (parseError) {
-                        hideLoader();
-                        showMessage('Import Error', 'Error parsing CSV file. Please check the data and format.');
-                        return;
-                    }
-                    
-                    const importMode = document.querySelector('input[name="import-mode"]:checked').value;
-                    const confirmed = await showModal(
-                        'Confirm Import', 
-                        `Found ${newExpenses.length} expenses. Do you want to <strong>${importMode}</strong> them with your current data?`,
-                        'Confirm Import',
-                        'bg-blue-600 hover:bg-blue-700'
-                    );
-
-                    if (confirmed) {
-                        if (importMode === 'replace') {
-                            expenses = newExpenses;
-                        } else {
-                            // Merge: Add new, update existing based on ID
-                            newExpenses.forEach(newExp => {
-                                const index = expenses.findIndex(e => e.id === newExp.id);
-                                if (index !== -1) {
-                                    expenses[index] = newExp; // Update
-                                } else {
-                                    expenses.push(newExp); // Add
-                                }
-                            });
-                        }
-                        saveExpenses();
-                        renderAll();
-                        hideLoader();
-                        showMessage('Success', `Successfully imported ${newExpenses.length} expenses.`);
-                    } else {
-                        hideLoader();
-                    }
-                };
-                
-                reader.onerror = () => {
-                    hideLoader();
-                    showMessage('Import Error', 'Could not read the file.');
-                };
-                
-                reader.readAsText(file);
-            };
+                    currentAngle += angle;
+                    colorIndex++;
+                }
+            });
             
-            const handleDeleteAllData = async () => {
-                const confirmed = await showModal(
-                    'Delete All Data', 
-                    '<strong>Are you absolutely sure?</strong> This will delete all expenses and budgets permanently. This action cannot be undone.', 
-                    'Yes, Delete Everything', 
-                    'bg-red-600 hover:bg-red-700'
-                );
+            gradientString = gradientString.slice(0, -2) + ')'; // Remove last comma and space
+            pieChartEl.style.background = gradientString;
+            pieChartLegendEl.innerHTML = legendHTML;
+        };
 
-                if (confirmed) {
-                    expenses = [];
-                    budgets = { baseSalary: 0, categories: {} };
-                    appSettings.categories = defaultCategories;
-                    appSettings.recurringExpenses = [];
-                    saveExpenses();
-                    saveBudgets();
-                    saveSettings();
-                    renderAll();
-                    showMessage('Data Deleted', 'All expenses, budgets, and custom categories have been deleted.');
-                }
-            };
+        /** Renders the list of expenses */
+        const renderExpenseList = (periodExpenses) => {
+            expenseListEl.innerHTML = '';
+            
+            const filteredExpenses = periodExpenses
+                .filter(exp => currentFilter === 'all' || exp.category === currentFilter)
+                .filter(exp => currentSearchTerm === '' || exp.title.toLowerCase().includes(currentSearchTerm.toLowerCase()))
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            emptyStateEl.classList.toggle('hidden', filteredExpenses.length > 0);
 
-            // --- NEW: RECURRING EXPENSES ---
-            const renderRecurringExpensesList = () => {
-                recurringListEl.innerHTML = '';
-                const today = new Date();
-                const currentMonthYear = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
-
-                if (appSettings.recurringExpenses.length === 0) {
-                    recurringListEl.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No recurring expenses found.</td></tr>`;
-                    return;
-                }
+            filteredExpenses.forEach(expense => {
+                const item = document.createElement('div');
+                item.className = 'glass-card flex items-center justify-between p-4 transition-all duration-200 hover:border-primary/20';
                 
-                appSettings.recurringExpenses.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
-
-                    const category = appSettings.categories.find(c => c.name === item.category);
-                    const color = category ? category.color : '#A78BFA';
-                    const icon = category ? (category.icon || '❓') : '❓';
-                    
-                    const isAdded = item.lastAdded === currentMonthYear;
-
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${formatCurrency(item.amount)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
-                                  style="color: ${color}; background-color: ${color}20;">
-                                ${icon} ${item.category}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.note}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.lastAdded === '2000-01' ? 'Never' : item.lastAdded}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <button data-id="${item.id}" class="recurring-add-btn px-3 py-1 text-xs rounded-full ${isAdded ? 'bg-green-600 text-white cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}" ${isAdded ? 'disabled' : ''}>
-                                ${isAdded ? 'Added' : 'Add'}
+                const category = categories[expense.category];
+                const categoryIcon = category ? category.icon : GENERIC_ICON;
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-tertiary/60 rounded-xl text-primary">
+                            ${categoryIcon}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-primary">${expense.title}</p>
+                            <p class="text-sm text-tertiary">${formatDate(expense.date)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <p class="font-semibold text-primary text-lg">
+                            ${formatCurrency(expense.amount)}
+                        </p>
+                        <div class="flex gap-2">
+                            <button class="edit-btn p-2 text-tertiary hover:text-blue-400 transition-colors" data-id="${expense.id}" title="Edit">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                             </button>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            <button data-id="${item.id}" class="recurring-edit-btn text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
-                            <button data-id="${item.id}" class="recurring-delete-btn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</button>
-                        </td>
-                    `;
-                    recurringListEl.appendChild(tr);
-                });
-            };
+                            <button class="delete-btn p-2 text-tertiary hover:text-red-400 transition-colors" data-id="${expense.id}" title="Delete">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                expenseListEl.appendChild(item);
+            });
+        };
+        
+        /** Renders the insights card */
+        const renderInsights = (periodExpenses) => {
+            if (periodExpenses.length === 0) {
+                insightTopCategory.innerHTML = `<h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3><p class="text-xl font-semibold text-primary">--</p>`;
+                insightHighestExpense.innerHTML = `<h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p><p class="text-sm text-tertiary truncate">--</p>`;
+                insightAvgSpend.innerHTML = `<h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p>`;
+                return;
+            }
 
-            const handleRecurringFormSubmit = (e) => {
-                e.preventDefault();
-                
-                const id = recurringIdInput.value;
-                const recurringItem = {
-                    amount: parseFloat(recurringAmountInput.value),
-                    category: recurringCategoryInput.value,
-                    note: recurringNoteInput.value.trim()
-                };
-
-                if (id) {
-                    // Update
-                    const index = appSettings.recurringExpenses.findIndex(item => item.id === id);
-                    if (index !== -1) {
-                        // Preserve lastAdded date
-                        recurringItem.lastAdded = appSettings.recurringExpenses[index].lastAdded;
-                        recurringItem.id = id;
-                        appSettings.recurringExpenses[index] = recurringItem;
-                    }
-                } else {
-                    // Add new
-                    recurringItem.id = crypto.randomUUID();
-                    recurringItem.lastAdded = '2000-01'; // Set to 'Never'
-                    appSettings.recurringExpenses.push(recurringItem);
-                }
-                
-                saveSettings();
-                renderRecurringExpensesList();
-                resetRecurringForm();
-                showMessage('Success', `Recurring expense successfully ${id ? 'updated' : 'added'}!`);
-            };
-
-            const resetRecurringForm = () => {
-                recurringForm.reset();
-                recurringIdInput.value = '';
-                recurringFormTitle.textContent = 'Add Recurring Expense';
-                recurringSubmitBtn.textContent = 'Add Recurring';
-                recurringCancelBtn.classList.add('hidden');
-            };
-
-            const handleEditRecurring = (id) => {
-                const item = appSettings.recurringExpenses.find(item => item.id === id);
-                if (!item) return;
-
-                recurringIdInput.value = item.id;
-                recurringAmountInput.value = item.amount;
-                recurringCategoryInput.value = item.category;
-                recurringNoteInput.value = item.note;
-
-                recurringFormTitle.textContent = 'Edit Recurring Expense';
-                recurringSubmitBtn.textContent = 'Update Recurring';
-                recurringCancelBtn.classList.remove('hidden');
-                
-                recurringForm.scrollIntoView({ behavior: 'smooth' });
-            };
-
-            const handleDeleteRecurring = async (id) => {
-                const confirmed = await showModal('Delete Recurring Expense', 'Are you sure you want to delete this recurring expense?', 'Delete', 'bg-red-600 hover:bg-red-700');
-                
-                if (confirmed) {
-                    appSettings.recurringExpenses = appSettings.recurringExpenses.filter(item => item.id !== id);
-                    saveSettings();
-                    renderRecurringExpensesList();
-                    showMessage('Deleted', 'The recurring expense has been deleted.');
-                }
-            };
+            // Top Category
+            const { totals } = getCategoryTotals(periodExpenses);
+            const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
+            insightTopCategory.innerHTML = `
+                <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
+                <p class="text-xl font-semibold text-primary">${totals[topCategory].total > 0 ? categories[topCategory].label : '--'}</p>
+            `;
             
-            const handleAddRecurring = (id) => {
-                const item = appSettings.recurringExpenses.find(item => item.id === id);
-                if (!item) return;
+            // Highest Expense
+            const highest = periodExpenses.reduce((max, exp) => parseFloat(exp.amount) > max.amount ? exp : max, { amount: 0 });
+            insightHighestExpense.innerHTML = `
+                <h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3>
+                <p class="text-xl font-semibold text-primary">${formatCurrency(highest.amount)}</p>
+                <p class="text-sm text-tertiary truncate">${highest.title}</p>
+            `;
+            
+            // Average Daily Spend
+            const total = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            const daysInUse = new Set(periodExpenses.map(exp => exp.date)).size;
+            const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+            const daysSoFar = (currentYear === new Date().getFullYear() && currentMonth === new Date().getMonth()) ? new Date().getDate() : daysInMonth;
+            const avg = total / daysSoFar;
+            insightAvgSpend.innerHTML = `
+                <h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3>
+                <p class="text-xl font-semibold text-primary">${formatCurrency(avg)}</p>
+            `;
+        };
+        
+        // --- MODAL & FORM HANDLING ---
 
-                const today = new Date();
-                const currentMonthYear = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
-                
-                if (item.lastAdded === currentMonthYear) {
-                    showMessage('Already Added', 'This item has already been added for this month.');
-                    return;
-                }
+        const openModal = (expense = null) => {
+            expenseForm.reset();
+            if (expense) {
+                modalTitle.textContent = 'Edit Expense';
+                expenseIdField.value = expense.id;
+                expenseTitleField.value = expense.title;
+                expenseAmountField.value = expense.amount;
+                expenseCategoryField.value = expense.category;
+                expenseDateField.value = expense.date;
+                expenseRecurringCheckbox.checked = false;
+                expenseRecurringCheckbox.disabled = true;
+            } else {
+                modalTitle.textContent = 'Add New Expense';
+                expenseIdField.value = '';
+                expenseDateField.value = getTodayString();
+                expenseRecurringCheckbox.checked = false;
+                expenseRecurringCheckbox.disabled = false;
+            }
+            modal.classList.remove('hidden');
+        };
+        const closeModal = () => modal.classList.add('hidden');
 
-                const newExpense = {
-                    id: crypto.randomUUID(),
-                    date: `${currentMonthYear}-01`, // Add on the 1st of the month
-                    amount: item.amount,
-                    category: item.category,
-                    note: `${item.note} (Recurring)`
-                };
-                expenses.push(newExpense);
-                item.lastAdded = currentMonthYear;
-                
-                saveExpenses();
-                saveSettings();
-                renderAll();
-                showMessage('Success', `Added "${item.note}" to expenses for this month.`);
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            
+            const id = expenseIdField.value;
+            const isRecurring = expenseRecurringCheckbox.checked;
+
+            const expenseData = {
+                id: id ? id : new Date().getTime().toString(),
+                title: expenseTitleField.value,
+                amount: parseFloat(expenseAmountField.value),
+                category: expenseCategoryField.value,
+                date: expenseDateField.value,
             };
 
-            // --- NEW: CATEGORY MANAGEMENT ---
-            const renderCategoryList = () => {
-                categoryListEl.innerHTML = '';
-                appSettings.categories.forEach(category => {
-                    const li = document.createElement('li');
-                    li.className = 'flex items-center justify-between p-2 bg-gray-100 rounded-md dark:bg-gray-700';
-                    li.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <span data-name="${category.name}" class="category-icon-btn text-xl w-6 text-center cursor-pointer" title="Edit Icon">${category.icon || '❓'}</span>
-                            <input type="color" data-name="${category.name}" value="${category.color}" class="category-color-picker">
-                            <span class="text-gray-800 dark:text-gray-200">${category.name}</span>
-                        </div>
-                        <div class="space-x-2">
-                            <button data-name="${category.name}" class="category-edit-btn text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 ${category.name === 'Other' ? 'hidden' : ''}">Edit</button>
-                            <button data-name="${category.name}" class="category-delete-btn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ${category.name === 'Other' ? 'hidden' : ''}">Delete</button>
-                        </div>
-                    `;
-                    categoryListEl.appendChild(li);
-                });
-            };
+            if (id) {
+                // Update
+                expenses = expenses.map(exp => exp.id === id ? expenseData : exp);
+            } else if (isRecurring) {
+                // Add to recurring list
+                expenseData.nextDueDate = expenseData.date; // Set first due date
+                recurringExpenses.push(expenseData);
+                saveToStorage(KEYS.RECURRING, recurringExpenses);
+            } else {
+                // Add to main list
+                expenses.push(expenseData);
+            }
+            
+            saveToStorage(KEYS.EXPENSES, expenses);
+            render();
+            closeModal();
+        };
+        
+        const handleListClick = (e) => {
+            const editBtn = e.target.closest('.edit-btn');
+            const deleteBtn = e.target.closest('.delete-btn');
+            
+            if (editBtn) {
+                openModal(expenses.find(exp => exp.id === editBtn.dataset.id));
+            }
+            if (deleteBtn) {
+                expenseToDeleteId = deleteBtn.dataset.id;
+                deleteModal.classList.remove('hidden');
+            }
+        };
+        
+        const handleDeleteConfirm = () => {
+            if (expenseToDeleteId) {
+                expenses = expenses.filter(exp => exp.id !== expenseToDeleteId);
+                saveToStorage(KEYS.EXPENSES, expenses);
+                render();
+                expenseToDeleteId = null;
+            }
+            deleteModal.classList.add('hidden');
+        };
 
-            const handleCategoryFormSubmit = (e) => {
-                e.preventDefault();
-                const newName = newCategoryNameInput.value.trim();
-                const newIcon = newCategoryIconInput.value.trim() || '❓';
-                if (newName && !appSettings.categories.find(c => c.name.toLowerCase() === newName.toLowerCase())) {
-                    appSettings.categories.push({ name: newName, icon: newIcon, color: getRandomColor() });
-                    saveSettings();
-                    renderAll();
-                    newCategoryNameInput.value = '';
-                    newCategoryIconInput.value = '';
-                } else if (!newName) {
-                    showMessage('Error', 'Category name cannot be empty.');
-                } else {
-                    showMessage('Error', 'This category already exists.');
-                }
-            };
+        // --- FEATURE HANDLERS ---
+        
+        // Theme
+        const initTheme = () => {
+            const savedTheme = getFromStorage(KEYS.THEME) || 'dark';
+            applyTheme(savedTheme);
+        };
+        const applyTheme = (theme) => {
+            if (theme === 'light') {
+                docElement.classList.add('light');
+                themeIconLight.classList.add('hidden');
+                themeIconDark.classList.remove('hidden');
+            } else {
+                docElement.classList.remove('light');
+                themeIconLight.classList.remove('hidden');
+                themeIconDark.classList.add('hidden');
+            }
+            saveToStorage(KEYS.THEME, theme);
+        };
+        const handleThemeToggle = () => applyTheme(docElement.classList.contains('light') ? 'dark' : 'light');
 
-            const handleEditCategory = async (oldName) => {
-                const newName = prompt(`Enter new name for "${oldName}":`, oldName);
+        // Month Selector
+        const populateMonthSelector = () => {
+            monthSelector.innerHTML = '';
+            const now = new Date();
+            for (let i = 0; i < 12; i++) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const option = document.createElement('option');
+                option.value = `${year}-${month}`;
+                option.textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                monthSelector.appendChild(option);
+            }
+            monthSelector.value = `${currentYear}-${currentMonth}`;
+        };
+        const handleMonthChange = (e) => {
+            const [year, month] = e.target.value.split('-').map(Number);
+            currentYear = year;
+            currentMonth = month;
+            render();
+        };
+        
+        // Budget
+        const openBudgetModal = () => {
+            budgetAmountField.value = currentBudget > 0 ? currentBudget : '';
+            budgetModal.classList.remove('hidden');
+        };
+        const closeBudgetModal = () => budgetModal.classList.add('hidden');
+        const handleBudgetSubmit = (e) => {
+            e.preventDefault();
+            currentBudget = parseFloat(budgetAmountField.value) || 0;
+            saveToStorage(KEYS.BUDGET, currentBudget);
+            render();
+            closeBudgetModal();
+        };
+        
+        // Search & Filter
+        const handleFilterChange = (e) => { currentFilter = e.target.value; render(); };
+        const handleSearchInput = (e) => { currentSearchTerm = e.target.value; render(); };
 
-                if (newName && newName.trim() !== '' && newName !== oldName) {
-                    const newNameTrimmed = newName.trim();
-                    if (appSettings.categories.find(c => c.name.toLowerCase() === newNameTrimmed.toLowerCase())) {
-                        showMessage('Error', 'This category name already exists.');
-                        return;
-                    }
+        // Chart Toggle
+        const handleChartToggle = (type) => {
+            chartType = type;
+            if (type === 'bar') {
+                chartToggleBarBtn.classList.add('bg-blue-600/30', 'text-blue-300');
+                chartTogglePieBtn.classList.remove('bg-blue-600/30', 'text-blue-300');
+            } else {
+                chartTogglePieBtn.classList.add('bg-blue-600/30', 'text-blue-300');
+                chartToggleBarBtn.classList.remove('bg-blue-600/30', 'text-blue-300');
+            }
+            render();
+        };
 
-                    // 1. Update in settings
-                    const category = appSettings.categories.find(c => c.name === oldName);
-                    if (category) {
-                        category.name = newNameTrimmed;
-                    }
+        // Export CSV
+        const handleExportCSV = () => {
+            const periodExpenses = getExpensesForPeriod(currentYear, currentMonth);
+            if (periodExpenses.length === 0) return;
+            
+            let csv = 'Title,Amount,Category,Date\n';
+            periodExpenses.forEach(exp => {
+                csv += `"${exp.title}","${exp.amount}","${categories[exp.category].label}","${exp.date}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `expenses_${currentYear}-${currentMonth + 1}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        };
+        
+        // Recurring Expenses
+        const initRecurringExpenses = () => {
+            recurringExpenses = getFromStorage(KEYS.RECURRING) || [];
+            const today = new Date(getTodayString());
+            let expensesAdded = false;
+            
+            recurringExpenses.forEach(rex => {
+                let nextDueDate = new Date(rex.nextDueDate + 'T00:00:00');
+                if (nextDueDate <= today) {
+                    // Add to main expenses
+                    const newExpense = { ...rex, id: new Date().getTime().toString() + rex.id, date: rex.nextDueDate };
+                    delete newExpense.nextDueDate;
+                    expenses.push(newExpense);
                     
-                    // 2. Update in all expenses
-                    expenses.forEach(expense => {
-                        if (expense.category === oldName) {
-                            expense.category = newNameTrimmed;
-                        }
-                    });
-
-                    // 3. Update in all budgets
-                    if (budgets.categories[oldName]) {
-                        budgets.categories[newNameTrimmed] = budgets.categories[oldName];
-                        delete budgets.categories[oldName];
-                    }
-
-                    // 4. Update in recurring expenses
-                    appSettings.recurringExpenses.forEach(item => {
-                        if (item.category === oldName) {
-                            item.category = newNameTrimmed;
-                        }
-                    });
-
-                    saveSettings();
-                    saveExpenses();
-                    saveBudgets();
-                    renderAll();
-                    showMessage('Success', `Category "${oldName}" renamed to "${newNameTrimmed}".`);
+                    // Set next due date (e.g., +1 month)
+                    rex.nextDueDate = new Date(nextDueDate.setMonth(nextDueDate.getMonth() + 1)).toISOString().split('T')[0];
+                    expensesAdded = true;
                 }
-            };
+            });
             
-            const handleEditCategoryIcon = (name) => {
-                const category = appSettings.categories.find(c => c.name === name);
-                if (!category) return;
-
-                const newIcon = prompt(`Enter new icon (emoji) for "${name}":`, category.icon);
-
-                if (newIcon && newIcon.trim() !== '') {
-                    category.icon = newIcon.trim();
-                    saveSettings();
-                    renderAll(); // Re-render to show new icon everywhere
-                }
-            };
+            if (expensesAdded) {
+                saveToStorage(KEYS.EXPENSES, expenses);
+                saveToStorage(KEYS.RECURRING, recurringExpenses);
+            }
+        };
+        
+        // Category Management
+        const initCategories = () => {
+            categories = getFromStorage(KEYS.CATEGORIES) || DEFAULT_CATEGORIES;
+            saveToStorage(KEYS.CATEGORIES, categories);
+            renderCategoryUI();
+        };
+        const renderCategoryUI = () => {
+            // Populate dropdowns
+            filterCategoryEl.innerHTML = '<option value="all">All Categories</option>';
+            expenseCategoryField.innerHTML = '';
+            categoryListEl.innerHTML = '';
             
-            // --- NAVIGATION ---
-            const showSection = (hash) => {
-                const id = hash.substring(1); // remove '#'
-                appSections.forEach(section => {
-                    if (section.id === id) {
-                        section.classList.remove('hidden');
-                    } else {
-                        section.classList.add('hidden');
-                    }
-                });
-
-                // Update nav link styles
-                navLinks.forEach(link => {
-                    if (link.getAttribute('href') === hash) {
-                        link.classList.add('text-blue-600', 'dark:text-blue-400');
-                        link.classList.remove('text-gray-700', 'dark:text-gray-300');
-                    } else {
-                        link.classList.remove('text-blue-600', 'dark:text-blue-400');
-                        link.classList.add('text-gray-700', 'dark:text-gray-300');
-                    }
-                });
+            Object.keys(categories).forEach(key => {
+                const category = categories[key];
+                filterCategoryEl.innerHTML += `<option value="${key}">${category.label}</option>`;
+                expenseCategoryField.innerHTML += `<option value="${key}">${category.label}</option>`;
                 
-                // Close mobile menu
-                mobileMenu.classList.add('hidden');
-            };
-
-            const handleNavClick = (e) => {
-                e.preventDefault();
-                const hash = e.currentTarget.getAttribute('href');
-                if (hash) {
-                    window.location.hash = hash;
-                }
-            };
-            
-            // --- EVENT LISTENERS ---
-            // Navigation
-            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
-            
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
+                // Populate manage modal list
+                const isDefault = Object.keys(DEFAULT_CATEGORIES).includes(key);
+                categoryListEl.innerHTML += `
+                    <div class="flex items-center justify-between p-2 glass-input rounded-lg">
+                        <span class="text-primary">${category.label}</span>
+                        ${!isDefault ? `<button class="delete-category-btn p-1 text-red-400 hover:text-red-300" data-key="${key}">&times;</button>` : '<span class="text-xs text-tertiary">Default</span>'}
+                    </div>
+                `;
             });
-            
-            // Handle hash changes (e.g., back/forward buttons)
-            window.addEventListener('hashchange', () => {
-                showSection(window.location.hash || '#dashboard');
-            });
-
-            // Filters
-            applyFiltersBtn.addEventListener('click', handleApplyFilters);
-            resetFiltersBtn.addEventListener('click', handleResetFilters);
-
-            // --- NEW: Quick Filter Listeners ---
-            const quickFilterButtons = [
-                { btn: quickFilterWeekBtn, type: 'week' },
-                { btn: quickFilterMonthBtn, type: 'month' },
-                { btn: quickFilterLastMonthBtn, type: 'last-month' },
-                { btn: quickFilterYearBtn, type: 'year' }
-            ];
-
-            quickFilterButtons.forEach(({ btn, type }) => {
-                btn.addEventListener('click', () => {
-                    // De-activate all buttons first
-                    document.querySelectorAll('.quick-filter-btn').forEach(b => {
-                        b.classList.remove('bg-blue-600', 'text-white', 'dark:bg-blue-500');
-                        b.classList.add('bg-gray-200', 'text-gray-700', 'dark:bg-gray-700', 'dark:text-gray-300');
+        };
+        const openCategoryModal = () => categoryModal.classList.remove('hidden');
+        const closeCategoryModal = () => categoryModal.classList.add('hidden');
+        const handleCategorySubmit = (e) => {
+            e.preventDefault();
+            const name = categoryNameInput.value.trim();
+            if (name && !Object.values(categories).find(c => c.label === name)) {
+                const key = name.toLowerCase().replace(/\s+/g, '_');
+                categories[key] = { label: name, icon: GENERIC_ICON };
+                saveToStorage(KEYS.CATEGORIES, categories);
+                renderCategoryUI();
+                categoryForm.reset();
+            }
+        };
+        const handleCategoryDelete = (e) => {
+            const btn = e.target.closest('.delete-category-btn');
+            if (btn) {
+                const key = btn.dataset.key;
+                if (confirm(`Are you sure you want to delete the "${categories[key].label}" category?\nAll expenses in this category will be moved to "Other".`)) {
+                    // Re-assign expenses
+                    expenses.forEach(exp => {
+                        if (exp.category === key) exp.category = 'other';
                     });
-                    // Activate this one
-                    btn.classList.add('bg-blue-600', 'text-white', 'dark:bg-blue-500');
-                    btn.classList.remove('bg-gray-200', 'text-gray-700', 'dark:bg-gray-700', 'dark:text-gray-300');
-
-                    const today = new Date();
-                    let startDate, endDate = getISODate(today);
-
-                    switch (type) {
-                        case 'week':
-                            const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-                            startDate = getISODate(firstDayOfWeek);
-                            break;
-                        case 'month':
-                            startDate = getISODate(new Date(today.getFullYear(), today.getMonth(), 1));
-                            break;
-                        case 'last-month':
-                            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                            startDate = getISODate(lastMonth);
-                            endDate = getISODate(new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0));
-                            break;
-                        case 'year':
-                            startDate = getISODate(new Date(today.getFullYear(), 0, 1));
-                            break;
-                    }
-
-                    filterStartDate.value = startDate;
-                    filterEndDate.value = endDate;
-                    filterCategory.value = ''; // Reset category
-                    handleApplyFilters();
-                });
-            });
-
-            // Search
-            searchBar.addEventListener('input', (e) => {
-                filters.searchTerm = e.target.value;
-                renderExpenseList();
-            });
-
-            // Expense Form
-            expenseForm.addEventListener('submit', handleExpenseFormSubmit);
-            expenseCancelBtn.addEventListener('click', resetExpenseForm);
+                    saveToStorage(KEYS.EXPENSES, expenses);
+                    
+                    // Delete category
+                    delete categories[key];
+                    saveToStorage(KEYS.CATEGORIES, categories);
+                    
+                    renderCategoryUI();
+                    render(); // Re-render main app
+                }
+            }
+        };
+        
+        // --- INITIALIZATION ---
+        const init = () => {
+            initTheme();
+            initCategories();
+            expenses = getFromStorage(KEYS.EXPENSES) || [];
+            currentBudget = getFromStorage(KEYS.BUDGET) || 0;
+            initRecurringExpenses(); // This may modify and save `expenses`
             
-            // Expense List Actions (Event Delegation)
-            expenseListEl.addEventListener('click', (e) => {
-                if (e.target.classList.contains('edit-btn')) {
-                    handleEditExpense(e.target.dataset.id);
-                }
-                if (e.target.classList.contains('delete-btn')) {
-                    handleDeleteExpense(e.target.dataset.id);
-                }
-            });
-
-            // Budget Form
-            budgetForm.addEventListener('submit', handleBudgetFormSubmit);
-
-            // Recurring Expense Form
-            recurringForm.addEventListener('submit', handleRecurringFormSubmit);
-            recurringCancelBtn.addEventListener('click', resetRecurringForm);
-
-            // Recurring List Actions
-            recurringListEl.addEventListener('click', (e) => {
-                if (e.target.classList.contains('recurring-edit-btn')) {
-                    handleEditRecurring(e.target.dataset.id);
-                }
-                if (e.target.classList.contains('recurring-delete-btn')) {
-                    handleDeleteRecurring(e.target.dataset.id);
-                }
-                if (e.target.classList.contains('recurring-add-btn')) {
-                    handleAddRecurring(e.target.dataset.id);
-                }
-            });
+            populateMonthSelector();
+            render(); // Initial Render
             
-            // Category Management
-            categoryForm.addEventListener('submit', handleCategoryFormSubmit);
-            categoryListEl.addEventListener('click', (e) => {
-                if (e.target.classList.contains('category-edit-btn')) {
-                    handleEditCategory(e.target.dataset.name);
-                }
-                if (e.target.classList.contains('category-delete-btn')) {
-                    handleDeleteCategory(e.target.dataset.name);
-                }
-                if (e.target.classList.contains('category-icon-btn')) {
-                    handleEditCategoryIcon(e.target.dataset.name);
-                }
-            });
-            // NEW: Listen for color changes
-            categoryListEl.addEventListener('change', (e) => {
-                if (e.target.classList.contains('category-color-picker')) {
-                    const categoryName = e.target.dataset.name;
-                    const newColor = e.target.value;
-                    const category = appSettings.categories.find(c => c.name === categoryName);
-                    if (category) {
-                        category.color = newColor;
-                        saveSettings();
-                        renderAll(); // Re-render to show new colors
-                    }
-                }
-            });
+            // Event Listeners
+            addExpenseBtn.addEventListener('click', () => openModal(null));
+            modalBackdrop.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            expenseForm.addEventListener('submit', handleSubmit);
             
-            // Data Management
+            themeToggleBtn.addEventListener('click', handleThemeToggle);
+            monthSelector.addEventListener('change', handleMonthChange);
+            
+            setBudgetBtn.addEventListener('click', openBudgetModal);
+            budgetModalBackdrop.addEventListener('click', closeBudgetModal);
+            budgetCancelBtn.addEventListener('click', closeBudgetModal);
+            budgetForm.addEventListener('submit', handleBudgetSubmit);
+            
+            deleteModalBackdrop.addEventListener('click', () => deleteModal.classList.add('hidden'));
+            deleteCancelBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
+            deleteConfirmBtn.addEventListener('click', handleDeleteConfirm);
+            
+            filterCategoryEl.addEventListener('change', handleFilterChange);
+            searchBar.addEventListener('input', handleSearchInput);
             exportCsvBtn.addEventListener('click', handleExportCSV);
-            deleteAllDataBtn.addEventListener('click', handleDeleteAllData);
             
-            importCsvInput.addEventListener('change', (e) => {
-                importCsvBtn.disabled = !e.target.files || e.target.files.length === 0;
-            });
+            chartToggleBarBtn.addEventListener('click', () => handleChartToggle('bar'));
+            chartTogglePieBtn.addEventListener('click', () => handleChartToggle('pie'));
             
-            importCsvBtn.addEventListener('click', () => {
-                handleImportCSV(importCsvInput.files[0]);
-                importCsvInput.value = ''; // Reset file input
-                importCsvBtn.disabled = true;
-            });
+            manageCategoriesBtn.addEventListener('click', openCategoryModal);
+            categoryModalBackdrop.addEventListener('click', closeCategoryModal);
+            categoryCloseBtn.addEventListener('click', closeCategoryModal);
+            categoryForm.addEventListener('submit', handleCategorySubmit);
+            categoryListEl.addEventListener('click', handleCategoryDelete);
+            
+            expenseListEl.addEventListener('click', handleListClick);
+        };
 
-            // Settings
-            currencyForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                appSettings.currency = currencySelect.value;
-                saveSettings();
-                updateCurrencyUI();
-                renderAll(); // Re-render all to update currency formatting
-                showMessage('Success', 'Currency saved.');
-            });
-
-            darkModeToggle.addEventListener('click', () => {
-                appSettings.darkMode = !appSettings.darkMode;
-                saveSettings(); // Save the new setting
-                updateDarkModeUI(appSettings.darkMode); // Update UI immediately
-            });
-
-
-            // --- UI HELPERS ---
-            const updateCurrencyUI = () => {
-                const currency = appSettings.currency || 'MAD';
-                currencyLabelForm.textContent = `(${currency})`;
-                currencyLabelRecurringForm.textContent = `(${currency})`;
-                // Update placeholder for base salary
-                baseSalaryInput.placeholder = `0.00`;
-                // Update placeholders for budget inputs
-                document.querySelectorAll('.budget-input').forEach(input => {
-                    input.placeholder = `0.00`;
-                });
-                // Update placeholder for expense amount
-                expenseAmountInput.placeholder = `0.00`;
-                // Update placeholder for recurring amount
-                recurringAmountInput.placeholder = `0.00`;
-            };
-
-            const populateCategoryDropdowns = () => {
-                const selects = [filterCategory, expenseCategoryInput, recurringCategoryInput];
-                
-                selects.forEach(select => {
-                    if (!select) return;
-                    
-                    // Preserve the first option (e.g., "All Categories") if it exists
-                    const firstOption = select.options[0] ? select.options[0].cloneNode(true) : null;
-                    select.innerHTML = '';
-                    if (firstOption && firstOption.value === "") {
-                        select.appendChild(firstOption);
-                    }
-
-                    appSettings.categories.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category.name;
-                        option.textContent = `${category.icon || '❓'} ${category.name}`;
-                        select.appendChild(option);
-                    });
-                });
-            };
-
-            const updateDarkModeUI = (isDark) => {
-                const htmlEl = document.documentElement;
-                if (isDark) {
-                    htmlEl.classList.add('dark');
-                    darkModeToggle.setAttribute('aria-checked', 'true');
-                    darkModeDot.classList.add('translate-x-5');
-                    darkModeDot.classList.remove('translate-x-0');
-                    darkModeToggle.classList.add('bg-blue-600');
-                    darkModeToggle.classList.remove('bg-gray-200');
-                    // Update Chart.js defaults
-                    Chart.defaults.color = '#D1D5DB'; // gray-300
-                    Chart.defaults.borderColor = '#4B5563'; // gray-600
-                } else {
-                    htmlEl.classList.remove('dark');
-                    darkModeToggle.setAttribute('aria-checked', 'false');
-                    darkModeDot.classList.remove('translate-x-5');
-                    darkModeDot.classList.add('translate-x-0');
-                    darkModeToggle.classList.remove('bg-blue-600');
-                    darkModeToggle.classList.add('bg-gray-200');
-                    // Update Chart.js defaults
-                    Chart.defaults.color = '#6B7280'; // gray-500
-                    Chart.defaults.borderColor = '#E5E7EB'; // gray-200
-                }
-                
-                // Force charts to re-render with new colors
-                if (categoryPieChart) categoryPieChart.update();
-                if (spendingLineChart) spendingLineChart.update();
-            };
-
-
-            // --- INITIALIZATION ---
-            const init = () => {
-                loadExpenses();
-                loadSettings();
-                loadBudgets();
-                
-                expenseDateInput.value = getISODate(new Date()); // Set default date
-                currencySelect.value = appSettings.currency; // Set currency dropdown
-                updateCurrencyUI();
-                updateDarkModeUI(appSettings.darkMode); // Set initial dark mode state
-                
-                // Set initial section based on hash or default to dashboard
-                showSection(window.location.hash || '#dashboard');
-                
-                // Initial render
-                renderAll();
-            };
-
-            init();
-        });
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
-
-
-
-
 
 
