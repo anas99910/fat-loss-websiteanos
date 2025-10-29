@@ -567,7 +567,7 @@
         let chartToggleBarBtn, chartTogglePieBtn, barChartContainer, pieChartContainer, pieChartEl, pieChartLegendEl, categoryBudgetsContainer;
         let weeklyTotalSpendEl, weeklyTopCategoryEl;
         let manageCategoriesBtn, categoryModal, categoryModalBackdrop, categoryCloseBtn, categoryForm, categoryNameInput, categoryListEl;
-        let incomeModal, incomeModalBackdrop, incomeCancelBtn, incomeForm, incomeIdField, incomeTitleField, incomeAmountField, incomeDateField;
+        let incomeModal, incomeModalTitle, incomeModalBackdrop, incomeCancelBtn, incomeForm, incomeIdField, incomeTitleField, incomeAmountField, incomeDateField;
         let historyTypeToggle;
         let appView, yearlyReportView, closeYearlyReportBtn;
         let settingsBtn, settingsModal, settingsModalBackdrop, settingsCloseBtn, importCsvInput, importStatus, resetDataBtn;
@@ -1628,6 +1628,7 @@
 
             // Add Income Modal
             incomeModal = document.getElementById('income-modal');
+            incomeModalTitle = document.getElementById('income-modal-title'); // <-- This line was missing
             incomeModalBackdrop = document.getElementById('income-modal-backdrop');
             incomeCancelBtn = document.getElementById('income-cancel-btn');
             incomeForm = document.getElementById('income-form');
@@ -1733,6 +1734,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
