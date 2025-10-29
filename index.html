@@ -147,6 +147,12 @@
                     </svg>
                     <span class="hidden sm:inline">Budget</span>
                 </button>
+                <button id="add-income-btn" class="bg-green-600 hover:bg-green-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg shadow-green-600/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" />
+                    </svg>
+                    <span class="hidden sm:inline">Add Income</span>
+                </button>
                 <button id="add-expense-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg shadow-blue-600/30">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
@@ -250,6 +256,10 @@
                         Monthly Insights
                     </h2>
                     <div class="space-y-4">
+                        <div id="insight-savings">
+                            <h3 class="text-sm font-medium text-tertiary">MONTHLY SAVINGS</h3>
+                            <p class="text-xl font-semibold text-green-400">0.00 MAD</p>
+                        </div>
                         <div id="insight-top-category">
                             <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
                             <p class="text-xl font-semibold text-primary">--</p>
@@ -262,6 +272,21 @@
                         <div id="insight-avg-spend">
                             <h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3>
                             <p class="text-xl font-semibold text-primary">0.00 MAD</p>
+                        </div>
+                    </div>
+                </section>
+                <section class="glass-card p-6">
+                    <h2 class="text-lg font-semibold text-primary mb-4">
+                        This Week's Summary
+                    </h2>
+                    <div class="space-y-2">
+                        <div>
+                            <h3 class="text-sm font-medium text-tertiary">TOTAL SPENT (Mon-Sun)</h3>
+                            <p id="weekly-total-spend" class="text-2xl font-semibold text-primary">0.00 MAD</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY (This Week)</h3>
+                            <p id="weekly-top-category" class="text-lg font-semibold text-primary">--</p>
                         </div>
                     </div>
                 </section>
@@ -367,11 +392,41 @@
         </div>
     </div>
 
+    <!-- Add Income Modal -->
+    <div id="income-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="income-modal-backdrop"></div>
+        <div class="glass-card z-10 w-full max-w-md p-6 modal-slide-in-up">
+            <h3 id="income-modal-title" class="text-2xl font-semibold text-primary mb-6">Add Income</h3>
+            <form id="income-form" class="space-y-4">
+                <input type="hidden" id="income-id">
+                <div>
+                    <label for="income-title" class="block text-sm font-medium text-tertiary mb-2">Description</label>
+                    <input type="text" id="income-title" class="glass-input w-full rounded-lg p-3" placeholder="e.g., Monthly Salary" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="income-amount" class="block text-sm font-medium text-tertiary mb-2">Amount (MAD)</label>
+                        <input type="number" id="income-amount" class="glass-input w-full rounded-lg p-3" placeholder="10000.00" min="0.01" step="0.01" required>
+                    </div>
+                    <div>
+                        <label for="income-date" class="block text-sm font-medium text-tertiary mb-2">Date</label>
+                        <input type="date" id="income-date" class="glass-input w-full rounded-lg p-3" required>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" id="income-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
+                    <button type="submit" id="income-save-btn" class="bg-green-600 hover:bg-green-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-green-600/30">Save Income</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script type="module">
         // --- STORAGE KEYS ---
         const KEYS = {
             EXPENSES: 'householdExpenses',
+            INCOME: 'householdIncome',
             RECURRING: 'recurringExpenses',
             BUDGET: 'monthlyBudget',
             THEME: 'appTheme',
@@ -391,6 +446,7 @@
 
         // --- STATE ---
         let expenses = [];
+        let income = [];
         let recurringExpenses = [];
         let categories = {};
         let currentFilter = 'all';
@@ -404,6 +460,7 @@
         // --- DOM ELEMENTS ---
         const docElement = document.documentElement;
         const addExpenseBtn = document.getElementById('add-expense-btn');
+        const addIncomeBtn = document.getElementById('add-income-btn');
         const expenseListEl = document.getElementById('expense-list');
         const totalExpensesEl = document.getElementById('total-expenses');
         const filterCategoryEl = document.getElementById('filter-category');
@@ -452,6 +509,7 @@
         const exportCsvBtn = document.getElementById('export-csv-btn');
         
         // Insights
+        const insightSavings = document.getElementById('insight-savings');
         const insightTopCategory = document.getElementById('insight-top-category');
         const insightHighestExpense = document.getElementById('insight-highest-expense');
         const insightAvgSpend = document.getElementById('insight-avg-spend');
@@ -464,6 +522,10 @@
         const pieChartEl = document.getElementById('pie-chart');
         const pieChartLegendEl = document.getElementById('pie-chart-legend');
         
+        // Weekly Summary
+        const weeklyTotalSpendEl = document.getElementById('weekly-total-spend');
+        const weeklyTopCategoryEl = document.getElementById('weekly-top-category');
+        
         // Categories
         const manageCategoriesBtn = document.getElementById('manage-categories-btn');
         const categoryModal = document.getElementById('category-modal');
@@ -473,12 +535,31 @@
         const categoryNameInput = document.getElementById('category-name-input');
         const categoryListEl = document.getElementById('category-list');
 
+        // Add Income Modal
+        const incomeModal = document.getElementById('income-modal');
+        const incomeModalBackdrop = document.getElementById('income-modal-backdrop');
+        const incomeCancelBtn = document.getElementById('income-cancel-btn');
+        const incomeForm = document.getElementById('income-form');
+        const incomeIdField = document.getElementById('income-id');
+        const incomeTitleField = document.getElementById('income-title');
+        const incomeAmountField = document.getElementById('income-amount');
+        const incomeDateField = document.getElementById('income-date');
+
         // --- HELPER FUNCTIONS ---
         
         const formatCurrency = (amount) => new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' }).format(amount);
         const formatDate = (dateString) => new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
         const getTodayString = () => new Date().toISOString().split('T')[0];
+
+        const getWeekRange = (date) => {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+            const mon = new Date(d.setDate(diff)).toISOString().split('T')[0];
+            const sun = new Date(d.setDate(d.getDate() + 6)).toISOString().split('T')[0];
+            return { start: mon, end: sun };
+        };
 
         // --- LOCAL STORAGE FUNCTIONS ---
         const getFromStorage = (key) => {
@@ -492,6 +573,13 @@
             return expenses.filter(expense => {
                 const expenseDate = new Date(expense.date + 'T00:00:00');
                 return expenseDate.getFullYear() === year && expenseDate.getMonth() === month;
+            });
+        };
+        
+        const getIncomeForPeriod = (year, month) => {
+            return income.filter(inc => {
+                const incomeDate = new Date(inc.date + 'T00:00:00');
+                return incomeDate.getFullYear() === year && incomeDate.getMonth() === month;
             });
         };
         
@@ -526,11 +614,13 @@
         /** Main render function, triggers all sub-renders */
         const render = () => {
             const periodExpenses = getExpensesForPeriod(currentYear, currentMonth);
+            const periodIncome = getIncomeForPeriod(currentYear, currentMonth);
             
             renderExpenseList(periodExpenses);
             renderSummary(periodExpenses);
             renderChart(periodExpenses);
-            renderInsights(periodExpenses);
+            renderInsights(periodExpenses, periodIncome);
+            renderWeeklySummary();
         };
 
         /** Renders the summary (total + budget) */
@@ -680,7 +770,19 @@
         };
         
         /** Renders the insights card */
-        const renderInsights = (periodExpenses) => {
+        const renderInsights = (periodExpenses, periodIncome) => {
+            // Calculate Savings
+            const totalIncome = periodIncome.reduce((sum, inc) => sum + parseFloat(inc.amount), 0);
+            const totalExpenses = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            const savings = totalIncome - totalExpenses;
+            
+            insightSavings.innerHTML = `
+                <h3 class="text-sm font-medium text-tertiary">MONTHLY SAVINGS</h3>
+                <p class="text-xl font-semibold ${savings >= 0 ? 'text-green-400' : 'text-red-400'}">
+                    ${formatCurrency(savings)}
+                </p>
+            `;
+
             if (periodExpenses.length === 0) {
                 insightTopCategory.innerHTML = `<h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3><p class="text-xl font-semibold text-primary">--</p>`;
                 insightHighestExpense.innerHTML = `<h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p><p class="text-sm text-tertiary truncate">--</p>`;
@@ -714,6 +816,27 @@
                 <h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3>
                 <p class="text-xl font-semibold text-primary">${formatCurrency(avg)}</p>
             `;
+        };
+        
+        /** Renders the weekly summary card */
+        const renderWeeklySummary = () => {
+            const today = new Date();
+            const { start, end } = getWeekRange(today);
+            
+            const weeklyExpenses = expenses.filter(exp => {
+                return exp.date >= start && exp.date <= end;
+            });
+            
+            const total = weeklyExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            weeklyTotalSpendEl.textContent = formatCurrency(total);
+            
+            if (weeklyExpenses.length > 0) {
+                const { totals } = getCategoryTotals(weeklyExpenses);
+                const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
+                weeklyTopCategoryEl.textContent = totals[topCategory].total > 0 ? categories[topCategory].label : '--';
+            } else {
+                weeklyTopCategoryEl.textContent = '--';
+            }
         };
         
         // --- MODAL & FORM HANDLING ---
@@ -793,6 +916,38 @@
                 expenseToDeleteId = null;
             }
             deleteModal.classList.add('hidden');
+        };
+
+        // Income Modal
+        const openIncomeModal = () => {
+            incomeForm.reset();
+            incomeIdField.value = '';
+            incomeDateField.value = getTodayString();
+            incomeModal.classList.remove('hidden');
+        };
+        const closeIncomeModal = () => incomeModal.classList.add('hidden');
+
+        const handleIncomeSubmit = (e) => {
+            e.preventDefault();
+            
+            const id = incomeIdField.value;
+            const incomeData = {
+                id: id ? id : new Date().getTime().toString(),
+                title: incomeTitleField.value,
+                amount: parseFloat(incomeAmountField.value),
+                date: incomeDateField.value,
+            };
+
+            if (id) {
+                // This is for editing, but we haven't implemented an edit button for income yet
+                income = income.map(inc => inc.id === id ? incomeData : inc);
+            } else {
+                income.push(incomeData);
+            }
+            
+            saveToStorage(KEYS.INCOME, income);
+            render();
+            closeIncomeModal();
         };
 
         // --- FEATURE HANDLERS ---
@@ -979,6 +1134,7 @@
             initTheme();
             initCategories();
             expenses = getFromStorage(KEYS.EXPENSES) || [];
+            income = getFromStorage(KEYS.INCOME) || [];
             currentBudget = getFromStorage(KEYS.BUDGET) || 0;
             initRecurringExpenses(); // This may modify and save `expenses`
             
@@ -987,9 +1143,15 @@
             
             // Event Listeners
             addExpenseBtn.addEventListener('click', () => openModal(null));
+            addIncomeBtn.addEventListener('click', openIncomeModal);
+CSS
             modalBackdrop.addEventListener('click', closeModal);
             cancelBtn.addEventListener('click', closeModal);
             expenseForm.addEventListener('submit', handleSubmit);
+            
+            incomeModalBackdrop.addEventListener('click', closeIncomeModal);
+            incomeCancelBtn.addEventListener('click', closeIncomeModal);
+            incomeForm.addEventListener('submit', handleIncomeSubmit);
             
             themeToggleBtn.addEventListener('click', handleThemeToggle);
             monthSelector.addEventListener('change', handleMonthChange);
@@ -1023,5 +1185,6 @@
     </script>
 </body>
 </html>
+
 
 
