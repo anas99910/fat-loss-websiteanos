@@ -141,6 +141,12 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
+                <button id="settings-btn" class="p-2 rounded-full glass-input" title="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
                 <button id="set-budget-btn" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg shadow-teal-600/30">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16v2m-6-6H3m6 0H9m6 0h3m-3 0h-3m-6 0H3m6 0H9m6 0h3m-3 0h-3" />
@@ -220,27 +226,40 @@
                         <div id="pie-chart"></div>
                         <div id="pie-chart-legend" class="text-sm space-y-1"></div>
                     </div>
+                    <!-- Category-specific budgets container -->
+                    <div id="category-budgets-container" class="mt-4 space-y-3">
+                        <!-- Category budgets will be injected here -->
+                    </div>
                 </section>
                 
                 <!-- Expense List -->
                 <section>
                     <div class="flex justify-between items-center mb-4 gap-4 flex-wrap">
-                        <h2 class="text-2xl font-semibold text-primary">
-                            History
-                        </h2>
-                        <div class="flex gap-2 flex-wrap">
-                            <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500" placeholder="Search expenses...">
-                            <select id="filter-category" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500">
-                                <!-- Filter options will be injected here -->
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-2xl font-semibold text-primary">
+                                History
+                            </h2>
+                            <select id="history-type-toggle" class="glass-input text-sm rounded-lg py-1 px-2">
+                                <option value="expenses" selected>Expenses</option>
+                                <option value="income">Income</option>
+                                <option value="all">All</option>
                             </select>
-                            <button id="export-csv-btn" class="glass-input p-2 rounded-lg" title="Export to CSV">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        </div>
+                        <div class="flex gap-2 flex-wrap">
+                            <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500" placeholder="Search or #tag...">
+                            <select id="filter-category" class="glass-input text-sm rounded-lg py-1 px-2">
+                                <!-- Categories will be injected here -->
+                            </select>
+                            <button id="export-csv-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Export CSV">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
                             </button>
                         </div>
                     </div>
-
-                    <div id="expense-list" class="space-y-3">
-                        <!-- Expense items will be injected here -->
+                    
+                    <div id="expense-list" class="space-y-4">
+                        <!-- Expenses injected here -->
                         <div id="empty-state" class="glass-card p-6 text-center text-tertiary">
                             <p>No expenses recorded for this month yet.</p>
                             <p class="text-sm">Click "Add Expense" to get started.</p>
@@ -300,6 +319,40 @@
         </div>
     </div>
 
+    <!-- Yearly Report View (Initially Hidden) -->
+    <div id="yearly-report" class="max-w-6xl mx-auto p-4 md:p-8 hidden">
+        <header class="flex justify-between items-center mb-6 md:mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-primary tracking-tight" id="yearly-report-title">
+                Yearly Report
+            </h1>
+            <button id="close-yearly-report" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-full transition-colors duration-200">
+                Back to Monthly
+            </button>
+        </header>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-6">
+                <h2 class="text-sm font-medium text-tertiary mb-2">Total Income</h2>
+                <p id="yearly-total-income" class="text-4xl font-bold text-green-400">0.00 MAD</p>
+            </div>
+            <div class="glass-card p-6">
+                <h2 class="text-sm font-medium text-tertiary mb-2">Total Expenses</h2>
+                <p id="yearly-total-expenses" class="text-4xl font-bold text-red-400">0.00 MAD</p>
+            </div>
+            <div class="glass-card p-6">
+                <h2 class="text-sm font-medium text-tertiary mb-2">Total Savings</h2>
+                <p id="yearly-total-savings" class="text-4xl font-bold text-primary">0.00 MAD</p>
+            </div>
+        </div>
+        
+        <div class="glass-card p-6 mt-6">
+            <h3 class="text-lg font-semibold text-primary mb-4">Monthly Spending</h3>
+            <div id="yearly-bar-chart" class="h-64 w-full flex justify-around items-end gap-2 p-4 bg-tertiary/20 rounded-xl">
+                <!-- Yearly bar chart will be injected here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Modals -->
 
     <!-- Add/Edit Expense Modal -->
@@ -328,6 +381,10 @@
                 <div>
                     <label for="expense-date" class="block text-sm font-medium text-tertiary mb-2">Date</label>
                     <input type="date" id="expense-date" class="glass-input w-full rounded-lg p-3" required>
+                </div>
+                <div>
+                    <label for="expense-tags" class="block text-sm font-medium text-tertiary mb-2">Tags <span class="text-xs">(comma separated)</span></label>
+                    <input type="text" id="expense-tags" class="glass-input w-full rounded-lg p-3" placeholder="e.g., vacation, work, gift">
                 </div>
                 <div class="flex items-center justify-between">
                     <label for="expense-recurring" class="flex items-center gap-2 text-sm text-tertiary cursor-pointer">
@@ -365,8 +422,8 @@
     <div id="delete-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
         <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="delete-modal-backdrop"></div>
         <div class="glass-card z-10 w-full max-w-sm p-6 modal-slide-in-up">
-            <h3 class="text-xl font-semibold text-primary mb-4">Delete Expense</h3>
-            <p class="text-tertiary mb-6">Are you sure you want to delete this expense? This action cannot be undone.</p>
+            <h3 id="delete-modal-title" class="text-xl font-semibold text-primary mb-4">Delete Transaction</h3>
+            <p id="delete-modal-text" class="text-tertiary mb-6">Are you sure you want to delete this? This action cannot be undone.</p>
             <div class="flex justify-end gap-3">
                 <button type="button" id="delete-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
                 <button type="button" id="delete-confirm-btn" class="bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-red-600/30">Delete</button>
@@ -414,777 +471,5 @@
                     </div>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" id="income-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
-                    <button type="submit" id="income-save-btn" class="bg-green-600 hover:bg-green-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-green-600/30">Save Income</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- JavaScript -->
-    <script type="module">
-        // --- STORAGE KEYS ---
-        const KEYS = {
-            EXPENSES: 'householdExpenses',
-            INCOME: 'householdIncome',
-            RECURRING: 'recurringExpenses',
-            BUDGET: 'monthlyBudget',
-            THEME: 'appTheme',
-            CATEGORIES: 'expenseCategories'
-        };
-
-        // --- DEFAULT CATEGORIES (if storage is empty) ---
-        const DEFAULT_CATEGORIES = {
-            food: { label: 'Food', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2zm0 0h18M5 7h14M5 11h7" /></svg>` },
-            water: { label: 'Water', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.472 15.03L3 12.56C3 12.23 3.23 12 3.56 12H5.44C5.77 12 6 12.23 6 12.56L8.53 15.03C8.72 15.22 9 15.09 9 14.82V3.5C9 3.22 8.78 3 8.5 3H3.5C3.22 3 3 3.22 3 3.5V14.82C3 15.09 3.28 15.22 3.47 15.03L5.472 15.03zM18.53 15.03L21 12.56C21 12.23 20.77 12 20.44 12H18.56C18.23 12 18 12.23 18 12.56L15.47 15.03C15.28 15.22 15 15.09 15 14.82V3.5C15 3.22 15.22 3 15.5 3H20.5C20.78 3 21 3.22 21 3.5V14.82C21 15.09 20.72 15.22 20.53 15.03L18.53 15.03zM12 10.5C12.83 10.5 13.5 9.83 13.5 9C13.5 8.17 12.83 7.5 12 7.5S10.5 8.17 10.5 9C10.5 9.83 11.17 10.5 12 10.5zM12 21C15.31 21 18 18.31 18 15V12H6V15C6 18.31 8.69 21 12 21z" /></svg>` },
-            electricity: { label: 'Electricity', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>` },
-            rent: { label: 'Rent', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2a1 1 0 01-1-1v-4z" /></svg>` },
-            transport: { label: 'Transport', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>` },
-            other: { label: 'Other', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 5.523-4.477 10-10 10S1 17.523 1 12S5.477 2 11 2s10 4.477 10 10z" /></svg>` }
-        };
-        const GENERIC_ICON = DEFAULT_CATEGORIES.other.icon;
-
-        // --- STATE ---
-        let expenses = [];
-        let income = [];
-        let recurringExpenses = [];
-        let categories = {};
-        let currentFilter = 'all';
-        let currentSearchTerm = '';
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        let currentBudget = 0;
-        let chartType = 'bar';
-        let expenseToDeleteId = null;
-
-        // --- DOM ELEMENTS ---
-        const docElement = document.documentElement;
-        const addExpenseBtn = document.getElementById('add-expense-btn');
-        const addIncomeBtn = document.getElementById('add-income-btn');
-        const expenseListEl = document.getElementById('expense-list');
-        const totalExpensesEl = document.getElementById('total-expenses');
-        const filterCategoryEl = document.getElementById('filter-category');
-        const emptyStateEl = document.getElementById('empty-state');
-        
-        // Expense Modal
-        const modal = document.getElementById('modal');
-        const modalBackdrop = document.getElementById('modal-backdrop');
-        const modalTitle = document.getElementById('modal-title');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const expenseForm = document.getElementById('expense-form');
-        const expenseIdField = document.getElementById('expense-id');
-        const expenseTitleField = document.getElementById('expense-title');
-        const expenseAmountField = document.getElementById('expense-amount');
-        const expenseCategoryField = document.getElementById('expense-category');
-        const expenseDateField = document.getElementById('expense-date');
-        const expenseRecurringCheckbox = document.getElementById('expense-recurring');
-
-        // Theme Toggle
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const themeIconLight = document.getElementById('theme-icon-light');
-        const themeIconDark = document.getElementById('theme-icon-dark');
-        
-        // Month Selector
-        const monthSelector = document.getElementById('month-selector');
-        
-        // Budget
-        const setBudgetBtn = document.getElementById('set-budget-btn');
-        const budgetModal = document.getElementById('budget-modal');
-        const budgetModalBackdrop = document.getElementById('budget-modal-backdrop');
-        const budgetForm = document.getElementById('budget-form');
-        const budgetAmountField = document.getElementById('budget-amount');
-        const budgetCancelBtn = document.getElementById('budget-cancel-btn');
-        const budgetDisplayEl = document.getElementById('budget-display');
-        const budgetProgressBar = document.getElementById('budget-progress-bar');
-        const budgetRemainingTextEl = document.getElementById('budget-remaining-text');
-
-        // Delete Modal
-        const deleteModal = document.getElementById('delete-modal');
-        const deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
-        const deleteCancelBtn = document.getElementById('delete-cancel-btn');
-        const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
-        
-        // Search & Export
-        const searchBar = document.getElementById('search-bar');
-        const exportCsvBtn = document.getElementById('export-csv-btn');
-        
-        // Insights
-        const insightSavings = document.getElementById('insight-savings');
-        const insightTopCategory = document.getElementById('insight-top-category');
-        const insightHighestExpense = document.getElementById('insight-highest-expense');
-        const insightAvgSpend = document.getElementById('insight-avg-spend');
-        
-        // Chart
-        const chartToggleBarBtn = document.getElementById('chart-toggle-bar');
-        const chartTogglePieBtn = document.getElementById('chart-toggle-pie');
-        const barChartContainer = document.getElementById('bar-chart-container');
-        const pieChartContainer = document.getElementById('pie-chart-container');
-        const pieChartEl = document.getElementById('pie-chart');
-        const pieChartLegendEl = document.getElementById('pie-chart-legend');
-        
-        // Weekly Summary
-        const weeklyTotalSpendEl = document.getElementById('weekly-total-spend');
-        const weeklyTopCategoryEl = document.getElementById('weekly-top-category');
-        
-        // Categories
-        const manageCategoriesBtn = document.getElementById('manage-categories-btn');
-        const categoryModal = document.getElementById('category-modal');
-        const categoryModalBackdrop = document.getElementById('category-modal-backdrop');
-        const categoryCloseBtn = document.getElementById('category-close-btn');
-        const categoryForm = document.getElementById('category-form');
-        const categoryNameInput = document.getElementById('category-name-input');
-        const categoryListEl = document.getElementById('category-list');
-
-        // Add Income Modal
-        const incomeModal = document.getElementById('income-modal');
-        const incomeModalBackdrop = document.getElementById('income-modal-backdrop');
-        const incomeCancelBtn = document.getElementById('income-cancel-btn');
-        const incomeForm = document.getElementById('income-form');
-        const incomeIdField = document.getElementById('income-id');
-        const incomeTitleField = document.getElementById('income-title');
-        const incomeAmountField = document.getElementById('income-amount');
-        const incomeDateField = document.getElementById('income-date');
-
-        // --- HELPER FUNCTIONS ---
-        
-        const formatCurrency = (amount) => new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' }).format(amount);
-        const formatDate = (dateString) => new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-        const getTodayString = () => new Date().toISOString().split('T')[0];
-
-        const getWeekRange = (date) => {
-            const d = new Date(date);
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-            const mon = new Date(d.setDate(diff)).toISOString().split('T')[0];
-            const sun = new Date(d.setDate(d.getDate() + 6)).toISOString().split('T')[0];
-            return { start: mon, end: sun };
-        };
-
-        // --- LOCAL STORAGE FUNCTIONS ---
-        const getFromStorage = (key) => {
-            const data = localStorage.getItem(key);
-            try { return data ? JSON.parse(data) : null; } catch (e) { console.error(`Error parsing ${key}`, e); return null; }
-        };
-        const saveToStorage = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-
-        // --- DATA FUNCTIONS ---
-        const getExpensesForPeriod = (year, month) => {
-            return expenses.filter(expense => {
-                const expenseDate = new Date(expense.date + 'T00:00:00');
-                return expenseDate.getFullYear() === year && expenseDate.getMonth() === month;
-            });
-        };
-        
-        const getIncomeForPeriod = (year, month) => {
-            return income.filter(inc => {
-                const incomeDate = new Date(inc.date + 'T00:00:00');
-                return incomeDate.getFullYear() === year && incomeDate.getMonth() === month;
-            });
-        };
-        
-        const getCategoryTotals = (expenseList) => {
-            const totals = Object.keys(categories).reduce((acc, key) => {
-                acc[key] = { total: 0, label: categories[key].label, count: 0 };
-                return acc;
-            }, {});
-            
-            // Add a safety net for expenses with orphaned categories
-            totals['other'] = totals['other'] || { total: 0, label: 'Other', count: 0 };
-
-            let grandTotal = 0;
-
-            expenseList.forEach(expense => {
-                const category = expense.category;
-                if (totals[category]) {
-                    totals[category].total += parseFloat(expense.amount);
-                    totals[category].count += 1;
-                } else {
-                    // If category was deleted, assign to 'other'
-                    totals['other'].total += parseFloat(expense.amount);
-                    totals['other'].count += 1;
-                }
-                grandTotal += parseFloat(expense.amount);
-            });
-            return { totals, grandTotal };
-        };
-
-        // --- RENDER FUNCTIONS (THE BIG ONES) ---
-        
-        /** Main render function, triggers all sub-renders */
-        const render = () => {
-            const periodExpenses = getExpensesForPeriod(currentYear, currentMonth);
-            const periodIncome = getIncomeForPeriod(currentYear, currentMonth);
-            
-            renderExpenseList(periodExpenses);
-            renderSummary(periodExpenses);
-            renderChart(periodExpenses);
-            renderInsights(periodExpenses, periodIncome);
-            renderWeeklySummary();
-        };
-
-        /** Renders the summary (total + budget) */
-        const renderSummary = (periodExpenses) => {
-            const total = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-            totalExpensesEl.textContent = formatCurrency(total);
-            
-            if (currentBudget > 0) {
-                budgetDisplayEl.textContent = formatCurrency(currentBudget);
-                const percentage = Math.min((total / currentBudget) * 100, 100);
-                budgetProgressBar.style.width = `${percentage}%`;
-                
-                // Change color based on percentage
-                if (percentage > 90) budgetProgressBar.className = 'bg-red-600 h-2.5 rounded-full';
-                else if (percentage > 70) budgetProgressBar.className = 'bg-yellow-500 h-2.5 rounded-full';
-                else budgetProgressBar.className = 'bg-blue-600 h-2.5 rounded-full';
-                
-                const remaining = currentBudget - total;
-                budgetRemainingTextEl.textContent = remaining >= 0 ? `${formatCurrency(remaining)} remaining` : `${formatCurrency(Math.abs(remaining))} over budget`;
-            } else {
-                budgetDisplayEl.textContent = 'Not Set';
-                budgetProgressBar.style.width = '0%';
-                budgetRemainingTextEl.textContent = 'Set a budget to track spending.';
-            }
-        };
-        
-        /** Renders the chart (Bar or Pie) */
-        const renderChart = (periodExpenses) => {
-            if (chartType === 'bar') {
-                barChartContainer.classList.remove('hidden');
-                pieChartContainer.classList.add('hidden');
-                renderBarChart(periodExpenses);
-            } else {
-                barChartContainer.classList.add('hidden');
-                pieChartContainer.classList.remove('hidden');
-                renderPieChart(periodExpenses);
-            }
-        };
-        
-        /** Renders the bar chart */
-        const renderBarChart = (periodExpenses) => {
-            barChartContainer.innerHTML = '';
-            const { totals } = getCategoryTotals(periodExpenses);
-            const categoryKeys = Object.keys(categories);
-            
-            let maxTotal = Math.max(...categoryKeys.map(key => totals[key].total));
-            if (maxTotal === 0) maxTotal = 1; // Avoid division by zero
-
-            categoryKeys.forEach(key => {
-                const total = totals[key].total;
-                const heightPercentage = (total / maxTotal) * 100;
-                
-                const barEl = document.createElement('div');
-                barEl.className = "flex flex-col items-center justify-end w-full h-full";
-                barEl.innerHTML = `
-                    <div class="chart-bar w-1/2 md:w-3/5 bg-blue-600 rounded-t-md" style="height: ${heightPercentage}%" title="${categories[key].label}: ${formatCurrency(total)}"></div>
-                    <span class="text-xs text-tertiary mt-2">${categories[key].label}</span>
-                `;
-                barChartContainer.appendChild(barEl);
-            });
-        };
-        
-        /** Renders the pie chart */
-        const renderPieChart = (periodExpenses) => {
-            const { totals, grandTotal } = getCategoryTotals(periodExpenses);
-            if (grandTotal === 0) {
-                pieChartEl.style.background = 'var(--bg-tertiary)';
-                pieChartLegendEl.innerHTML = '<span class="text-tertiary">No data</span>';
-                return;
-            }
-
-            const pieColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1', '#F9C851', '#E67E22', '#3498DB', '#2ECC71'];
-            let gradientString = 'conic-gradient(';
-            let currentAngle = 0;
-            let legendHTML = '';
-            
-            let colorIndex = 0;
-            Object.keys(totals).forEach(key => {
-                const { total, label } = totals[key];
-                if (total > 0) {
-                    const percentage = (total / grandTotal) * 100;
-                    const angle = (percentage / 100) * 360;
-                    const color = pieColors[colorIndex % pieColors.length];
-                    
-                    gradientString += `${color} ${currentAngle}deg ${currentAngle + angle}deg, `;
-                    legendHTML += `
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 rounded-full" style="background-color: ${color}"></div>
-                            <span class="text-secondary">${label} (${percentage.toFixed(0)}%)</span>
-                        </div>
-                    `;
-                    
-                    currentAngle += angle;
-                    colorIndex++;
-                }
-            });
-            
-            gradientString = gradientString.slice(0, -2) + ')'; // Remove last comma and space
-            pieChartEl.style.background = gradientString;
-            pieChartLegendEl.innerHTML = legendHTML;
-        };
-
-        /** Renders the list of expenses */
-        const renderExpenseList = (periodExpenses) => {
-            expenseListEl.innerHTML = '';
-            
-            const filteredExpenses = periodExpenses
-                .filter(exp => currentFilter === 'all' || exp.category === currentFilter)
-                .filter(exp => currentSearchTerm === '' || exp.title.toLowerCase().includes(currentSearchTerm.toLowerCase()))
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            emptyStateEl.classList.toggle('hidden', filteredExpenses.length > 0);
-
-            filteredExpenses.forEach(expense => {
-                const item = document.createElement('div');
-                item.className = 'glass-card flex items-center justify-between p-4 transition-all duration-200 hover:border-primary/20';
-                
-                const category = categories[expense.category];
-                const categoryIcon = category ? category.icon : GENERIC_ICON;
-                
-                item.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="p-3 bg-tertiary/60 rounded-xl text-primary">
-                            ${categoryIcon}
-                        </div>
-                        <div>
-                            <p class="font-semibold text-primary">${expense.title}</p>
-                            <p class="text-sm text-tertiary">${formatDate(expense.date)}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <p class="font-semibold text-primary text-lg">
-                            ${formatCurrency(expense.amount)}
-                        </p>
-                        <div class="flex gap-2">
-                            <button class="edit-btn p-2 text-tertiary hover:text-blue-400 transition-colors" data-id="${expense.id}" title="Edit">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            </button>
-                            <button class="delete-btn p-2 text-tertiary hover:text-red-400 transition-colors" data-id="${expense.id}" title="Delete">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                expenseListEl.appendChild(item);
-            });
-        };
-        
-        /** Renders the insights card */
-        const renderInsights = (periodExpenses, periodIncome) => {
-            // Calculate Savings
-            const totalIncome = periodIncome.reduce((sum, inc) => sum + parseFloat(inc.amount), 0);
-            const totalExpenses = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-            const savings = totalIncome - totalExpenses;
-            
-            insightSavings.innerHTML = `
-                <h3 class="text-sm font-medium text-tertiary">MONTHLY SAVINGS</h3>
-                <p class="text-xl font-semibold ${savings >= 0 ? 'text-green-400' : 'text-red-400'}">
-                    ${formatCurrency(savings)}
-                </p>
-            `;
-
-            if (periodExpenses.length === 0) {
-                insightTopCategory.innerHTML = `<h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3><p class="text-xl font-semibold text-primary">--</p>`;
-                insightHighestExpense.innerHTML = `<h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p><p class="text-sm text-tertiary truncate">--</p>`;
-                insightAvgSpend.innerHTML = `<h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p>`;
-                return;
-            }
-
-            // Top Category
-            const { totals } = getCategoryTotals(periodExpenses);
-            const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
-            insightTopCategory.innerHTML = `
-                <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
-                <p class="text-xl font-semibold text-primary">${totals[topCategory].total > 0 ? categories[topCategory].label : '--'}</p>
-            `;
-            
-            // Highest Expense
-            const highest = periodExpenses.reduce((max, exp) => parseFloat(exp.amount) > max.amount ? exp : max, { amount: 0 });
-            insightHighestExpense.innerHTML = `
-                <h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3>
-                <p class="text-xl font-semibold text-primary">${formatCurrency(highest.amount)}</p>
-                <p class="text-sm text-tertiary truncate">${highest.title}</p>
-            `;
-            
-            // Average Daily Spend
-            const total = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-            const daysInUse = new Set(periodExpenses.map(exp => exp.date)).size;
-            const daysInMonth = getDaysInMonth(currentYear, currentMonth);
-            const daysSoFar = (currentYear === new Date().getFullYear() && currentMonth === new Date().getMonth()) ? new Date().getDate() : daysInMonth;
-            const avg = total / daysSoFar;
-            insightAvgSpend.innerHTML = `
-                <h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3>
-                <p class="text-xl font-semibold text-primary">${formatCurrency(avg)}</p>
-            `;
-        };
-        
-        /** Renders the weekly summary card */
-        const renderWeeklySummary = () => {
-            const today = new Date();
-            const { start, end } = getWeekRange(today);
-            
-            const weeklyExpenses = expenses.filter(exp => {
-                return exp.date >= start && exp.date <= end;
-            });
-            
-            const total = weeklyExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-            weeklyTotalSpendEl.textContent = formatCurrency(total);
-            
-            if (weeklyExpenses.length > 0) {
-                const { totals } = getCategoryTotals(weeklyExpenses);
-                const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
-                weeklyTopCategoryEl.textContent = totals[topCategory].total > 0 ? categories[topCategory].label : '--';
-            } else {
-                weeklyTopCategoryEl.textContent = '--';
-            }
-        };
-        
-        // --- MODAL & FORM HANDLING ---
-
-        const openModal = (expense = null) => {
-            expenseForm.reset();
-            if (expense) {
-                modalTitle.textContent = 'Edit Expense';
-                expenseIdField.value = expense.id;
-                expenseTitleField.value = expense.title;
-                expenseAmountField.value = expense.amount;
-                expenseCategoryField.value = expense.category;
-                expenseDateField.value = expense.date;
-                expenseRecurringCheckbox.checked = false;
-                expenseRecurringCheckbox.disabled = true;
-            } else {
-                modalTitle.textContent = 'Add New Expense';
-                expenseIdField.value = '';
-                expenseDateField.value = getTodayString();
-                expenseRecurringCheckbox.checked = false;
-                expenseRecurringCheckbox.disabled = false;
-            }
-            modal.classList.remove('hidden');
-        };
-        const closeModal = () => modal.classList.add('hidden');
-
-        const handleSubmit = (e) => {
-            e.preventDefault();
-            
-            const id = expenseIdField.value;
-            const isRecurring = expenseRecurringCheckbox.checked;
-
-            const expenseData = {
-                id: id ? id : new Date().getTime().toString(),
-                title: expenseTitleField.value,
-                amount: parseFloat(expenseAmountField.value),
-                category: expenseCategoryField.value,
-                date: expenseDateField.value,
-            };
-
-            if (id) {
-                // Update
-                expenses = expenses.map(exp => exp.id === id ? expenseData : exp);
-            } else if (isRecurring) {
-                // Add to recurring list
-                expenseData.nextDueDate = expenseData.date; // Set first due date
-                recurringExpenses.push(expenseData);
-                saveToStorage(KEYS.RECURRING, recurringExpenses);
-            } else {
-                // Add to main list
-                expenses.push(expenseData);
-            }
-            
-            saveToStorage(KEYS.EXPENSES, expenses);
-            render();
-            closeModal();
-        };
-        
-        const handleListClick = (e) => {
-            const editBtn = e.target.closest('.edit-btn');
-            const deleteBtn = e.target.closest('.delete-btn');
-            
-            if (editBtn) {
-                openModal(expenses.find(exp => exp.id === editBtn.dataset.id));
-            }
-            if (deleteBtn) {
-                expenseToDeleteId = deleteBtn.dataset.id;
-                deleteModal.classList.remove('hidden');
-            }
-        };
-        
-        const handleDeleteConfirm = () => {
-            if (expenseToDeleteId) {
-                expenses = expenses.filter(exp => exp.id !== expenseToDeleteId);
-                saveToStorage(KEYS.EXPENSES, expenses);
-                render();
-                expenseToDeleteId = null;
-            }
-            deleteModal.classList.add('hidden');
-        };
-
-        // Income Modal
-        const openIncomeModal = () => {
-            incomeForm.reset();
-            incomeIdField.value = '';
-            incomeDateField.value = getTodayString();
-            incomeModal.classList.remove('hidden');
-        };
-        const closeIncomeModal = () => incomeModal.classList.add('hidden');
-
-        const handleIncomeSubmit = (e) => {
-            e.preventDefault();
-            
-            const id = incomeIdField.value;
-            const incomeData = {
-                id: id ? id : new Date().getTime().toString(),
-                title: incomeTitleField.value,
-                amount: parseFloat(incomeAmountField.value),
-                date: incomeDateField.value,
-            };
-
-            if (id) {
-                // This is for editing, but we haven't implemented an edit button for income yet
-                income = income.map(inc => inc.id === id ? incomeData : inc);
-            } else {
-                income.push(incomeData);
-            }
-            
-            saveToStorage(KEYS.INCOME, income);
-            render();
-            closeIncomeModal();
-        };
-
-        // --- FEATURE HANDLERS ---
-        
-        // Theme
-        const initTheme = () => {
-            const savedTheme = getFromStorage(KEYS.THEME) || 'dark';
-            applyTheme(savedTheme);
-        };
-        const applyTheme = (theme) => {
-            if (theme === 'light') {
-                docElement.classList.add('light');
-                themeIconLight.classList.add('hidden');
-                themeIconDark.classList.remove('hidden');
-            } else {
-                docElement.classList.remove('light');
-                themeIconLight.classList.remove('hidden');
-                themeIconDark.classList.add('hidden');
-            }
-            saveToStorage(KEYS.THEME, theme);
-        };
-        const handleThemeToggle = () => applyTheme(docElement.classList.contains('light') ? 'dark' : 'light');
-
-        // Month Selector
-        const populateMonthSelector = () => {
-            monthSelector.innerHTML = '';
-            const now = new Date();
-            for (let i = 0; i < 12; i++) {
-                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const year = date.getFullYear();
-                const month = date.getMonth();
-                const option = document.createElement('option');
-                option.value = `${year}-${month}`;
-                option.textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                monthSelector.appendChild(option);
-            }
-            monthSelector.value = `${currentYear}-${currentMonth}`;
-        };
-        const handleMonthChange = (e) => {
-            const [year, month] = e.target.value.split('-').map(Number);
-            currentYear = year;
-            currentMonth = month;
-            render();
-        };
-        
-        // Budget
-        const openBudgetModal = () => {
-            budgetAmountField.value = currentBudget > 0 ? currentBudget : '';
-            budgetModal.classList.remove('hidden');
-        };
-        const closeBudgetModal = () => budgetModal.classList.add('hidden');
-        const handleBudgetSubmit = (e) => {
-            e.preventDefault();
-            currentBudget = parseFloat(budgetAmountField.value) || 0;
-            saveToStorage(KEYS.BUDGET, currentBudget);
-            render();
-            closeBudgetModal();
-        };
-        
-        // Search & Filter
-        const handleFilterChange = (e) => { currentFilter = e.target.value; render(); };
-        const handleSearchInput = (e) => { currentSearchTerm = e.target.value; render(); };
-
-        // Chart Toggle
-        const handleChartToggle = (type) => {
-            chartType = type;
-            if (type === 'bar') {
-                chartToggleBarBtn.classList.add('bg-blue-600/30', 'text-blue-300');
-                chartTogglePieBtn.classList.remove('bg-blue-600/30', 'text-blue-300');
-            } else {
-                chartTogglePieBtn.classList.add('bg-blue-600/30', 'text-blue-300');
-                chartToggleBarBtn.classList.remove('bg-blue-600/30', 'text-blue-300');
-            }
-            render();
-        };
-
-        // Export CSV
-        const handleExportCSV = () => {
-            const periodExpenses = getExpensesForPeriod(currentYear, currentMonth);
-            if (periodExpenses.length === 0) return;
-            
-            let csv = 'Title,Amount,Category,Date\n';
-            periodExpenses.forEach(exp => {
-                csv += `"${exp.title}","${exp.amount}","${categories[exp.category].label}","${exp.date}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `expenses_${currentYear}-${currentMonth + 1}.csv`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-        };
-        
-        // Recurring Expenses
-        const initRecurringExpenses = () => {
-            recurringExpenses = getFromStorage(KEYS.RECURRING) || [];
-            const today = new Date(getTodayString());
-            let expensesAdded = false;
-            
-            recurringExpenses.forEach(rex => {
-                let nextDueDate = new Date(rex.nextDueDate + 'T00:00:00');
-                if (nextDueDate <= today) {
-                    // Add to main expenses
-                    const newExpense = { ...rex, id: new Date().getTime().toString() + rex.id, date: rex.nextDueDate };
-                    delete newExpense.nextDueDate;
-                    expenses.push(newExpense);
-                    
-                    // Set next due date (e.g., +1 month)
-                    rex.nextDueDate = new Date(nextDueDate.setMonth(nextDueDate.getMonth() + 1)).toISOString().split('T')[0];
-                    expensesAdded = true;
-                }
-            });
-            
-            if (expensesAdded) {
-                saveToStorage(KEYS.EXPENSES, expenses);
-                saveToStorage(KEYS.RECURRING, recurringExpenses);
-            }
-        };
-        
-        // Category Management
-        const initCategories = () => {
-            categories = getFromStorage(KEYS.CATEGORIES) || DEFAULT_CATEGORIES;
-            saveToStorage(KEYS.CATEGORIES, categories);
-            renderCategoryUI();
-        };
-        const renderCategoryUI = () => {
-            // Populate dropdowns
-            filterCategoryEl.innerHTML = '<option value="all">All Categories</option>';
-            expenseCategoryField.innerHTML = '';
-            categoryListEl.innerHTML = '';
-            
-            Object.keys(categories).forEach(key => {
-                const category = categories[key];
-                filterCategoryEl.innerHTML += `<option value="${key}">${category.label}</option>`;
-                expenseCategoryField.innerHTML += `<option value="${key}">${category.label}</option>`;
-                
-                // Populate manage modal list
-                const isDefault = Object.keys(DEFAULT_CATEGORIES).includes(key);
-                categoryListEl.innerHTML += `
-                    <div class="flex items-center justify-between p-2 glass-input rounded-lg">
-                        <span class="text-primary">${category.label}</span>
-                        ${!isDefault ? `<button class="delete-category-btn p-1 text-red-400 hover:text-red-300" data-key="${key}">&times;</button>` : '<span class="text-xs text-tertiary">Default</span>'}
-                    </div>
-                `;
-            });
-        };
-        const openCategoryModal = () => categoryModal.classList.remove('hidden');
-        const closeCategoryModal = () => categoryModal.classList.add('hidden');
-        const handleCategorySubmit = (e) => {
-            e.preventDefault();
-            const name = categoryNameInput.value.trim();
-            if (name && !Object.values(categories).find(c => c.label === name)) {
-                const key = name.toLowerCase().replace(/\s+/g, '_');
-                categories[key] = { label: name, icon: GENERIC_ICON };
-                saveToStorage(KEYS.CATEGORIES, categories);
-                renderCategoryUI();
-                categoryForm.reset();
-            }
-        };
-        const handleCategoryDelete = (e) => {
-            const btn = e.target.closest('.delete-category-btn');
-            if (btn) {
-                const key = btn.dataset.key;
-                if (confirm(`Are you sure you want to delete the "${categories[key].label}" category?\nAll expenses in this category will be moved to "Other".`)) {
-                    // Re-assign expenses
-                    expenses.forEach(exp => {
-                        if (exp.category === key) exp.category = 'other';
-                    });
-                    saveToStorage(KEYS.EXPENSES, expenses);
-                    
-                    // Delete category
-                    delete categories[key];
-                    saveToStorage(KEYS.CATEGORIES, categories);
-                    
-                    renderCategoryUI();
-                    render(); // Re-render main app
-                }
-            }
-        };
-        
-        // --- INITIALIZATION ---
-        const init = () => {
-            initTheme();
-            initCategories();
-            expenses = getFromStorage(KEYS.EXPENSES) || [];
-            income = getFromStorage(KEYS.INCOME) || [];
-            currentBudget = getFromStorage(KEYS.BUDGET) || 0;
-            initRecurringExpenses(); // This may modify and save `expenses`
-            
-            populateMonthSelector();
-            render(); // Initial Render
-            
-            // Event Listeners
-            addExpenseBtn.addEventListener('click', () => openModal(null));
-            addIncomeBtn.addEventListener('click', openIncomeModal);
-CSS
-            modalBackdrop.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
-            expenseForm.addEventListener('submit', handleSubmit);
-            
-            incomeModalBackdrop.addEventListener('click', closeIncomeModal);
-            incomeCancelBtn.addEventListener('click', closeIncomeModal);
-            incomeForm.addEventListener('submit', handleIncomeSubmit);
-            
-            themeToggleBtn.addEventListener('click', handleThemeToggle);
-            monthSelector.addEventListener('change', handleMonthChange);
-            
-            setBudgetBtn.addEventListener('click', openBudgetModal);
-            budgetModalBackdrop.addEventListener('click', closeBudgetModal);
-            budgetCancelBtn.addEventListener('click', closeBudgetModal);
-            budgetForm.addEventListener('submit', handleBudgetSubmit);
-            
-            deleteModalBackdrop.addEventListener('click', () => deleteModal.classList.add('hidden'));
-            deleteCancelBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
-            deleteConfirmBtn.addEventListener('click', handleDeleteConfirm);
-            
-            filterCategoryEl.addEventListener('change', handleFilterChange);
-            searchBar.addEventListener('input', handleSearchInput);
-            exportCsvBtn.addEventListener('click', handleExportCSV);
-            
-            chartToggleBarBtn.addEventListener('click', () => handleChartToggle('bar'));
-            chartTogglePieBtn.addEventListener('click', () => handleChartToggle('pie'));
-            
-            manageCategoriesBtn.addEventListener('click', openCategoryModal);
-            categoryModalBackdrop.addEventListener('click', closeCategoryModal);
-            categoryCloseBtn.addEventListener('click', closeCategoryModal);
-            categoryForm.addEventListener('submit', handleCategorySubmit);
-            categoryListEl.addEventListener('click', handleCategoryDelete);
-            
-            expenseListEl.addEventListener('click', handleListClick);
-        };
-
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
-</body>
-</html>
-
-
+                    <button type="button" id="income-cancel
 
