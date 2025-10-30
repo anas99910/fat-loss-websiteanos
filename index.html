@@ -248,8 +248,8 @@
                     <div id="bar-chart-container" class="h-48 w-full flex justify-around items-end gap-2 p-4 bg-tertiary/20 rounded-xl">
                         <!-- Bar chart bars will be injected here -->
                     </div>
-                    <div id="pie-chart-container" class="h-48 w-full hidden justify-center items-center gap-6 p-4 bg-tertiary/20 rounded-xl">
-                        <div id="pie-chart"></div>
+                    <div id="pie-chart-container" class="h-auto sm:h-48 w-full hidden flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 p-4 bg-tertiary/20 rounded-xl">
+                        <div id="pie-chart" class="flex-shrink-0"></div>
                         <div id="pie-chart-legend" class="text-sm space-y-1"></div>
                     </div>
                     <!-- Category-specific budgets container -->
@@ -1990,7 +1990,5 @@
     </script>
 </body>
 </html>
-
-
 
 
