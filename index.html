@@ -1118,7 +1118,7 @@
                 expenseDateField.value = expense.date;
                 expenseTagsField.value = expense.tags ? expense.tags.join(', ') : '';
                 expenseRecurringCheckbox.checked = false;
-                expenseRecurringCheckbox.disabled = true;
+                expenseRecurringCheckbox.disabled = false;
             } else {
                 modalTitle.textContent = 'Add New Expense';
                 expenseIdField.value = '';
@@ -1151,10 +1151,28 @@
 
             try {
                 if (id) {
-                    // Update
-                    const expenseRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
-                    await updateDoc(expenseRef, expenseData);
-                    showToast('Expense updated!');
+                    // We are EDITING an existing expense
+                    if (isRecurring) {
+                        // User wants to convert this one-time expense to a recurring one
+                        
+                        // 1. Add to recurring collection
+                        const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
+                        const recurringData = { ...expenseData }; // copy data
+                        recurringData.nextDueDate = recurringData.date; // Set first due date
+                        await addDoc(recurringRef, recurringData);
+                        
+                        // 2. Delete from one-time expenses collection
+                        const expenseRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
+                        await deleteDoc(expenseRef);
+                        
+                        showToast('Expense converted to recurring!');
+                        
+                    } else {
+                        // Just a normal update
+                        const expenseRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
+                        await updateDoc(expenseRef, expenseData);
+                        showToast('Expense updated!');
+                    }
                 } else if (isRecurring) {
                     // Add to recurring list
                     const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
@@ -1442,7 +1460,7 @@
                 
                 if (expensesAdded) {
                     await batch.commit();
-                    showToast('Recurring expenses processed.');
+                    // showToast('Recurring expenses processed.'); // REMOVE THIS LINE
                 }
             } catch (err) {
                 console.error("Error processing recurring expenses: ", err);
@@ -1815,7 +1833,7 @@
                     recurringExpenses.push({ id: doc.id, ...doc.data() });
                 });
                 // We don't need to re-render, but we can check them
-                checkRecurringExpenses();
+                // checkRecurringExpenses(); // DO NOT check here, this causes the loop
             }, (err) => {
                 console.error("Error on recurring snapshot: ", err);
             });
@@ -1941,6 +1959,7 @@
                         // User is ready, attach all data listeners
                         // Buttons will be enabled by the settings snapshot listener
                         attachDataListeners();
+                        checkRecurringExpenses(); // CHECK ONCE ON LOAD
                     } else {
                         // User is signed out.
                         console.log('User is signed out. Attempting to sign in anonymously...');
@@ -2081,6 +2100,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
