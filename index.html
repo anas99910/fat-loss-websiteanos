@@ -280,7 +280,7 @@
                 <!-- Expense List -->
                 <section>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <h2 class="text-2xl font-semibold text-primary">
                                 History
                             </h2>
@@ -292,6 +292,12 @@
                             <!-- ****** THIS IS THE FIX ****** -->
                             <select id="filter-category" class="glass-input text-sm rounded-lg py-1 px-2">
                                 <option value="all">All Categories</option>
+                            </select>
+                            <select id="history-sort-toggle" class="glass-input text-sm rounded-lg py-1 px-2">
+                                <option value="date-desc" selected>Sort by Date (Newest)</option>
+                                <option value="date-asc">Sort by Date (Oldest)</option>
+                                <option value="amount-desc">Sort by Amount (High)</option>
+                                <option value="amount-asc">Sort by Amount (Low)</option>
                             </select>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
@@ -629,6 +635,7 @@
         let chartType = 'bar';
         let deleteInfo = { id: null, type: null }; // To track what to delete
         let currentHistoryType = 'expenses';
+        let currentSortOrder = 'date-desc'; // Add this line
         let currentUserId = null; // No longer used for path, but good for auth status
 
         // --- DOM ELEMENTS ---
@@ -675,6 +682,7 @@
 
         // History Toggle
         let historyTypeToggle;
+        let historySortToggle; // Add this line
 
         // Yearly Report
         let appView, yearlyReportView, closeYearlyReportBtn;
@@ -941,7 +949,21 @@
                     
                     return currentSearchTerm === '' || titleMatch || tagMatch;
                 })
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
+                .sort((a, b) => {
+                    switch (currentSortOrder) {
+                        case 'date-asc':
+                            return new Date(a.date) - new Date(b.date);
+                        case 'amount-desc':
+                            // Ensure amounts are numbers for correct sorting
+                            return parseFloat(b.amount) - parseFloat(a.amount);
+                        case 'amount-asc':
+                            // Ensure amounts are numbers for correct sorting
+                            return parseFloat(a.amount) - parseFloat(b.amount);
+                        case 'date-desc':
+                        default:
+                            return new Date(b.date) - new Date(a.date);
+                    }
+                });
             
             emptyStateEl.classList.toggle('hidden', filteredList.length > 0);
 
@@ -1884,6 +1906,7 @@
             incomeModalTitle = document.getElementById('income-modal-title');
 
             historyTypeToggle = document.getElementById('history-type-toggle');
+            historySortToggle = document.getElementById('history-sort-toggle'); // Add this line
 
             appView = document.getElementById('app');
             yearlyReportView = document.getElementById('yearly-report');
@@ -1988,6 +2011,11 @@
                 render();
             });
             
+            historySortToggle.addEventListener('change', (e) => { // Add this block
+                currentSortOrder = e.target.value;
+                render();
+            });
+            
             closeYearlyReportBtn.addEventListener('click', () => {
                 yearlyReportView.classList.add('hidden');
                 appView.classList.remove('hidden');
@@ -2053,5 +2081,6 @@
     </script>
 </body>
 </html>
+
 
 
