@@ -202,8 +202,8 @@
                 
                 <!-- Total Expenses Card -->
                 <section class="glass-card p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-start">
+                        <div class="mb-4 sm:mb-0">
                             <h2 class="text-sm font-medium text-tertiary mb-2">
                                 Total This Month
                             </h2>
@@ -211,7 +211,7 @@
                                 0.00 MAD
                             </div>
                         </div>
-                        <div class="text-right">
+                        <div class="sm:text-right">
                             <h2 class="text-sm font-medium text-tertiary mb-2">
                                 Budget
                             </h2>
@@ -676,7 +676,14 @@
 
         // --- HELPER FUNCTIONS ---
         
-        const formatCurrency = (amount) => new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' }).format(amount);
+        const formatCurrency = (amount) => {
+            // Format the number with 0 decimal places, using 'fr-MA' for potential number grouping (e.g., spaces for thousands)
+            const numberFormatter = new Intl.NumberFormat('fr-MA', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+            return `${numberFormatter.format(amount)} DH`;
+        };
         const formatDate = (dateString) => new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
         const getTodayString = () => new Date().toISOString().split('T')[0];
@@ -1981,4 +1988,5 @@
     </script>
 </body>
 </html>
+
 
