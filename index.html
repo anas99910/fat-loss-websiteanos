@@ -87,7 +87,8 @@
 
         /* Date picker icon */
         input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: var(--bg-primary) = #1C1C1E ? invert(1) : invert(0.2);
+            /* Invert(1) for dark, Invert(0.2) for light */
+            filter: var(--bg-primary, #1C1C1E) = #1C1C1E ? invert(1) : invert(0.2);
             cursor: pointer;
         }
         
@@ -116,6 +117,30 @@
         
         /* Utility for hiding */
         .hidden { display: none !important; }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 9999px;
+            font-weight: 500;
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+        #toast.show {
+            bottom: 30px;
+        }
+        #toast.success {
+            background-color: #34D399; /* Emerald 400 */
+            color: #064E3B; /* Emerald 900 */
+        }
+        #toast.error {
+            background-color: #F87171; /* Red 400 */
+            color: #7F1D1D; /* Red 900 */
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased">
@@ -235,7 +260,7 @@
                 
                 <!-- Expense List -->
                 <section>
-                    <div class="flex justify-between items-center mb-4 gap-4 flex-wrap">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
                         <div class="flex items-center gap-2">
                             <h2 class="text-2xl font-semibold text-primary">
                                 History
@@ -246,11 +271,8 @@
                                 <option value="all">All</option>
                             </select>
                         </div>
-                        <div class="flex gap-2 flex-wrap">
-                            <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500" placeholder="Search or #tag...">
-                            <select id="filter-category" class="glass-input text-sm rounded-lg py-1 px-2">
-                                <!-- Categories will be injected here -->
-                            </select>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto" placeholder="Search or #tag...">
                             <button id="export-csv-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Export CSV">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -319,8 +341,8 @@
 
         </div>
 
-        <footer class="text-center text-tertiary text-sm mt-12">
-            © 2025 Made By Gringo | User ID: <span id="user-id-display" class="text-secondary"></span>
+        <footer class="text-center text-tertiary text-sm mt-8">
+            © 2025 Made By Gringo
         </footer>
     </div>
 
@@ -356,9 +378,9 @@
                 <!-- Yearly bar chart will be injected here -->
             </div>
         </div>
-        
-        <footer class="text-center text-tertiary text-sm mt-12">
-            © 2025 Made By Gringo
+
+        <footer class="text-center text-tertiary text-sm mt-8">
+             © 2025 Made By Gringo
         </footer>
     </div>
 
@@ -372,31 +394,31 @@
             <form id="expense-form" class="space-y-4">
                 <input type="hidden" id="expense-id">
                 <div>
-                    <label for="expense-title" class="block text-sm font-medium text-tertiary mb-2">Description</label>
+                    <label for="expense-title" class="block text-sm font-medium text-secondary mb-2">Description</label>
                     <input type="text" id="expense-title" class="glass-input w-full rounded-lg p-3" placeholder="e.g., Weekly Groceries" required>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="expense-amount" class="block text-sm font-medium text-tertiary mb-2">Amount (MAD)</label>
+                        <label for="expense-amount" class="block text-sm font-medium text-secondary mb-2">Amount (MAD)</label>
                         <input type="number" id="expense-amount" class="glass-input w-full rounded-lg p-3" placeholder="150.00" min="0.01" step="0.01" required>
                     </div>
                     <div>
-                        <label for="expense-category" class="block text-sm font-medium text-tertiary mb-2">Category</label>
+                        <label for="expense-category" class="block text-sm font-medium text-secondary mb-2">Category</label>
                         <select id="expense-category" class="glass-input w-full rounded-lg p-3 h-[46px]" required>
                             <!-- Category options will be injected here -->
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label for="expense-date" class="block text-sm font-medium text-tertiary mb-2">Date</label>
+                    <label for="expense-date" class="block text-sm font-medium text-secondary mb-2">Date</label>
                     <input type="date" id="expense-date" class="glass-input w-full rounded-lg p-3" required>
                 </div>
                 <div>
-                    <label for="expense-tags" class="block text-sm font-medium text-tertiary mb-2">Tags <span class="text-xs">(comma separated)</span></label>
+                    <label for="expense-tags" class="block text-sm font-medium text-secondary mb-2">Tags <span class="text-xs">(comma separated)</span></label>
                     <input type="text" id="expense-tags" class="glass-input w-full rounded-lg p-3" placeholder="e.g., vacation, work, gift">
                 </div>
                 <div class="flex items-center justify-between">
-                    <label for="expense-recurring" class="flex items-center gap-2 text-sm text-tertiary cursor-pointer">
+                    <label for="expense-recurring" class="flex items-center gap-2 text-sm text-secondary cursor-pointer">
                         <input type="checkbox" id="expense-recurring" class="glass-input rounded text-blue-600 focus:ring-blue-500">
                         Set as recurring (monthly)
                     </label>
@@ -404,7 +426,6 @@
                 <div class="flex justify-end gap-3 pt-4">
                     <button type="button" id="cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
                     <button type="submit" id="save-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Save Expense</button>
-
                 </div>
             </form>
         </div>
@@ -417,7 +438,7 @@
             <h3 class="text-2xl font-semibold text-primary mb-6">Set Monthly Budget</h3>
             <form id="budget-form" class="space-y-4">
                 <div>
-                    <label for="budget-amount" class="block text-sm font-medium text-tertiary mb-2">Budget Amount (MAD)</label>
+                    <label for="budget-amount" class="block text-sm font-medium text-secondary mb-2">Budget Amount (MAD)</label>
                     <input type="number" id="budget-amount" class="glass-input w-full rounded-lg p-3" placeholder="5000.00" min="0" step="100">
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
@@ -433,7 +454,7 @@
         <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="delete-modal-backdrop"></div>
         <div class="glass-card z-10 w-full max-w-sm p-6 modal-slide-in-up">
             <h3 id="delete-modal-title" class="text-xl font-semibold text-primary mb-4">Delete Transaction</h3>
-            <p id="delete-modal-text" class="text-tertiary mb-6">Are you sure you want to delete this? This action cannot be undone.</p>
+            <p id="delete-modal-text" class="text-secondary mb-6">Are you sure? This action cannot be undone.</p>
             <div class="flex justify-end gap-3">
                 <button type="button" id="delete-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
                 <button type="button" id="delete-confirm-btn" class="bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Delete</button>
@@ -467,16 +488,16 @@
             <form id="income-form" class="space-y-4">
                 <input type="hidden" id="income-id">
                 <div>
-                    <label for="income-title" class="block text-sm font-medium text-tertiary mb-2">Description</label>
+                    <label for="income-title" class="block text-sm font-medium text-secondary mb-2">Description</label>
                     <input type="text" id="income-title" class="glass-input w-full rounded-lg p-3" placeholder="e.g., Monthly Salary" required>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="income-amount" class="block text-sm font-medium text-tertiary mb-2">Amount (MAD)</label>
-                        <input type="number" id="income-amount" class="glass-input w-full rounded-lg p-3" placeholder="10000.00" min="0.01" step="0.01" required>
+                        <label for="income-amount" class="block text-sm font-medium text-secondary mb-2">Amount (MAD)</label>
+                        <input type="number" id="income-amount" class="glass-input w-.full rounded-lg p-3" placeholder="10000.00" min="0.01" step="0.01" required>
                     </div>
                     <div>
-                        <label for="income-date" class="block text-sm font-medium text-tertiary mb-2">Date</label>
+                        <label for="income-date" class="block text-sm font-medium text-secondary mb-2">Date</label>
                         <input type="date" id="income-date" class="glass-input w-full rounded-lg p-3" required>
                     </div>
                 </div>
@@ -497,9 +518,8 @@
             <div class="space-y-4">
                 <div>
                     <h4 class="text-lg font-medium text-primary mb-2">Import Data</h4>
-                    <p class="text-sm text-tertiary mb-2">Import expenses from a CSV file. Format: Title,Amount,CategoryLabel,Date (YYYY-MM-DD)</p>
+                    <p class="text-sm text-secondary mb-2">Import expenses from a CSV file. Format: Title,Amount,CategoryLabel,Date (YYYY-MM-DD)</p>
                     <input type="file" id="import-csv-input" class="glass-input w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600/20 file:text-blue-300 hover:file:bg-blue-600/40" accept=".csv">
-                    <p id="import-status" class="text-sm text-tertiary mt-2"></p>
                 </div>
                 
                 <div class="pt-4 border-t border-border-primary">
@@ -507,7 +527,7 @@
                     <button id="reset-data-btn" class="w-full text-left bg-red-600/20 text-red-300 hover:bg-red-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
                         Clear All App Data
                     </button>
-                    <p class="text-sm text-tertiary mt-1">This will permanently delete all expenses, income, and settings from Firestore.</p>
+                    <p class="text-sm text-secondary mt-1">This will permanently delete all shared expenses, income, and settings.</p>
                 </div>
             </div>
             
@@ -517,46 +537,34 @@
         </div>
     </div>
 
-    <!-- Simple Toast/Notification Modal -->
-    <div id="toast-modal" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 p-4 hidden w-full max-w-xs sm:max-w-sm">
-        <div id="toast-content" class="glass-card z-10 w-full p-4 text-center text-primary rounded-lg shadow-lg modal-slide-in-up">
-            <p id="toast-message"></p>
-        </div>
-    </div>
+    <!-- Toast Notification -->
+    <div id="toast" class=""></div>
 
-    <!-- JavaScript -->
+    <!-- Firebase SDK -->
     <script type="module">
-        // --- Firebase Imports ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            signInWithCustomToken, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { 
             getFirestore, 
             doc, 
             getDoc, 
             setDoc, 
-            addDoc, 
             updateDoc, 
             deleteDoc, 
             onSnapshot, 
             collection, 
             query, 
-            where, 
-            getDocs,
+            addDoc,
             writeBatch,
-            setLogLevel
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+            getDocs,
+            Timestamp 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- Firebase Config (WILL BE INJECTED) ---
-        // This structure assumes __firebase_config, __app_id, and __initial_auth_token are provided globally.
-        
-        // --- User's Firebase Config ---
+        // --- FIREBASE CONFIG ---
+        // We will hard-code the config you provided.
         const firebaseConfig = {
-          apiKey: "AIzaSyC9NyVrmam2_1ABkjeCu057trLBlUMN8L8", // This is safe to expose
+          apiKey: "AIzaSyC9NyVrmam2_1ABkjeCu057trLBlUMN8L8",
           authDomain: "expenso-e317f.firebaseapp.com",
           projectId: "expenso-e317f",
           storageBucket: "expenso-e317f.firebasestorage.app",
@@ -565,9 +573,9 @@
           measurementId: "G-RKEV6XWG7W"
         };
         
-        let db, auth, app;
-        let currentUserId = null;
-        let appId = 'default-app-id';
+        // This is the app ID you set up in Firebase: expenso-e317f
+        // We will use this to build the database path.
+        const appId = "expenso-e317f";
 
         // --- DEFAULT CATEGORIES (if storage is empty) ---
         const DEFAULT_CATEGORIES = {
@@ -580,21 +588,79 @@
         };
         const GENERIC_ICON = DEFAULT_CATEGORIES.other.icon;
 
+        // --- FIREBASE GLOBALS ---
+        let app;
+        let auth;
+        let db;
+
         // --- STATE ---
         let expenses = [];
         let income = [];
         let recurringExpenses = [];
-        let categories = {}; // Will be loaded from Firestore
+        let categories = {};
         let currentFilter = 'all';
         let currentSearchTerm = '';
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-        let currentBudget = 0; // Will be loaded from Firestore
+        let currentBudget = 0;
         let chartType = 'bar';
-        let expenseToDeleteId = null;
+        let deleteInfo = { id: null, type: null }; // To track what to delete
         let currentHistoryType = 'expenses';
-        let isResettingData = false;
-        let categoryToDeleteKey = null;
+        let currentUserId = null; // No longer used for path, but good for auth status
+
+        // --- DOM ELEMENTS ---
+        let docElement;
+        let addExpenseBtn;
+        let addIncomeBtn;
+        let expenseListEl;
+        let totalExpensesEl;
+        let filterCategoryEl;
+        let emptyStateEl;
+        
+        // Expense Modal
+        let modal, modalBackdrop, modalTitle, cancelBtn, expenseForm, expenseIdField, expenseTitleField, expenseAmountField, expenseCategoryField, expenseDateField, expenseTagsField, expenseRecurringCheckbox;
+
+        // Theme Toggle
+        let themeToggleBtn, themeIconLight, themeIconDark;
+        
+        // Month Selector
+        let monthSelector;
+        
+        // Budget
+        let setBudgetBtn, budgetModal, budgetModalBackdrop, budgetForm, budgetAmountField, budgetCancelBtn, budgetDisplayEl, budgetProgressBar, budgetRemainingTextEl;
+
+        // Delete Modal
+        let deleteModal, deleteModalBackdrop, deleteModalTitle, deleteModalText, deleteCancelBtn, deleteConfirmBtn;
+        
+        // Search & Export
+        let searchBar, exportCsvBtn;
+        
+        // Insights
+        let insightSavings, insightTopCategory, insightHighestExpense, insightAvgSpend;
+        
+        // Chart
+        let chartToggleBarBtn, chartTogglePieBtn, barChartContainer, pieChartContainer, pieChartEl, pieChartLegendEl, categoryBudgetsContainer;
+        
+        // Weekly Summary
+        let weeklyTotalSpendEl, weeklyTopCategoryEl;
+        
+        // Categories
+        let manageCategoriesBtn, categoryModal, categoryModalBackdrop, categoryCloseBtn, categoryForm, categoryNameInput, categoryListEl;
+
+        // Add Income Modal
+        let incomeModal, incomeModalBackdrop, incomeCancelBtn, incomeForm, incomeIdField, incomeTitleField, incomeAmountField, incomeDateField, incomeModalTitle;
+
+        // History Toggle
+        let historyTypeToggle;
+
+        // Yearly Report
+        let appView, yearlyReportView, closeYearlyReportBtn;
+
+        // Settings Modal
+        let settingsBtn, settingsModal, settingsModalBackdrop, settingsCloseBtn, importCsvInput, resetDataBtn;
+        
+        // Toast
+        let toastEl;
         let toastTimeout = null;
         
         // Firestore Unsubscribe Listeners
@@ -602,26 +668,6 @@
         let incomeUnsub = () => {};
         let settingsUnsub = () => {};
         let recurringUnsub = () => {};
-
-
-        // --- DOM ELEMENTS ---
-        let docElement, addExpenseBtn, addIncomeBtn, expenseListEl, totalExpensesEl, filterCategoryEl, emptyStateEl;
-        let modal, modalBackdrop, modalTitle, cancelBtn, expenseForm, expenseIdField, expenseTitleField, expenseAmountField, expenseCategoryField, expenseDateField, expenseTagsField, expenseRecurringCheckbox;
-        let themeToggleBtn, themeIconLight, themeIconDark;
-        let monthSelector;
-        let setBudgetBtn, budgetModal, budgetModalBackdrop, budgetForm, budgetAmountField, budgetCancelBtn, budgetDisplayEl, budgetProgressBar, budgetRemainingTextEl;
-        let deleteModal, deleteModalBackdrop, deleteModalTitle, deleteModalText, deleteCancelBtn, deleteConfirmBtn;
-        let searchBar, exportCsvBtn;
-        let insightSavings, insightTopCategory, insightHighestExpense, insightAvgSpend;
-        let chartToggleBarBtn, chartTogglePieBtn, barChartContainer, pieChartContainer, pieChartEl, pieChartLegendEl, categoryBudgetsContainer;
-        let weeklyTotalSpendEl, weeklyTopCategoryEl;
-        let manageCategoriesBtn, categoryModal, categoryModalBackdrop, categoryCloseBtn, categoryForm, categoryNameInput, categoryListEl;
-        let incomeModal, incomeModalTitle, incomeModalBackdrop, incomeCancelBtn, incomeForm, incomeIdField, incomeTitleField, incomeAmountField, incomeDateField;
-        let historyTypeToggle;
-        let appView, yearlyReportView, closeYearlyReportBtn;
-        let settingsBtn, settingsModal, settingsModalBackdrop, settingsCloseBtn, importCsvInput, importStatus, resetDataBtn;
-        let toastModal, toastMessage, toastContent;
-        let userIdDisplay;
 
 
         // --- HELPER FUNCTIONS ---
@@ -640,22 +686,14 @@
             return { start: mon, end: sun };
         };
 
-        // --- TOAST NOTIFICATION ---
         const showToast = (message, isError = false) => {
-            if (toastTimeout) clearTimeout(toastTimeout); // Clear existing timeout
-
-            toastMessage.textContent = message;
-            if (isError) {
-                toastContent.classList.add('!text-red-300'); // Use Tailwind's important modifier
-            } else {
-                toastContent.classList.remove('!text-red-300');
-            }
-            
-            toastModal.classList.remove('hidden');
-            
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastEl.textContent = message;
+            toastEl.className = isError ? 'error' : 'success';
+            toastEl.classList.add('show');
             toastTimeout = setTimeout(() => {
-                toastModal.classList.add('hidden');
-            }, 3000); // Hide after 3 seconds
+                toastEl.classList.remove('show');
+            }, 3000);
         };
 
         // --- DATA FUNCTIONS ---
@@ -886,25 +924,25 @@
                     const categoryIcon = category ? category.icon : GENERIC_ICON;
                     
                     el.innerHTML = `
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                            <div class="flex items-center gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                            <div class="flex items-center gap-4 mb-2 sm:mb-0">
                                 <div class="p-3 bg-tertiary/60 rounded-xl text-primary">
                                     ${categoryIcon}
                                 </div>
                                 <div>
                                     <p class="font-semibold text-primary">${item.title}</p>
-                                    <p class="text-sm text-tertiary">${formatDate(item.date)}</p>
+                                    <p class="text-sm text-secondary">${formatDate(item.date)}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between">
+                            <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
                                 <p class="font-semibold text-primary text-lg">
                                     ${formatCurrency(item.amount)}
                                 </p>
-                                <div class="flex gap-1 sm:gap-2">
-                                    <button class="edit-btn p-2 text-tertiary hover:text-blue-400 transition-colors" data-id="${item.id}" title="Edit Expense">
+                                <div class="flex gap-2">
+                                    <button class="edit-btn p-2 text-secondary hover:text-blue-400 transition-colors" data-id="${item.id}" title="Edit Expense">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                     </button>
-                                    <button class="delete-btn p-2 text-tertiary hover:text-red-400 transition-colors" data-id="${item.id}" title="Delete Expense">
+                                    <button class="delete-btn p-2 text-secondary hover:text-red-400 transition-colors" data-id="${item.id}" title="Delete Expense">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </div>
@@ -916,25 +954,25 @@
                     `;
                 } else { // Income
                     el.innerHTML = `
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                            <div class="flex items-center gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                            <div class="flex items-center gap-4 mb-2 sm:mb-0">
                                 <div class="p-3 bg-tertiary/60 rounded-xl text-green-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" /></svg>
                                 </div>
                                 <div>
                                     <p class="font-semibold text-primary">${item.title}</p>
-                                    <p class="text-sm text-tertiary">${formatDate(item.date)}</p>
+                                    <p class="text-sm text-secondary">${formatDate(item.date)}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between">
+                            <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
                                 <p class="font-semibold text-green-400 text-lg">
                                     + ${formatCurrency(item.amount)}
                                 </p>
-                                <div class="flex gap-1 sm:gap-2">
-                                    <button class="edit-income-btn p-2 text-tertiary hover:text-blue-400 transition-colors" data-id="${item.id}" title="Edit Income">
+                                <div class="flex gap-2">
+                                    <button class="edit-income-btn p-2 text-secondary hover:text-blue-400 transition-colors" data-id="${item.id}" title="Edit Income">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                     </button>
-                                    <button class="delete-income-btn p-2 text-tertiary hover:text-red-400 transition-colors" data-id="${item.id}" title="Delete Income">
+                                    <button class="delete-income-btn p-2 text-secondary hover:text-red-400 transition-colors" data-id="${item.id}" title="Delete Income">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </div>
@@ -962,14 +1000,14 @@
 
             if (periodExpenses.length === 0) {
                 insightTopCategory.innerHTML = `<h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3><p class="text-xl font-semibold text-primary">--</p>`;
-                insightHighestExpense.innerHTML = `<h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p><p class="text-sm text-tertiary truncate">--</p>`;
+                insightHighestExpense.innerHTML = `<h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p><p class="text-sm text-secondary truncate">--</p>`;
                 insightAvgSpend.innerHTML = `<h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p>`;
                 return;
             }
 
             // Top Category
             const { totals } = getCategoryTotals(periodExpenses);
-            const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
+            const topCategory = Object.keys(totals).reduce((a, b) => (totals[a] ? totals[a].total : 0) > (totals[b] ? totals[b].total : 0) ? a : b, 'other');
             insightTopCategory.innerHTML = `
                 <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
                 <p class="text-xl font-semibold text-primary">${(totals[topCategory] && totals[topCategory].total > 0) ? categories[topCategory].label : '--'}</p>
@@ -980,12 +1018,11 @@
             insightHighestExpense.innerHTML = `
                 <h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3>
                 <p class="text-xl font-semibold text-primary">${formatCurrency(highest.amount)}</p>
-                <p class="text-sm text-tertiary truncate">${highest.title}</p>
+                <p class="text-sm text-secondary truncate">${highest.title}</p>
             `;
             
             // Average Daily Spend
             const total = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-            const daysInUse = new Set(periodExpenses.map(exp => exp.date)).size;
             const daysInMonth = getDaysInMonth(currentYear, currentMonth);
             const daysSoFar = (currentYear === new Date().getFullYear() && currentMonth === new Date().getMonth()) ? new Date().getDate() : daysInMonth;
             const avg = total / daysSoFar;
@@ -1009,7 +1046,7 @@
             
             if (weeklyExpenses.length > 0) {
                 const { totals } = getCategoryTotals(weeklyExpenses);
-                const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
+                const topCategory = Object.keys(totals).reduce((a, b) => (totals[a] ? totals[a].total : 0) > (totals[b] ? totals[b].total : 0) ? a : b, 'other');
                 weeklyTopCategoryEl.textContent = (totals[topCategory] && totals[topCategory].total > 0) ? categories[topCategory].label : '--';
             } else {
                 weeklyTopCategoryEl.textContent = '--';
@@ -1055,33 +1092,34 @@
                 category: expenseCategoryField.value,
                 date: expenseDateField.value,
                 tags: tags
+                // We don't save the ID in the document itself, Firebase gives it one.
             };
 
             try {
                 if (id) {
                     // Update
-                    const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', id);
-                    await setDoc(docRef, expenseData);
-                    showToast('Expense updated.');
+                    const expenseRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
+                    await updateDoc(expenseRef, expenseData);
+                    showToast('Expense updated!');
                 } else if (isRecurring) {
                     // Add to recurring list
+                    const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
                     expenseData.nextDueDate = expenseData.date; // Set first due date
-                    const colRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'recurringExpenses');
-                    await addDoc(colRef, expenseData);
-                    showToast('Recurring expense added.');
+                    await addDoc(recurringRef, expenseData);
+                    showToast('Recurring expense added!');
                 } else {
                     // Add to main list
-                    const colRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'expenses');
-                    await addDoc(colRef, expenseData);
-                    showToast('Expense added.');
+                    const expensesRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
+                    await addDoc(expensesRef, expenseData);
+                    showToast('Expense added!');
                 }
+                
+                // No need to save to local array, onSnapshot will handle it.
+                closeModal();
             } catch (err) {
                 console.error("Error saving expense: ", err);
                 showToast(`Error: ${err.message}`, true);
             }
-            
-            // No need to call render() here, onSnapshot will do it.
-            closeModal();
         };
         
         const handleListClick = (e) => {
@@ -1094,129 +1132,54 @@
                 openModal(expenses.find(exp => exp.id === editBtn.dataset.id));
             }
             if (deleteBtn) {
-                expenseToDeleteId = deleteBtn.dataset.id;
-                categoryToDeleteKey = null;
-                isResettingData = false;
+                deleteInfo = { id: deleteBtn.dataset.id, type: 'expense' };
                 deleteModalTitle.textContent = 'Delete Expense';
-                deleteModalText.textContent = 'Are you sure you want to delete this expense? This action cannot be undone.';
-                deleteConfirmBtn.textContent = 'Delete';
-                deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
+                deleteModalText.textContent = 'Are you sure you want to delete this expense?';
                 deleteModal.classList.remove('hidden');
             }
             if (editIncomeBtn) {
                 openIncomeModal(income.find(inc => inc.id === editIncomeBtn.dataset.id));
             }
             if (deleteIncomeBtn) {
-                expenseToDeleteId = deleteIncomeBtn.dataset.id;
-                categoryToDeleteKey = null;
-                isResettingData = false;
+                deleteInfo = { id: deleteIncomeBtn.dataset.id, type: 'income' };
                 deleteModalTitle.textContent = 'Delete Income';
-                deleteModalText.textContent = 'Are you sure you want to delete this income record? This action cannot be undone.';
-                deleteConfirmBtn.textContent = 'Delete';
-                deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
+                deleteModalText.textContent = 'Are you sure you want to delete this income record?';
                 deleteModal.classList.remove('hidden');
             }
         };
         
         const handleDeleteConfirm = async () => {
-            if (!currentUserId) return showToast('Not authenticated', true);
-
-            try {
-                if (isResettingData) {
-                    // This is a destructive operation, be careful.
-                    showToast('Clearing all data...');
-                    const batch = writeBatch(db);
-                    
-                    // Delete all expenses
-                    expenses.forEach(exp => {
-                        const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', exp.id);
-                        batch.delete(docRef);
-                    });
-                    
-                    // Delete all income
-                    income.forEach(inc => {
-                        const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'income', inc.id);
-                        batch.delete(docRef);
-                    });
-
-                    // Delete all recurring
-                    recurringExpenses.forEach(rex => {
-                        const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'recurringExpenses', rex.id);
-                        batch.delete(docRef);
-                    });
-                    
-                    // Delete settings doc
-                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
-                    batch.delete(settingsRef);
-                    
-                    await batch.commit();
-                    
-                    // The onSnapshot listeners will fire and reset the UI
-                    isResettingData = false;
-                    closeSettingsModal(); // Close the settings modal it came from
-                    showToast('All app data has been cleared.');
-
-                } else if (expenseToDeleteId) {
-                    let docRef;
-                    let expenseFound = expenses.some(exp => exp.id === expenseToDeleteId);
-                    if (expenseFound) {
-                        docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', expenseToDeleteId);
-                    } else {
-                        docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'income', expenseToDeleteId);
-                    }
-                    await deleteDoc(docRef);
-                    
-                    expenseToDeleteId = null;
-                    showToast('Transaction deleted.');
-                    
-                } else if (categoryToDeleteKey) {
-                    // Re-assign expenses
-                    const batch = writeBatch(db);
-                    expenses.forEach(exp => {
-                        if (exp.category === categoryToDeleteKey) {
-                            const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', exp.id);
-                            batch.update(docRef, { category: 'other' });
-                        }
-                    });
-                    
-                    // Delete category from settings
-                    delete categories[categoryToDeleteKey];
-                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
-                    batch.update(settingsRef, { categories: categories });
-                    
-                    await batch.commit();
-                    
-                    showToast('Category deleted.');
-                    categoryToDeleteKey = null; // Reset the flag
-                }
-            } catch (err) {
-                console.error("Error during delete: ", err);
-                showToast(`Error: ${err.message}`, true);
-                isResettingData = false;
-                expenseToDeleteId = null;
-                categoryToDeleteKey = null;
-            }
-
-            deleteModal.classList.add('hidden');
+            if (!deleteInfo.type || !currentUserId) return; // Note: deleteInfo.id can be null for 'all-data'
             
-            // Reset modal text and button back to default delete
-            deleteModalTitle.textContent = 'Delete Transaction';
-            deleteModalText.textContent = 'Are you sure you want to delete this? This action cannot be undone.';
-            deleteConfirmBtn.textContent = 'Delete';
-            deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
-        };
-
-        const closeDeleteModal = () => {
+            let docRef;
+            if (deleteInfo.type === 'expense') {
+                if (!deleteInfo.id) return;
+                docRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', deleteInfo.id);
+            } else if (deleteInfo.type === 'income') {
+                if (!deleteInfo.id) return;
+                docRef = doc(db, 'artifacts', appId, 'public', 'data', 'income', deleteInfo.id);
+            } else if (deleteInfo.type === 'category') {
+                if (!deleteInfo.id) return;
+                await handleCategoryDeleteConfirm(deleteInfo.id);
+                return;
+            } else if (deleteInfo.type === 'all-data') {
+                await handleResetDataConfirm();
+                return;
+            } else {
+                return; // Unknown type
+            }
+            
+            try {
+                await deleteDoc(docRef);
+                showToast(`${deleteInfo.type} deleted!`);
+            } catch (err) {
+                console.error(`Error deleting ${deleteInfo.type}: `, err);
+                showToast(`Error: ${err.message}`, true);
+            }
+            
+            deleteInfo = { id: null, type: null };
             deleteModal.classList.add('hidden');
-            isResettingData = false; // Reset this flag
-            expenseToDeleteId = null; // And this one
-            categoryToDeleteKey = null; // And this one
-            // Reset modal text and button back to default delete
-            deleteModalTitle.textContent = 'Delete Transaction';
-            deleteModalText.textContent = 'Are you sure you want to delete this? This action cannot be undone.';
-            deleteConfirmBtn.textContent = 'Delete';
-            deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
-        }
+        };
 
         // Income Modal
         const openIncomeModal = (inc = null) => {
@@ -1249,30 +1212,26 @@
 
             try {
                 if (id) {
-                    const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'income', id);
-                    await setDoc(docRef, incomeData);
-                    showToast('Income updated.');
+                    // Update
+                    const incomeRef = doc(db, 'artifacts', appId, 'public', 'data', 'income', id);
+                    await updateDoc(incomeRef, incomeData);
+                    showToast('Income updated!');
                 } else {
-                    const colRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'income');
-                    await addDoc(colRef, incomeData);
-                    showToast('Income added.');
+                    // Add
+                    const incomeRef = collection(db, 'artifacts', appId, 'public', 'data', 'income');
+                    await addDoc(incomeRef, incomeData);
+                    showToast('Income added!');
                 }
+                closeIncomeModal();
             } catch (err) {
                 console.error("Error saving income: ", err);
                 showToast(`Error: ${err.message}`, true);
             }
-            
-            closeIncomeModal();
         };
 
         // --- FEATURE HANDLERS ---
         
         // Theme
-        // const initTheme = () => {
-        //     // Theme is now loaded from Firestore
-        //     const savedTheme = localStorage.getItem('appTheme') || 'dark';
-        //     applyTheme(savedTheme);
-        // };
         const applyTheme = (theme) => {
             if (theme === 'light') {
                 docElement.classList.add('light');
@@ -1283,14 +1242,13 @@
                 themeIconLight.classList.remove('hidden');
                 themeIconDark.classList.add('hidden');
             }
-            // localStorage.setItem('appTheme', theme); // No longer use localStorage
         };
         
         const handleThemeToggle = async () => {
             if (!currentUserId) return; // Not signed in
             const newTheme = docElement.classList.contains('light') ? 'dark' : 'light';
             try {
-                const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
                 await setDoc(settingsRef, { theme: newTheme }, { merge: true });
                 // The onSnapshot listener will call applyTheme()
             } catch (err) {
@@ -1347,18 +1305,17 @@
             e.preventDefault();
             if (!currentUserId) return showToast('Not authenticated', true);
             
-            currentBudget = parseFloat(budgetAmountField.value) || 0;
-            
+            const newBudget = parseFloat(budgetAmountField.value) || 0;
             try {
-                const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
-                await setDoc(settingsRef, { budget: currentBudget }, { merge: true });
-                showToast('Budget updated.');
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
+                await setDoc(settingsRef, { budget: newBudget }, { merge: true });
+                // onSnapshot will update currentBudget and re-render
+                closeBudgetModal();
+                showToast('Budget updated!');
             } catch (err) {
                 console.error("Error saving budget: ", err);
                 showToast(`Error: ${err.message}`, true);
             }
-
-            closeBudgetModal();
         };
         
         // Search & Filter
@@ -1385,7 +1342,7 @@
             
             let csv = 'Title,Amount,Category,Date\n';
             periodExpenses.forEach(exp => {
-                const categoryLabel = categories[exp.category] ? categories[exp.category].label : 'Other';
+                const categoryLabel = categories[exp.category] ? categories[exp.category].label : exp.category;
                 csv += `"${exp.title}","${exp.amount}","${categoryLabel}","${exp.date}"\n`;
             });
             
@@ -1399,47 +1356,47 @@
         
         // Recurring Expenses
         const checkRecurringExpenses = async () => {
-            const today = new Date(getTodayString());
-            let expensesAdded = false;
-            const batch = writeBatch(db);
+            if (!currentUserId) return;
             
-            const expensesColRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'expenses');
+            const today = getTodayString();
+            const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
+            const q = query(recurringRef, where => where("nextDueDate", "<=", today));
             
-            recurringExpenses.forEach(rex => {
-                let nextDueDate = new Date(rex.nextDueDate + 'T00:00:00');
-                if (nextDueDate <= today) {
+            try {
+                const querySnapshot = await getDocs(q);
+                const batch = writeBatch(db);
+                let expensesAdded = false;
+
+                querySnapshot.forEach(docSnap => {
+                    const rex = docSnap.data();
+                    let nextDueDate = new Date(rex.nextDueDate + 'T00:00:00');
+
                     // Add to main expenses
                     const newExpense = { ...rex, date: rex.nextDueDate };
-                    delete newExpense.nextDueDate; // remove this field for the new expense doc
-                    delete newExpense.id; // remove old ID
-                    
-                    batch.add(expensesColRef, newExpense);
+                    delete newExpense.nextDueDate;
+                    // Need to create a new doc ref in the expenses collection to add to batch
+                    const newExpenseRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'));
+                    batch.set(newExpenseRef, newExpense);
                     
                     // Set next due date (e.g., +1 month)
-                    const newNextDueDate = new Date(nextDueDate.setMonth(nextDueDate.getMonth() + 1)).toISOString().split('T')[0];
-                    const rexRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'recurringExpenses', rex.id);
-                    batch.update(rexRef, { nextDueDate: newNextDueDate });
+                    const updatedDueDate = new Date(nextDueDate.setMonth(nextDueDate.getMonth() + 1)).toISOString().split('T')[0];
+                    const rexRef = doc(db, 'artifacts', appId, 'public', 'data', 'recurring', docSnap.id);
+                    batch.update(rexRef, { nextDueDate: updatedDueDate });
                     
                     expensesAdded = true;
-                }
-            });
-            
-            if (expensesAdded) {
-                try {
+                });
+                
+                if (expensesAdded) {
                     await batch.commit();
-                    showToast('Recurring expenses auto-added.');
-                } catch (err) {
-                    console.error("Error processing recurring expenses: ", err);
-                    showToast(`Error: ${err.message}`, true);
+                    showToast('Recurring expenses processed.');
                 }
+            } catch (err) {
+                console.error("Error processing recurring expenses: ", err);
+                // Don't toast this, as it runs in background
             }
         };
         
         // Category Management
-        const initCategories = () => {
-            // This is now handled by the settings onSnapshot listener
-            renderCategoryUI();
-        };
         const renderCategoryUI = () => {
             // Populate dropdowns
             filterCategoryEl.innerHTML = '<option value="all">All Categories</option>';
@@ -1458,7 +1415,7 @@
                         <span class="text-primary truncate">${category.label}</span>
                         <div class="flex items-center gap-2 flex-shrink-0">
                             <input type="number" class="category-budget-input glass-input w-24 text-sm p-1 rounded" placeholder="Budget" data-key="${key}" value="${category.budget || ''}">
-                            ${!isDefault ? `<button class="delete-category-btn p-1 text-red-400 hover:text-red-300" data-key="${key}">&times;</button>` : '<span class="text-xs text-tertiary w-8 text-right"></span>'}
+                            ${!isDefault ? `<button class="delete-category-btn p-1 text-red-400 hover:text-red-300" data-key="${key}" title="Delete ${category.label}">&times;</button>` : '<span class="text-xs text-tertiary w-8 text-right"></span>'}
                         </div>
                     </div>
                 `;
@@ -1466,6 +1423,7 @@
         };
         const openCategoryModal = () => categoryModal.classList.remove('hidden');
         const closeCategoryModal = () => categoryModal.classList.add('hidden');
+        
         const handleCategorySubmit = async (e) => {
             e.preventDefault();
             if (!currentUserId) return showToast('Not authenticated', true);
@@ -1473,47 +1431,82 @@
             const name = categoryNameInput.value.trim();
             if (name && !Object.values(categories).find(c => c.label === name)) {
                 const key = name.toLowerCase().replace(/\s+/g, '_');
-                categories[key] = { label: name, icon: GENERIC_ICON };
+                const newCategories = { 
+                    ...categories, 
+                    [key]: { label: name, icon: GENERIC_ICON } 
+                };
                 
                 try {
-                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
-                    await setDoc(settingsRef, { categories: categories }, { merge: true });
-                    showToast('Category added.');
+                    const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
+                    await setDoc(settingsRef, { categories: newCategories }, { merge: true });
+                    // onSnapshot will re-render
                     categoryForm.reset();
+                    showToast('Category added!');
                 } catch (err) {
                     console.error("Error adding category: ", err);
                     showToast(`Error: ${err.message}`, true);
                 }
             }
         };
-        const handleCategoryDelete = (e) => {
+        
+        const handleCategoryDeleteClick = (e) => {
             const btn = e.target.closest('.delete-category-btn');
             if (btn) {
                 const key = btn.dataset.key;
-                isResettingData = false;
-                expenseToDeleteId = null;
-                categoryToDeleteKey = key; // Set the key
-
+                deleteInfo = { id: key, type: 'category' };
                 deleteModalTitle.textContent = 'Delete Category';
-                deleteModalText.textContent = `Are you sure you want to delete "${categories[key].label}"? Expenses will be moved to "Other".`;
-                deleteConfirmBtn.textContent = 'Delete Category';
-                deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
+                deleteModalText.textContent = `Are you sure you want to delete "${categories[key].label}"?\nAll expenses in this category will be moved to "Other".`;
                 deleteModal.classList.remove('hidden');
             }
+        };
+
+        const handleCategoryDeleteConfirm = async (key) => {
+            // New local state without the deleted category
+            const newCategories = { ...categories };
+            delete newCategories[key];
+            
+            // Re-assign expenses
+            const batch = writeBatch(db);
+            expenses.forEach(exp => {
+                if (exp.category === key) {
+                    const expRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', exp.id);
+                    batch.update(expRef, { category: 'other' });
+                }
+            });
+            
+            // Update settings
+            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
+            batch.update(settingsRef, { categories: newCategories });
+            
+            try {
+                await batch.commit();
+                showToast('Category deleted!');
+            } catch (err) {
+                console.error("Error deleting category: ", err);
+                showToast(`Error: ${err.message}`, true);
+            }
+            
+            deleteInfo = { id: null, type: null };
+            deleteModal.classList.add('hidden');
         };
         
         const handleCategoryBudgetChange = async (e) => {
             if (e.target.classList.contains('category-budget-input')) {
                 if (!currentUserId) return showToast('Not authenticated', true);
+                
                 const key = e.target.dataset.key;
                 const budget = parseFloat(e.target.value) || 0;
+                
                 if (categories[key]) {
-                    categories[key].budget = budget > 0 ? budget : null;
+                    const newCategories = { ...categories };
+                    newCategories[key].budget = budget > 0 ? budget : null;
+                    
                     try {
-                        const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
-                        await setDoc(settingsRef, { categories: categories }, { merge: true });
+                        const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
+                        await setDoc(settingsRef, { categories: newCategories }, { merge: true });
+                        showToast('Category budget updated!');
                     } catch (err) {
-                        console.error("Error saving category budget: ", err);
+                        console.error("Error updating category budget: ", err);
                         showToast(`Error: ${err.message}`, true);
                     }
                 }
@@ -1527,12 +1520,11 @@
             
             document.getElementById('yearly-report-title').textContent = `Yearly Report: ${currentYear}`;
             
-            // 1. Aggregate data for the whole year
+            // 1. Aggregate data for the whole year (from all loaded data)
             let yearlyIncome = 0;
             let yearlyExpenses = 0;
             const monthlyTotals = Array(12).fill(0);
             
-            // Use the data from state, which is already loaded
             expenses.forEach(exp => {
                 const date = new Date(exp.date + 'T00:00:00');
                 if (date.getFullYear() === currentYear) {
@@ -1577,10 +1569,9 @@
         const openSettingsModal = () => settingsModal.classList.remove('hidden');
         const closeSettingsModal = () => settingsModal.classList.add('hidden');
         
-        const handleImportCSV = async (e) => {
+        const handleImportCSV = (e) => {
             const file = e.target.files[0];
-            if (!file) return;
-            if (!currentUserId) return showToast('Not authenticated', true);
+            if (!file || !currentUserId) return;
             
             const reader = new FileReader();
             reader.onload = async (event) => {
@@ -1590,22 +1581,21 @@
                 let errorCount = 0;
                 
                 const batch = writeBatch(db);
-                const expensesColRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'expenses');
+                let newCategories = { ...categories };
+                let categoriesChanged = false;
 
-                for (const line of lines) {
+                lines.forEach(line => {
                     try {
                         const [title, amount, categoryLabel, date] = line.split(',');
                         if (title && amount && categoryLabel && date) {
                             // Find category key by label
-                            let categoryKey = Object.keys(categories).find(key => categories[key].label.toLowerCase() === categoryLabel.trim().toLowerCase());
+                            let categoryKey = Object.keys(newCategories).find(key => newCategories[key].label.toLowerCase() === categoryLabel.trim().toLowerCase());
                             if (!categoryKey) {
                                 // If category doesn't exist, create it
                                 const newKey = categoryLabel.trim().toLowerCase().replace(/\s+/g, '_');
-                                if (!categories[newKey]) {
-                                    categories[newKey] = { label: categoryLabel.trim(), icon: GENERIC_ICON };
-                                    // Save new category to settings
-                                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
-                                    await setDoc(settingsRef, { categories: categories }, { merge: true });
+                                if (!newCategories[newKey]) {
+                                    newCategories[newKey] = { label: categoryLabel.trim(), icon: GENERIC_ICON };
+                                    categoriesChanged = true;
                                 }
                                 categoryKey = newKey;
                             }
@@ -1615,11 +1605,11 @@
                                 amount: parseFloat(amount.trim().replace(/"/g, '')),
                                 category: categoryKey,
                                 date: date.trim().replace(/"/g, ''), // Assumes YYYY-MM-DD
-                                tags: []
+                                tags: ['imported']
                             };
                             
                             if (!isNaN(expenseData.amount) && new Date(expenseData.date) != 'Invalid Date') {
-                                const newDocRef = doc(expensesColRef); // Create a new doc ref in the collection
+                                const newDocRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'));
                                 batch.set(newDocRef, expenseData);
                                 importedCount++;
                             } else {
@@ -1629,49 +1619,85 @@
                     } catch (err) {
                         errorCount++;
                     }
-                }
+                });
                 
                 try {
-                    if (importedCount > 0) await batch.commit();
-                    if (errorCount > 0) {
-                        showToast(`Import complete: ${importedCount} added, ${errorCount} failed.`, true);
-                    } else {
-                        showToast(`Import complete: ${importedCount} expenses added.`);
+                    if (categoriesChanged) {
+                        const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
+                        batch.set(settingsRef, { categories: newCategories }, { merge: true });
                     }
+                    await batch.commit();
+                    showToast(`Import complete: ${importedCount} added, ${errorCount} failed.`);
                 } catch (err) {
-                    console.error("Error committing batch import: ", err);
+                    console.error("Error importing CSV: ", err);
                     showToast(`Error: ${err.message}`, true);
                 }
-
+                
                 importCsvInput.value = ''; // Reset input
-                // render() will be called by onSnapshot
             };
             reader.readAsText(file);
         };
         
-        const handleResetData = () => {
-            isResettingData = true;
-            expenseToDeleteId = null; // Ensure we're not deleting an item
-            categoryToDeleteKey = null; // Ensure we're not deleting a category
-            deleteModalTitle.textContent = 'Clear All App Data';
-            deleteModalText.textContent = 'Are you sure you want to delete all expenses, income, and settings? This action cannot be undone.';
-            deleteConfirmBtn.textContent = 'Delete All';
-            deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
+        const handleResetDataClick = () => {
+            deleteInfo = { id: null, type: 'all-data' };
+            deleteModalTitle.textContent = 'Clear All App Data?';
+            deleteModalText.textContent = 'This will permanently delete all shared data. This action cannot be undone.';
             deleteModal.classList.remove('hidden');
         };
 
-        // --- FIRESTORE DATA LISTENERS ---
-        const attachDataListeners = (userId) => {
-            if (!userId) return;
-
-            // Detach old listeners if they exist
+        const handleResetDataConfirm = async () => {
+            if (!currentUserId) return;
+            
+            const batch = writeBatch(db);
+            
+            // Delete all collections
+            const expensesRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
+            const incomeRef = collection(db, 'artifacts', appId, 'public', 'data', 'income');
+            const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
+            
+            // Delete settings doc
+            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
+            
+            try {
+                // Fetch and delete all docs in collections
+                const expensesSnap = await getDocs(expensesRef);
+                expensesSnap.forEach(doc => batch.delete(doc.ref));
+                
+                const incomeSnap = await getDocs(incomeRef);
+                incomeSnap.forEach(doc => batch.delete(doc.ref));
+                
+                const recurringSnap = await getDocs(recurringRef);
+                recurringSnap.forEach(doc => batch.delete(doc.ref));
+                
+                // Reset settings doc to default
+                batch.set(settingsRef, { budget: 0, categories: DEFAULT_CATEGORIES, theme: 'dark' });
+                
+                await batch.commit();
+                showToast('All app data has been reset.');
+            } catch (err) {
+                console.error("Error resetting data: ", err);
+                showToast(`Error: ${err.message}`, true);
+            }
+            
+            deleteInfo = { id: null, type: null };
+            deleteModal.classList.add('hidden');
+        };
+        
+        // --- DATA LISTENERS ---
+        const attachDataListeners = () => {
+            if (!currentUserId) return; // Should be signed in, but as a safeguard
+            
+            // Detach old listeners
             expensesUnsub();
             incomeUnsub();
             settingsUnsub();
             recurringUnsub();
-
+            
+            // --- PUBLIC DATA PATHS ---
+            const publicDataPath = `artifacts/${appId}/public/data`;
+            
             // --- Listener for Settings (Budget & Categories) ---
-            const settingsRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'userSettings');
+            const settingsRef = doc(db, publicDataPath, 'settings', 'userSettings');
             settingsUnsub = onSnapshot(settingsRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const settingsData = docSnap.data();
@@ -1696,44 +1722,54 @@
                 render(); // Re-render with new settings
             }, (err) => {
                 console.error("Error on settings snapshot: ", err);
-                showToast(`Error loading settings: ${err.message}`, true);
+                showToast(`Error: ${err.message}`, true);
+                addExpenseBtn.disabled = true; // Disable on error
+                addIncomeBtn.disabled = true;
             });
-
+            
             // --- Listener for Expenses ---
-            const expensesColRef = collection(db, 'artifacts', appId, 'users', userId, 'expenses');
-            expensesUnsub = onSnapshot(expensesColRef, (snapshot) => {
-                expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                render();
+            const expensesRef = collection(db, publicDataPath, 'expenses');
+            expensesUnsub = onSnapshot(expensesRef, (querySnapshot) => {
+                expenses = [];
+                querySnapshot.forEach((doc) => {
+                    expenses.push({ id: doc.id, ...doc.data() });
+                });
+                render(); // Re-render with new data
             }, (err) => {
                 console.error("Error on expenses snapshot: ", err);
-                showToast(`Error loading expenses: ${err.message}`, true);
+                showToast(`Error: ${err.message}`, true);
             });
-
+            
             // --- Listener for Income ---
-            const incomeColRef = collection(db, 'artifacts', appId, 'users', userId, 'income');
-            incomeUnsub = onSnapshot(incomeColRef, (snapshot) => {
-                income = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                render();
+            const incomeRef = collection(db, publicDataPath, 'income');
+            incomeUnsub = onSnapshot(incomeRef, (querySnapshot) => {
+                income = [];
+                querySnapshot.forEach((doc) => {
+                    income.push({ id: doc.id, ...doc.data() });
+                });
+                render(); // Re-render with new data
             }, (err) => {
                 console.error("Error on income snapshot: ", err);
-                showToast(`Error loading income: ${err.message}`, true);
+                showToast(`Error: ${err.message}`, true);
             });
-
-            // --- Listener for Recurring Expenses ---
-            const recurringColRef = collection(db, 'artifacts', appId, 'users', userId, 'recurringExpenses');
-            recurringUnsub = onSnapshot(recurringColRef, (snapshot) => {
-                recurringExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                checkRecurringExpenses(); // Check if any are due
+            
+            // --- Listener for Recurring (we don't render this, but we need it) ---
+            const recurringRef = collection(db, publicDataPath, 'recurring');
+            recurringUnsub = onSnapshot(recurringRef, (querySnapshot) => {
+                recurringExpenses = [];
+                querySnapshot.forEach((doc) => {
+                    recurringExpenses.push({ id: doc.id, ...doc.data() });
+                });
+                // We don't need to re-render, but we can check them
+                checkRecurringExpenses();
             }, (err) => {
-                console.error("Error on recurring expenses snapshot: ", err);
+                console.error("Error on recurring snapshot: ", err);
             });
         };
 
-
         // --- INITIALIZATION ---
-        const init = async () => {
-
-            // --- ASSIGN DOM ELEMENTS (runs after DOM loaded) ---
+        const init = () => {
+            // Assign DOM Elements
             docElement = document.documentElement;
             addExpenseBtn = document.getElementById('add-expense-btn');
             addIncomeBtn = document.getElementById('add-income-btn');
@@ -1742,7 +1778,6 @@
             filterCategoryEl = document.getElementById('filter-category');
             emptyStateEl = document.getElementById('empty-state');
             
-            // Expense Modal
             modal = document.getElementById('modal');
             modalBackdrop = document.getElementById('modal-backdrop');
             modalTitle = document.getElementById('modal-title');
@@ -1756,15 +1791,12 @@
             expenseTagsField = document.getElementById('expense-tags');
             expenseRecurringCheckbox = document.getElementById('expense-recurring');
 
-            // Theme Toggle
             themeToggleBtn = document.getElementById('theme-toggle-btn');
             themeIconLight = document.getElementById('theme-icon-light');
             themeIconDark = document.getElementById('theme-icon-dark');
             
-            // Month Selector
             monthSelector = document.getElementById('month-selector');
             
-            // Budget
             setBudgetBtn = document.getElementById('set-budget-btn');
             budgetModal = document.getElementById('budget-modal');
             budgetModalBackdrop = document.getElementById('budget-modal-backdrop');
@@ -1775,7 +1807,6 @@
             budgetProgressBar = document.getElementById('budget-progress-bar');
             budgetRemainingTextEl = document.getElementById('budget-remaining-text');
 
-            // Delete Modal
             deleteModal = document.getElementById('delete-modal');
             deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
             deleteModalTitle = document.getElementById('delete-modal-title');
@@ -1783,17 +1814,14 @@
             deleteCancelBtn = document.getElementById('delete-cancel-btn');
             deleteConfirmBtn = document.getElementById('delete-confirm-btn');
             
-            // Search & Export
             searchBar = document.getElementById('search-bar');
             exportCsvBtn = document.getElementById('export-csv-btn');
             
-            // Insights
             insightSavings = document.getElementById('insight-savings');
             insightTopCategory = document.getElementById('insight-top-category');
             insightHighestExpense = document.getElementById('insight-highest-expense');
             insightAvgSpend = document.getElementById('insight-avg-spend');
             
-            // Chart
             chartToggleBarBtn = document.getElementById('chart-toggle-bar');
             chartTogglePieBtn = document.getElementById('chart-toggle-pie');
             barChartContainer = document.getElementById('bar-chart-container');
@@ -1802,11 +1830,9 @@
             pieChartLegendEl = document.getElementById('pie-chart-legend');
             categoryBudgetsContainer = document.getElementById('category-budgets-container');
             
-            // Weekly Summary
             weeklyTotalSpendEl = document.getElementById('weekly-total-spend');
             weeklyTopCategoryEl = document.getElementById('weekly-top-category');
             
-            // Categories
             manageCategoriesBtn = document.getElementById('manage-categories-btn');
             categoryModal = document.getElementById('category-modal');
             categoryModalBackdrop = document.getElementById('category-modal-backdrop');
@@ -1815,9 +1841,7 @@
             categoryNameInput = document.getElementById('category-name-input');
             categoryListEl = document.getElementById('category-list');
 
-            // Add Income Modal
             incomeModal = document.getElementById('income-modal');
-            incomeModalTitle = document.getElementById('income-modal-title');
             incomeModalBackdrop = document.getElementById('income-modal-backdrop');
             incomeCancelBtn = document.getElementById('income-cancel-btn');
             incomeForm = document.getElementById('income-form');
@@ -1825,63 +1849,47 @@
             incomeTitleField = document.getElementById('income-title');
             incomeAmountField = document.getElementById('income-amount');
             incomeDateField = document.getElementById('income-date');
+            incomeModalTitle = document.getElementById('income-modal-title');
 
-            // History Toggle
             historyTypeToggle = document.getElementById('history-type-toggle');
 
-            // Yearly Report
             appView = document.getElementById('app');
             yearlyReportView = document.getElementById('yearly-report');
             closeYearlyReportBtn = document.getElementById('close-yearly-report');
 
-            // Settings Modal
             settingsBtn = document.getElementById('settings-btn');
             settingsModal = document.getElementById('settings-modal');
             settingsModalBackdrop = document.getElementById('settings-modal-backdrop');
             settingsCloseBtn = document.getElementById('settings-close-btn');
             importCsvInput = document.getElementById('import-csv-input');
-            importStatus = document.getElementById('import-status');
             resetDataBtn = document.getElementById('reset-data-btn');
-
-            // Toast Modal
-            toastModal = document.getElementById('toast-modal');
-            toastMessage = document.getElementById('toast-message');
-            toastContent = document.getElementById('toast-content');
-
-            // User ID Display
-            userIdDisplay = document.getElementById('user-id-display');
+            
+            toastEl = document.getElementById('toast');
 
             // --- START APP ---
-            // initTheme(); // No longer needed, handled by settings snapshot
             populateMonthSelector(); // Static UI
             addExpenseBtn.disabled = true; // Disable buttons until settings are loaded
             addIncomeBtn.disabled = true;
             
             // --- FIREBASE INIT ---
             try {
-                // Get injected globals
-                // const firebaseConfig = JSON.parse(__firebase_config); // No longer needed
-                appId = firebaseConfig.projectId; // Use projectId from your config
-                
-                // Initialize Firebase
                 app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
                 auth = getAuth(app);
-                setLogLevel('Debug'); // Enable detailed Firestore logs
+                db = getFirestore(app);
                 
                 // Set up Auth Listener
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
+                        // User is signed in.
                         console.log('User is signed in:', user.uid);
                         currentUserId = user.uid;
-                        userIdDisplay.textContent = currentUserId;
                         // User is ready, attach all data listeners
                         // Buttons will be enabled by the settings snapshot listener
-                        attachDataListeners(currentUserId);
+                        attachDataListeners();
                     } else {
-                        console.log('User is signed out.');
+                        // User is signed out.
+                        console.log('User is signed out. Attempting to sign in anonymously...');
                         currentUserId = null;
-                        userIdDisplay.textContent = 'Not Signed In';
                         // Detach listeners
                         expensesUnsub();
                         incomeUnsub();
@@ -1890,23 +1898,21 @@
                         // Disable buttons
                         addExpenseBtn.disabled = true;
                         addIncomeBtn.disabled = true;
+                        
+                        // Try to sign in anonymously
+                        signInAnonymously(auth).catch((error) => {
+                            console.error("Anonymous sign-in failed: ", error);
+                            showToast('Firebase connection failed. Please refresh.', true);
+                        });
                     }
                 });
-
-                // Sign in
-                // if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                //     await signInWithCustomToken(auth, __initial_auth_token);
-                // } else {
-                //     await signInAnonymously(auth);
-                // }
-                await signInAnonymously(auth); // Always sign in anonymously
-
+                
             } catch (err) {
-                console.error("Firebase Init Error:", err);
+                console.error("Firebase Init Error: ", err);
                 showToast(`Firebase Init Error: ${err.message}`, true);
             }
             
-            // Event Listeners (rest of the app)
+            // Event Listeners
             addExpenseBtn.addEventListener('click', () => openModal(null));
             addIncomeBtn.addEventListener('click', openIncomeModal);
 
@@ -1926,8 +1932,8 @@
             budgetCancelBtn.addEventListener('click', closeBudgetModal);
             budgetForm.addEventListener('submit', handleBudgetSubmit);
             
-            deleteModalBackdrop.addEventListener('click', closeDeleteModal);
-            deleteCancelBtn.addEventListener('click', closeDeleteModal);
+            deleteModalBackdrop.addEventListener('click', () => deleteModal.classList.add('hidden'));
+            deleteCancelBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
             deleteConfirmBtn.addEventListener('click', handleDeleteConfirm);
             
             filterCategoryEl.addEventListener('change', handleFilterChange);
@@ -1941,7 +1947,7 @@
             categoryModalBackdrop.addEventListener('click', closeCategoryModal);
             categoryCloseBtn.addEventListener('click', closeCategoryModal);
             categoryForm.addEventListener('submit', handleCategorySubmit);
-            categoryListEl.addEventListener('click', handleCategoryDelete);
+            categoryListEl.addEventListener('click', handleCategoryDeleteClick);
             categoryListEl.addEventListener('change', handleCategoryBudgetChange);
             
             expenseListEl.addEventListener('click', handleListClick);
@@ -1961,14 +1967,11 @@
             settingsModalBackdrop.addEventListener('click', closeSettingsModal);
             settingsCloseBtn.addEventListener('click', closeSettingsModal);
             importCsvInput.addEventListener('change', handleImportCSV);
-            resetDataBtn.addEventListener('click', handleResetData);
+            resetDataBtn.addEventListener('click', handleResetDataClick);
         };
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
-
-
-
 
