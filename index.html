@@ -602,9 +602,8 @@
           measurementId: "G-RKEV6XWG7W"
         };
         
-        // This is the app ID you set up in Firebase: expenso-e317f
-        // We will use this to build the database path.
-        const appId = "expenso-e317f";
+        // This will be set by the password gate
+        let appId = "";
 
         // --- DEFAULT CATEGORIES (if storage is empty) ---
         const DEFAULT_CATEGORIES = {
@@ -1757,7 +1756,7 @@
         
         // --- DATA LISTENERS ---
         const attachDataListeners = () => {
-            if (!currentUserId) return; // Should be signed in, but as a safeguard
+            if (!currentUserId || !appId) return; // Should be signed in and have an app ID
             
             // Detach old listeners
             expensesUnsub();
@@ -1765,7 +1764,7 @@
             settingsUnsub();
             recurringUnsub();
             
-            // --- PUBLIC DATA PATHS ---
+            // --- PUBLIC DATA PATHS (now dynamic with appId) ---
             const publicDataPath = `artifacts/${appId}/public/data`;
             
             // --- Listener for Settings (Budget & Categories) ---
@@ -1840,7 +1839,9 @@
         };
 
         // --- INITIALIZATION ---
-        const init = () => {
+        const init = (authenticatedAppId) => {
+            appId = authenticatedAppId; // Set the global app ID for this session
+
             // Assign DOM Elements
             docElement = document.documentElement;
             addExpenseBtn = document.getElementById('add-expense-btn');
@@ -2057,15 +2058,19 @@
             const inputEl = document.getElementById('password-input');
             const errorEl = document.getElementById('password-error');
             
-            // The password you requested
-            const CORRECT_PASSWORD = "2417"; 
+            // The passwords and their corresponding app IDs
+            const PASSWORDS = {
+                "2417": "expenso-e317f",     // Production app ID
+                "2222": "expenso-test-mode"  // Test app ID
+            };
 
             // Check session storage first
-            if (sessionStorage.getItem('expenso_auth') === 'true') {
+            const authenticatedAppId = sessionStorage.getItem('expenso_app_id');
+            if (authenticatedAppId) {
                 // Already authenticated in this session
                 gateEl.classList.add('hidden'); // Hide the gate
                 appEl.classList.remove('hidden'); // Show the app
-                init(); // Initialize the main app
+                init(authenticatedAppId); // Initialize the main app with the stored app ID
                 return;
             }
 
@@ -2073,15 +2078,18 @@
             // and add the form listener.
             formEl.addEventListener('submit', (e) => {
                 e.preventDefault();
-                if (inputEl.value === CORRECT_PASSWORD) {
+                const enteredPassword = inputEl.value;
+                const targetAppId = PASSWORDS[enteredPassword];
+
+                if (targetAppId) {
                     // Success
-                    sessionStorage.setItem('expenso_auth', 'true'); // Save auth status to session
+                    sessionStorage.setItem('expenso_app_id', targetAppId); // Save the specific app ID
                     gateEl.classList.add('hidden'); // Hide the gate
                     appEl.classList.remove('hidden'); // Show the app
                     
                     // --- APP INITIALIZATION (MOVED HERE) ---
                     // Now we initialize the main app and Firebase
-                    init(); 
+                    init(targetAppId); 
 
                 } else {
                     // Failure
@@ -2100,8 +2108,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 
