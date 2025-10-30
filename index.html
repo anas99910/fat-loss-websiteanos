@@ -270,6 +270,10 @@
                                 <option value="income">Income</option>
                                 <option value="all">All</option>
                             </select>
+                            <!-- ****** THIS IS THE FIX ****** -->
+                            <select id="filter-category" class="glass-input text-sm rounded-lg py-1 px-2">
+                                <option value="all">All Categories</option>
+                            </select>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto" placeholder="Search or #tag...">
@@ -1970,6 +1974,9 @@
             resetDataBtn.addEventListener('click', handleResetDataClick);
         };
 
+        // ****** THIS IS THE FIX ******
+        // We will call init() directly *after* the DOM is loaded
+        // by placing it after the DOMContentLoaded event listener setup.
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
