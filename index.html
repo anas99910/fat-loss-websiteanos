@@ -553,6 +553,18 @@
 
         // --- Firebase Config (WILL BE INJECTED) ---
         // This structure assumes __firebase_config, __app_id, and __initial_auth_token are provided globally.
+        
+        // --- User's Firebase Config ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyC9NyVrmam2_1ABkjeCu057trLBlUMN8L8", // This is safe to expose
+          authDomain: "expenso-e317f.firebaseapp.com",
+          projectId: "expenso-e317f",
+          storageBucket: "expenso-e317f.firebasestorage.app",
+          messagingSenderId: "699583670160",
+          appId: "1:699583670160:web:9fe66f1c44675b0278f515",
+          measurementId: "G-RKEV6XWG7W"
+        };
+        
         let db, auth, app;
         let currentUserId = null;
         let appId = 'default-app-id';
@@ -1829,8 +1841,8 @@
             // --- FIREBASE INIT ---
             try {
                 // Get injected globals
-                const firebaseConfig = JSON.parse(__firebase_config);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                // const firebaseConfig = JSON.parse(__firebase_config); // No longer needed
+                appId = firebaseConfig.projectId; // Use projectId from your config
                 
                 // Initialize Firebase
                 app = initializeApp(firebaseConfig);
@@ -1859,11 +1871,12 @@
                 });
 
                 // Sign in
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                //     await signInWithCustomToken(auth, __initial_auth_token);
+                // } else {
+                //     await signInAnonymously(auth);
+                // }
+                await signInAnonymously(auth); // Always sign in anonymously
 
             } catch (err) {
                 console.error("Firebase Init Error:", err);
@@ -1932,4 +1945,5 @@
     </script>
 </body>
 </html>
+
 
