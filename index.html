@@ -1268,11 +1268,11 @@
         // --- FEATURE HANDLERS ---
         
         // Theme
-        const initTheme = () => {
-            // Theme is still local, no need to sync
-            const savedTheme = localStorage.getItem('appTheme') || 'dark';
-            applyTheme(savedTheme);
-        };
+        // const initTheme = () => {
+        //     // Theme is now loaded from Firestore
+        //     const savedTheme = localStorage.getItem('appTheme') || 'dark';
+        //     applyTheme(savedTheme);
+        // };
         const applyTheme = (theme) => {
             if (theme === 'light') {
                 docElement.classList.add('light');
@@ -1283,9 +1283,21 @@
                 themeIconLight.classList.remove('hidden');
                 themeIconDark.classList.add('hidden');
             }
-            localStorage.setItem('appTheme', theme);
+            // localStorage.setItem('appTheme', theme); // No longer use localStorage
         };
-        const handleThemeToggle = () => applyTheme(docElement.classList.contains('light') ? 'dark' : 'light');
+        
+        const handleThemeToggle = async () => {
+            if (!currentUserId) return; // Not signed in
+            const newTheme = docElement.classList.contains('light') ? 'dark' : 'light';
+            try {
+                const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                await setDoc(settingsRef, { theme: newTheme }, { merge: true });
+                // The onSnapshot listener will call applyTheme()
+            } catch (err) {
+                console.error("Error saving theme: ", err);
+                showToast(`Error: ${err.message}`, true);
+            }
+        };
 
         // Month Selector
         const populateMonthSelector = () => {
@@ -1665,16 +1677,21 @@
                     const settingsData = docSnap.data();
                     currentBudget = settingsData.budget || 0;
                     categories = settingsData.categories || DEFAULT_CATEGORIES;
+                    applyTheme(settingsData.theme || 'dark'); // Load theme from Firestore
                 } else {
                     // No settings doc, create one with defaults
                     currentBudget = 0;
                     categories = DEFAULT_CATEGORIES;
+                    applyTheme('dark'); // Apply default theme
                     try {
-                        await setDoc(settingsRef, { budget: currentBudget, categories: categories });
+                        await setDoc(settingsRef, { budget: currentBudget, categories: categories, theme: 'dark' });
                     } catch (err) {
                         console.error("Error creating default settings: ", err);
                     }
                 }
+                // Settings are loaded, enable buttons
+                addExpenseBtn.disabled = false;
+                addIncomeBtn.disabled = false;
                 renderCategoryUI(); // Update dropdowns
                 render(); // Re-render with new settings
             }, (err) => {
@@ -1835,8 +1852,10 @@
             userIdDisplay = document.getElementById('user-id-display');
 
             // --- START APP ---
-            initTheme(); // Local theme setting
+            // initTheme(); // No longer needed, handled by settings snapshot
             populateMonthSelector(); // Static UI
+            addExpenseBtn.disabled = true; // Disable buttons until settings are loaded
+            addIncomeBtn.disabled = true;
             
             // --- FIREBASE INIT ---
             try {
@@ -1857,6 +1876,7 @@
                         currentUserId = user.uid;
                         userIdDisplay.textContent = currentUserId;
                         // User is ready, attach all data listeners
+                        // Buttons will be enabled by the settings snapshot listener
                         attachDataListeners(currentUserId);
                     } else {
                         console.log('User is signed out.');
@@ -1867,6 +1887,9 @@
                         incomeUnsub();
                         settingsUnsub();
                         recurringUnsub();
+                        // Disable buttons
+                        addExpenseBtn.disabled = true;
+                        addIncomeBtn.disabled = true;
                     }
                 });
 
@@ -1945,5 +1968,7 @@
     </script>
 </body>
 </html>
+
+
 
 
