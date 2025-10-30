@@ -320,7 +320,7 @@
         </div>
 
         <footer class="text-center text-tertiary text-sm mt-12">
-            © 2025 Made By Gringo
+            © 2025 Made By Gringo | User ID: <span id="user-id-display" class="text-secondary"></span>
         </footer>
     </div>
 
@@ -507,7 +507,7 @@
                     <button id="reset-data-btn" class="w-full text-left bg-red-600/20 text-red-300 hover:bg-red-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
                         Clear All App Data
                     </button>
-                    <p class="text-sm text-tertiary mt-1">This will permanently delete all expenses, income, and settings.</p>
+                    <p class="text-sm text-tertiary mt-1">This will permanently delete all expenses, income, and settings from Firestore.</p>
                 </div>
             </div>
             
@@ -526,15 +526,36 @@
 
     <!-- JavaScript -->
     <script type="module">
-        // --- STORAGE KEYS ---
-        const KEYS = {
-            EXPENSES: 'householdExpenses',
-            INCOME: 'householdIncome',
-            RECURRING: 'recurringExpenses',
-            BUDGET: 'monthlyBudget',
-            THEME: 'appTheme',
-            CATEGORIES: 'expenseCategories'
-        };
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            addDoc, 
+            updateDoc, 
+            deleteDoc, 
+            onSnapshot, 
+            collection, 
+            query, 
+            where, 
+            getDocs,
+            writeBatch,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Config (WILL BE INJECTED) ---
+        // This structure assumes __firebase_config, __app_id, and __initial_auth_token are provided globally.
+        let db, auth, app;
+        let currentUserId = null;
+        let appId = 'default-app-id';
 
         // --- DEFAULT CATEGORIES (if storage is empty) ---
         const DEFAULT_CATEGORIES = {
@@ -551,18 +572,25 @@
         let expenses = [];
         let income = [];
         let recurringExpenses = [];
-        let categories = {};
+        let categories = {}; // Will be loaded from Firestore
         let currentFilter = 'all';
         let currentSearchTerm = '';
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-        let currentBudget = 0;
+        let currentBudget = 0; // Will be loaded from Firestore
         let chartType = 'bar';
         let expenseToDeleteId = null;
         let currentHistoryType = 'expenses';
         let isResettingData = false;
         let categoryToDeleteKey = null;
         let toastTimeout = null;
+        
+        // Firestore Unsubscribe Listeners
+        let expensesUnsub = () => {};
+        let incomeUnsub = () => {};
+        let settingsUnsub = () => {};
+        let recurringUnsub = () => {};
+
 
         // --- DOM ELEMENTS ---
         let docElement, addExpenseBtn, addIncomeBtn, expenseListEl, totalExpensesEl, filterCategoryEl, emptyStateEl;
@@ -581,6 +609,7 @@
         let appView, yearlyReportView, closeYearlyReportBtn;
         let settingsBtn, settingsModal, settingsModalBackdrop, settingsCloseBtn, importCsvInput, importStatus, resetDataBtn;
         let toastModal, toastMessage, toastContent;
+        let userIdDisplay;
 
 
         // --- HELPER FUNCTIONS ---
@@ -616,13 +645,6 @@
                 toastModal.classList.add('hidden');
             }, 3000); // Hide after 3 seconds
         };
-
-        // --- LOCAL STORAGE FUNCTIONS ---
-        const getFromStorage = (key) => {
-            const data = localStorage.getItem(key);
-            try { return data ? JSON.parse(data) : null; } catch (e) { console.error(`Error parsing ${key}`, e); return null; }
-        };
-        const saveToStorage = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
         // --- DATA FUNCTIONS ---
         const getExpensesForPeriod = (year, month) => {
@@ -723,11 +745,11 @@
             const { totals } = getCategoryTotals(periodExpenses);
             const categoryKeys = Object.keys(categories);
             
-            let maxTotal = Math.max(...categoryKeys.map(key => totals[key].total));
+            let maxTotal = Math.max(...categoryKeys.map(key => totals[key] ? totals[key].total : 0));
             if (maxTotal === 0) maxTotal = 1; // Avoid division by zero
 
             categoryKeys.forEach(key => {
-                const total = totals[key].total;
+                const total = totals[key] ? totals[key].total : 0;
                 const heightPercentage = (total / maxTotal) * 100;
                 
                 const barEl = document.createElement('div');
@@ -938,7 +960,7 @@
             const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
             insightTopCategory.innerHTML = `
                 <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
-                <p class="text-xl font-semibold text-primary">${totals[topCategory].total > 0 ? categories[topCategory].label : '--'}</p>
+                <p class="text-xl font-semibold text-primary">${(totals[topCategory] && totals[topCategory].total > 0) ? categories[topCategory].label : '--'}</p>
             `;
             
             // Highest Expense
@@ -976,7 +998,7 @@
             if (weeklyExpenses.length > 0) {
                 const { totals } = getCategoryTotals(weeklyExpenses);
                 const topCategory = Object.keys(totals).reduce((a, b) => totals[a].total > totals[b].total ? a : b);
-                weeklyTopCategoryEl.textContent = totals[topCategory].total > 0 ? categories[topCategory].label : '--';
+                weeklyTopCategoryEl.textContent = (totals[topCategory] && totals[topCategory].total > 0) ? categories[topCategory].label : '--';
             } else {
                 weeklyTopCategoryEl.textContent = '--';
             }
@@ -1007,15 +1029,15 @@
         };
         const closeModal = () => modal.classList.add('hidden');
 
-        const handleSubmit = (e) => {
+        const handleSubmit = async (e) => {
             e.preventDefault();
+            if (!currentUserId) return showToast('Not authenticated', true);
             
             const id = expenseIdField.value;
             const isRecurring = expenseRecurringCheckbox.checked;
             const tags = expenseTagsField.value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
 
             const expenseData = {
-                id: id ? id : new Date().getTime().toString(),
                 title: expenseTitleField.value,
                 amount: parseFloat(expenseAmountField.value),
                 category: expenseCategoryField.value,
@@ -1023,23 +1045,31 @@
                 tags: tags
             };
 
-            if (id) {
-                // Update
-                expenses = expenses.map(exp => exp.id === id ? expenseData : exp);
-            } else if (isRecurring) {
-                // Add to recurring list
-                expenseData.nextDueDate = expenseData.date; // Set first due date
-                recurringExpenses.push(expenseData);
-                saveToStorage(KEYS.RECURRING, recurringExpenses);
-            } else {
-                // Add to main list
-                expenses.push(expenseData);
+            try {
+                if (id) {
+                    // Update
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', id);
+                    await setDoc(docRef, expenseData);
+                    showToast('Expense updated.');
+                } else if (isRecurring) {
+                    // Add to recurring list
+                    expenseData.nextDueDate = expenseData.date; // Set first due date
+                    const colRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'recurringExpenses');
+                    await addDoc(colRef, expenseData);
+                    showToast('Recurring expense added.');
+                } else {
+                    // Add to main list
+                    const colRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'expenses');
+                    await addDoc(colRef, expenseData);
+                    showToast('Expense added.');
+                }
+            } catch (err) {
+                console.error("Error saving expense: ", err);
+                showToast(`Error: ${err.message}`, true);
             }
             
-            saveToStorage(KEYS.EXPENSES, expenses);
-            render();
+            // No need to call render() here, onSnapshot will do it.
             closeModal();
-            showToast(id ? 'Expense updated.' : 'Expense added.');
         };
         
         const handleListClick = (e) => {
@@ -1058,7 +1088,7 @@
                 deleteModalTitle.textContent = 'Delete Expense';
                 deleteModalText.textContent = 'Are you sure you want to delete this expense? This action cannot be undone.';
                 deleteConfirmBtn.textContent = 'Delete';
-                deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-red-600/30"; // Reset classes
+                deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
                 deleteModal.classList.remove('hidden');
             }
             if (editIncomeBtn) {
@@ -1071,55 +1101,88 @@
                 deleteModalTitle.textContent = 'Delete Income';
                 deleteModalText.textContent = 'Are you sure you want to delete this income record? This action cannot be undone.';
                 deleteConfirmBtn.textContent = 'Delete';
-                deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200 shadow-lg shadow-red-600/30"; // Reset classes
+                deleteConfirmBtn.className = "bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200";
                 deleteModal.classList.remove('hidden');
             }
         };
         
-        const handleDeleteConfirm = () => {
-            if (isResettingData) {
-                localStorage.clear();
-                // Reset all state variables
-                expenses = [];
-                income = [];
-                recurringExpenses = [];
-                categories = {};
-                currentBudget = 0;
-                // Re-init
-                initCategories(); // This will load defaults
-                render();
-                closeSettingsModal(); // Close the settings modal it came from
-                isResettingData = false;
-                showToast('All app data has been cleared.');
+        const handleDeleteConfirm = async () => {
+            if (!currentUserId) return showToast('Not authenticated', true);
 
-            } else if (expenseToDeleteId) {
-                let expenseFound = expenses.some(exp => exp.id === expenseToDeleteId);
-                if (expenseFound) {
-                    expenses = expenses.filter(exp => exp.id !== expenseToDeleteId);
-                    saveToStorage(KEYS.EXPENSES, expenses);
-                } else {
-                    income = income.filter(inc => inc.id !== expenseToDeleteId);
-                    saveToStorage(KEYS.INCOME, income);
+            try {
+                if (isResettingData) {
+                    // This is a destructive operation, be careful.
+                    showToast('Clearing all data...');
+                    const batch = writeBatch(db);
+                    
+                    // Delete all expenses
+                    expenses.forEach(exp => {
+                        const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', exp.id);
+                        batch.delete(docRef);
+                    });
+                    
+                    // Delete all income
+                    income.forEach(inc => {
+                        const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'income', inc.id);
+                        batch.delete(docRef);
+                    });
+
+                    // Delete all recurring
+                    recurringExpenses.forEach(rex => {
+                        const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'recurringExpenses', rex.id);
+                        batch.delete(docRef);
+                    });
+                    
+                    // Delete settings doc
+                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                    batch.delete(settingsRef);
+                    
+                    await batch.commit();
+                    
+                    // The onSnapshot listeners will fire and reset the UI
+                    isResettingData = false;
+                    closeSettingsModal(); // Close the settings modal it came from
+                    showToast('All app data has been cleared.');
+
+                } else if (expenseToDeleteId) {
+                    let docRef;
+                    let expenseFound = expenses.some(exp => exp.id === expenseToDeleteId);
+                    if (expenseFound) {
+                        docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', expenseToDeleteId);
+                    } else {
+                        docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'income', expenseToDeleteId);
+                    }
+                    await deleteDoc(docRef);
+                    
+                    expenseToDeleteId = null;
+                    showToast('Transaction deleted.');
+                    
+                } else if (categoryToDeleteKey) {
+                    // Re-assign expenses
+                    const batch = writeBatch(db);
+                    expenses.forEach(exp => {
+                        if (exp.category === categoryToDeleteKey) {
+                            const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'expenses', exp.id);
+                            batch.update(docRef, { category: 'other' });
+                        }
+                    });
+                    
+                    // Delete category from settings
+                    delete categories[categoryToDeleteKey];
+                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                    batch.update(settingsRef, { categories: categories });
+                    
+                    await batch.commit();
+                    
+                    showToast('Category deleted.');
+                    categoryToDeleteKey = null; // Reset the flag
                 }
-                render();
+            } catch (err) {
+                console.error("Error during delete: ", err);
+                showToast(`Error: ${err.message}`, true);
+                isResettingData = false;
                 expenseToDeleteId = null;
-                showToast('Transaction deleted.');
-                
-            } else if (categoryToDeleteKey) {
-                // Re-assign expenses
-                expenses.forEach(exp => {
-                    if (exp.category === categoryToDeleteKey) exp.category = 'other';
-                });
-                saveToStorage(KEYS.EXPENSES, expenses);
-                
-                // Delete category
-                delete categories[categoryToDeleteKey];
-                saveToStorage(KEYS.CATEGORIES, categories);
-                
-                renderCategoryUI();
-                render(); // Re-render main app
-                showToast('Category deleted.');
-                categoryToDeleteKey = null; // Reset the flag
+                categoryToDeleteKey = null;
             }
 
             deleteModal.classList.add('hidden');
@@ -1161,35 +1224,41 @@
         };
         const closeIncomeModal = () => incomeModal.classList.add('hidden');
 
-        const handleIncomeSubmit = (e) => {
+        const handleIncomeSubmit = async (e) => {
             e.preventDefault();
+            if (!currentUserId) return showToast('Not authenticated', true);
             
             const id = incomeIdField.value;
             const incomeData = {
-                id: id ? id : new Date().getTime().toString(),
                 title: incomeTitleField.value,
                 amount: parseFloat(incomeAmountField.value),
                 date: incomeDateField.value,
             };
 
-            if (id) {
-                // This is for editing, but we haven't implemented an edit button for income yet
-                income = income.map(inc => inc.id === id ? incomeData : inc);
-            } else {
-                income.push(incomeData);
+            try {
+                if (id) {
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'income', id);
+                    await setDoc(docRef, incomeData);
+                    showToast('Income updated.');
+                } else {
+                    const colRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'income');
+                    await addDoc(colRef, incomeData);
+                    showToast('Income added.');
+                }
+            } catch (err) {
+                console.error("Error saving income: ", err);
+                showToast(`Error: ${err.message}`, true);
             }
             
-            saveToStorage(KEYS.INCOME, income);
-            render();
             closeIncomeModal();
-            showToast(id ? 'Income updated.' : 'Income added.');
         };
 
         // --- FEATURE HANDLERS ---
         
         // Theme
         const initTheme = () => {
-            const savedTheme = getFromStorage(KEYS.THEME) || 'dark';
+            // Theme is still local, no need to sync
+            const savedTheme = localStorage.getItem('appTheme') || 'dark';
             applyTheme(savedTheme);
         };
         const applyTheme = (theme) => {
@@ -1202,7 +1271,7 @@
                 themeIconLight.classList.remove('hidden');
                 themeIconDark.classList.add('hidden');
             }
-            saveToStorage(KEYS.THEME, theme);
+            localStorage.setItem('appTheme', theme);
         };
         const handleThemeToggle = () => applyTheme(docElement.classList.contains('light') ? 'dark' : 'light');
 
@@ -1250,11 +1319,21 @@
             budgetModal.classList.remove('hidden');
         };
         const closeBudgetModal = () => budgetModal.classList.add('hidden');
-        const handleBudgetSubmit = (e) => {
+        const handleBudgetSubmit = async (e) => {
             e.preventDefault();
+            if (!currentUserId) return showToast('Not authenticated', true);
+            
             currentBudget = parseFloat(budgetAmountField.value) || 0;
-            saveToStorage(KEYS.BUDGET, currentBudget);
-            render();
+            
+            try {
+                const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                await setDoc(settingsRef, { budget: currentBudget }, { merge: true });
+                showToast('Budget updated.');
+            } catch (err) {
+                console.error("Error saving budget: ", err);
+                showToast(`Error: ${err.message}`, true);
+            }
+
             closeBudgetModal();
         };
         
@@ -1282,7 +1361,8 @@
             
             let csv = 'Title,Amount,Category,Date\n';
             periodExpenses.forEach(exp => {
-                csv += `"${exp.title}","${exp.amount}","${categories[exp.category].label}","${exp.date}"\n`;
+                const categoryLabel = categories[exp.category] ? categories[exp.category].label : 'Other';
+                csv += `"${exp.title}","${exp.amount}","${categoryLabel}","${exp.date}"\n`;
             });
             
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1294,35 +1374,46 @@
         };
         
         // Recurring Expenses
-        const initRecurringExpenses = () => {
-            recurringExpenses = getFromStorage(KEYS.RECURRING) || [];
+        const checkRecurringExpenses = async () => {
             const today = new Date(getTodayString());
             let expensesAdded = false;
+            const batch = writeBatch(db);
+            
+            const expensesColRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'expenses');
             
             recurringExpenses.forEach(rex => {
                 let nextDueDate = new Date(rex.nextDueDate + 'T00:00:00');
                 if (nextDueDate <= today) {
                     // Add to main expenses
-                    const newExpense = { ...rex, id: new Date().getTime().toString() + rex.id, date: rex.nextDueDate };
-                    delete newExpense.nextDueDate;
-                    expenses.push(newExpense);
+                    const newExpense = { ...rex, date: rex.nextDueDate };
+                    delete newExpense.nextDueDate; // remove this field for the new expense doc
+                    delete newExpense.id; // remove old ID
+                    
+                    batch.add(expensesColRef, newExpense);
                     
                     // Set next due date (e.g., +1 month)
-                    rex.nextDueDate = new Date(nextDueDate.setMonth(nextDueDate.getMonth() + 1)).toISOString().split('T')[0];
+                    const newNextDueDate = new Date(nextDueDate.setMonth(nextDueDate.getMonth() + 1)).toISOString().split('T')[0];
+                    const rexRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'recurringExpenses', rex.id);
+                    batch.update(rexRef, { nextDueDate: newNextDueDate });
+                    
                     expensesAdded = true;
                 }
             });
             
             if (expensesAdded) {
-                saveToStorage(KEYS.EXPENSES, expenses);
-                saveToStorage(KEYS.RECURRING, recurringExpenses);
+                try {
+                    await batch.commit();
+                    showToast('Recurring expenses auto-added.');
+                } catch (err) {
+                    console.error("Error processing recurring expenses: ", err);
+                    showToast(`Error: ${err.message}`, true);
+                }
             }
         };
         
         // Category Management
         const initCategories = () => {
-            categories = getFromStorage(KEYS.CATEGORIES) || DEFAULT_CATEGORIES;
-            saveToStorage(KEYS.CATEGORIES, categories);
+            // This is now handled by the settings onSnapshot listener
             renderCategoryUI();
         };
         const renderCategoryUI = () => {
@@ -1351,16 +1442,24 @@
         };
         const openCategoryModal = () => categoryModal.classList.remove('hidden');
         const closeCategoryModal = () => categoryModal.classList.add('hidden');
-        const handleCategorySubmit = (e) => {
+        const handleCategorySubmit = async (e) => {
             e.preventDefault();
+            if (!currentUserId) return showToast('Not authenticated', true);
+            
             const name = categoryNameInput.value.trim();
             if (name && !Object.values(categories).find(c => c.label === name)) {
                 const key = name.toLowerCase().replace(/\s+/g, '_');
                 categories[key] = { label: name, icon: GENERIC_ICON };
-                saveToStorage(KEYS.CATEGORIES, categories);
-                renderCategoryUI();
-                categoryForm.reset();
-                showToast('Category added.');
+                
+                try {
+                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                    await setDoc(settingsRef, { categories: categories }, { merge: true });
+                    showToast('Category added.');
+                    categoryForm.reset();
+                } catch (err) {
+                    console.error("Error adding category: ", err);
+                    showToast(`Error: ${err.message}`, true);
+                }
             }
         };
         const handleCategoryDelete = (e) => {
@@ -1379,14 +1478,20 @@
             }
         };
         
-        const handleCategoryBudgetChange = (e) => {
+        const handleCategoryBudgetChange = async (e) => {
             if (e.target.classList.contains('category-budget-input')) {
+                if (!currentUserId) return showToast('Not authenticated', true);
                 const key = e.target.dataset.key;
                 const budget = parseFloat(e.target.value) || 0;
                 if (categories[key]) {
                     categories[key].budget = budget > 0 ? budget : null;
-                    saveToStorage(KEYS.CATEGORIES, categories);
-                    render(); // Re-render to show new budget bars
+                    try {
+                        const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                        await setDoc(settingsRef, { categories: categories }, { merge: true });
+                    } catch (err) {
+                        console.error("Error saving category budget: ", err);
+                        showToast(`Error: ${err.message}`, true);
+                    }
                 }
             }
         };
@@ -1403,10 +1508,8 @@
             let yearlyExpenses = 0;
             const monthlyTotals = Array(12).fill(0);
             
-            const allExpenses = getFromStorage(KEYS.EXPENSES) || [];
-            const allIncome = getFromStorage(KEYS.INCOME) || [];
-            
-            allExpenses.forEach(exp => {
+            // Use the data from state, which is already loaded
+            expenses.forEach(exp => {
                 const date = new Date(exp.date + 'T00:00:00');
                 if (date.getFullYear() === currentYear) {
                     yearlyExpenses += parseFloat(exp.amount);
@@ -1414,7 +1517,7 @@
                 }
             });
             
-            allIncome.forEach(inc => {
+            income.forEach(inc => {
                 const date = new Date(inc.date + 'T00:00:00');
                 if (date.getFullYear() === currentYear) {
                     yearlyIncome += parseFloat(inc.amount);
@@ -1450,18 +1553,22 @@
         const openSettingsModal = () => settingsModal.classList.remove('hidden');
         const closeSettingsModal = () => settingsModal.classList.add('hidden');
         
-        const handleImportCSV = (e) => {
+        const handleImportCSV = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+            if (!currentUserId) return showToast('Not authenticated', true);
             
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = async (event) => {
                 const csv = event.target.result;
                 const lines = csv.split('\n').slice(1); // Skip header
                 let importedCount = 0;
                 let errorCount = 0;
                 
-                lines.forEach(line => {
+                const batch = writeBatch(db);
+                const expensesColRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'expenses');
+
+                for (const line of lines) {
                     try {
                         const [title, amount, categoryLabel, date] = line.split(',');
                         if (title && amount && categoryLabel && date) {
@@ -1472,14 +1579,14 @@
                                 const newKey = categoryLabel.trim().toLowerCase().replace(/\s+/g, '_');
                                 if (!categories[newKey]) {
                                     categories[newKey] = { label: categoryLabel.trim(), icon: GENERIC_ICON };
-                                    saveToStorage(KEYS.CATEGORIES, categories);
-                                    renderCategoryUI(); // Update UI
+                                    // Save new category to settings
+                                    const settingsRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'settings', 'userSettings');
+                                    await setDoc(settingsRef, { categories: categories }, { merge: true });
                                 }
                                 categoryKey = newKey;
                             }
                             
                             const expenseData = {
-                                id: new Date().getTime().toString() + Math.random(),
                                 title: title.trim().replace(/"/g, ''),
                                 amount: parseFloat(amount.trim().replace(/"/g, '')),
                                 category: categoryKey,
@@ -1488,8 +1595,9 @@
                             };
                             
                             if (!isNaN(expenseData.amount) && new Date(expenseData.date) != 'Invalid Date') {
-                                expenses.push(expenseData);
-                                importedCount++; // Increment count on successful parse
+                                const newDocRef = doc(expensesColRef); // Create a new doc ref in the collection
+                                batch.set(newDocRef, expenseData);
+                                importedCount++;
                             } else {
                                 errorCount++;
                             }
@@ -1497,17 +1605,22 @@
                     } catch (err) {
                         errorCount++;
                     }
-                });
-                
-                if (importedCount > 0) saveToStorage(KEYS.EXPENSES, expenses);
-                // importStatus.textContent = `Import complete: ${importedCount} added, ${errorCount} failed.`;
-                if (errorCount > 0) {
-                    showToast(`Import complete: ${importedCount} added, ${errorCount} failed.`, true);
-                } else {
-                    showToast(`Import complete: ${importedCount} expenses added.`);
                 }
+                
+                try {
+                    if (importedCount > 0) await batch.commit();
+                    if (errorCount > 0) {
+                        showToast(`Import complete: ${importedCount} added, ${errorCount} failed.`, true);
+                    } else {
+                        showToast(`Import complete: ${importedCount} expenses added.`);
+                    }
+                } catch (err) {
+                    console.error("Error committing batch import: ", err);
+                    showToast(`Error: ${err.message}`, true);
+                }
+
                 importCsvInput.value = ''; // Reset input
-                render();
+                // render() will be called by onSnapshot
             };
             reader.readAsText(file);
         };
@@ -1523,8 +1636,73 @@
             deleteModal.classList.remove('hidden');
         };
 
+        // --- FIRESTORE DATA LISTENERS ---
+        const attachDataListeners = (userId) => {
+            if (!userId) return;
+
+            // Detach old listeners if they exist
+            expensesUnsub();
+            incomeUnsub();
+            settingsUnsub();
+            recurringUnsub();
+
+            // --- Listener for Settings (Budget & Categories) ---
+            const settingsRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'userSettings');
+            settingsUnsub = onSnapshot(settingsRef, async (docSnap) => {
+                if (docSnap.exists()) {
+                    const settingsData = docSnap.data();
+                    currentBudget = settingsData.budget || 0;
+                    categories = settingsData.categories || DEFAULT_CATEGORIES;
+                } else {
+                    // No settings doc, create one with defaults
+                    currentBudget = 0;
+                    categories = DEFAULT_CATEGORIES;
+                    try {
+                        await setDoc(settingsRef, { budget: currentBudget, categories: categories });
+                    } catch (err) {
+                        console.error("Error creating default settings: ", err);
+                    }
+                }
+                renderCategoryUI(); // Update dropdowns
+                render(); // Re-render with new settings
+            }, (err) => {
+                console.error("Error on settings snapshot: ", err);
+                showToast(`Error loading settings: ${err.message}`, true);
+            });
+
+            // --- Listener for Expenses ---
+            const expensesColRef = collection(db, 'artifacts', appId, 'users', userId, 'expenses');
+            expensesUnsub = onSnapshot(expensesColRef, (snapshot) => {
+                expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                render();
+            }, (err) => {
+                console.error("Error on expenses snapshot: ", err);
+                showToast(`Error loading expenses: ${err.message}`, true);
+            });
+
+            // --- Listener for Income ---
+            const incomeColRef = collection(db, 'artifacts', appId, 'users', userId, 'income');
+            incomeUnsub = onSnapshot(incomeColRef, (snapshot) => {
+                income = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                render();
+            }, (err) => {
+                console.error("Error on income snapshot: ", err);
+                showToast(`Error loading income: ${err.message}`, true);
+            });
+
+            // --- Listener for Recurring Expenses ---
+            const recurringColRef = collection(db, 'artifacts', appId, 'users', userId, 'recurringExpenses');
+            recurringUnsub = onSnapshot(recurringColRef, (snapshot) => {
+                recurringExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                checkRecurringExpenses(); // Check if any are due
+            }, (err) => {
+                console.error("Error on recurring expenses snapshot: ", err);
+            });
+        };
+
+
         // --- INITIALIZATION ---
-        const init = () => {
+        const init = async () => {
 
             // --- ASSIGN DOM ELEMENTS (runs after DOM loaded) ---
             docElement = document.documentElement;
@@ -1641,18 +1819,58 @@
             toastMessage = document.getElementById('toast-message');
             toastContent = document.getElementById('toast-content');
 
+            // User ID Display
+            userIdDisplay = document.getElementById('user-id-display');
+
             // --- START APP ---
-            initTheme();
-            initCategories();
-            expenses = getFromStorage(KEYS.EXPENSES) || [];
-            income = getFromStorage(KEYS.INCOME) || [];
-            currentBudget = getFromStorage(KEYS.BUDGET) || 0;
-            initRecurringExpenses(); // This may modify and save `expenses`
+            initTheme(); // Local theme setting
+            populateMonthSelector(); // Static UI
             
-            populateMonthSelector();
-            render(); // Initial Render
+            // --- FIREBASE INIT ---
+            try {
+                // Get injected globals
+                const firebaseConfig = JSON.parse(__firebase_config);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                
+                // Initialize Firebase
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('Debug'); // Enable detailed Firestore logs
+                
+                // Set up Auth Listener
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        console.log('User is signed in:', user.uid);
+                        currentUserId = user.uid;
+                        userIdDisplay.textContent = currentUserId;
+                        // User is ready, attach all data listeners
+                        attachDataListeners(currentUserId);
+                    } else {
+                        console.log('User is signed out.');
+                        currentUserId = null;
+                        userIdDisplay.textContent = 'Not Signed In';
+                        // Detach listeners
+                        expensesUnsub();
+                        incomeUnsub();
+                        settingsUnsub();
+                        recurringUnsub();
+                    }
+                });
+
+                // Sign in
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+            } catch (err) {
+                console.error("Firebase Init Error:", err);
+                showToast(`Firebase Init Error: ${err.message}`, true);
+            }
             
-            // Event Listeners
+            // Event Listeners (rest of the app)
             addExpenseBtn.addEventListener('click', () => openModal(null));
             addIncomeBtn.addEventListener('click', openIncomeModal);
 
@@ -1672,8 +1890,6 @@
             budgetCancelBtn.addEventListener('click', closeBudgetModal);
             budgetForm.addEventListener('submit', handleBudgetSubmit);
             
-            // deleteModalBackdrop.addEventListener('click', () => deleteModal.classList.add('hidden'));
-            // deleteCancelBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
             deleteModalBackdrop.addEventListener('click', closeDeleteModal);
             deleteCancelBtn.addEventListener('click', closeDeleteModal);
             deleteConfirmBtn.addEventListener('click', handleDeleteConfirm);
@@ -1716,6 +1932,4 @@
     </script>
 </body>
 </html>
-
-
 
