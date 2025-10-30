@@ -322,7 +322,7 @@
                     <div class="space-y-4">
                         <div id="insight-savings">
                             <h3 class="text-sm font-medium text-tertiary">MONTHLY SAVINGS</h3>
-                            <p class="text-xl font-semibold text-green-400">0.00 MAD</p>
+                            <p class="text-xl font-semibold text-green-400">0 DH</p>
                         </div>
                         <div id="insight-top-category">
                             <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
@@ -330,12 +330,12 @@
                         </div>
                         <div id="insight-highest-expense">
                             <h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3>
-                            <p class="text-xl font-semibold text-primary">0.00 MAD</p>
+                            <p class="text-xl font-semibold text-primary">0 DH</p>
                             <p class="text-sm text-tertiary truncate">--</p>
                         </div>
                         <div id="insight-avg-spend">
                             <h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3>
-                            <p class="text-xl font-semibold text-primary">0.00 MAD</p>
+                            <p class="text-xl font-semibold text-primary">0 DH</p>
                         </div>
                     </div>
                 </section>
@@ -346,7 +346,7 @@
                     <div class="space-y-2">
                         <div>
                             <h3 class="text-sm font-medium text-tertiary">TOTAL SPENT (Mon-Sun)</h3>
-                            <p id="weekly-total-spend" class="text-2xl font-semibold text-primary">0.00 MAD</p>
+                            <p id="weekly-total-spend" class="text-2xl font-semibold text-primary">0 DH</p>
                         </div>
                         <div>
                             <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY (This Week)</h3>
@@ -382,15 +382,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="glass-card p-6">
                 <h2 class="text-sm font-medium text-tertiary mb-2">Total Income</h2>
-                <p id="yearly-total-income" class="text-4xl font-bold text-green-400">0.00 MAD</p>
+                <p id="yearly-total-income" class="text-4xl font-bold text-green-400">0 DH</p>
             </div>
             <div class="glass-card p-6">
                 <h2 class="text-sm font-medium text-tertiary mb-2">Total Expenses</h2>
-                <p id="yearly-total-expenses" class="text-4xl font-bold text-red-400">0.00 MAD</p>
+                <p id="yearly-total-expenses" class="text-4xl font-bold text-red-400">0 DH</p>
             </div>
             <div class="glass-card p-6">
                 <h2 class="text-sm font-medium text-tertiary mb-2">Total Savings</h2>
-                <p id="yearly-total-savings" class="text-4xl font-bold text-primary">0.00 MAD</p>
+                <p id="yearly-total-savings" class="text-4xl font-bold text-primary">0 DH</p>
             </div>
         </div>
         
@@ -421,8 +421,8 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="expense-amount" class="block text-sm font-medium text-secondary mb-2">Amount (MAD)</label>
-                        <input type="number" id="expense-amount" class="glass-input w-full rounded-lg p-3" placeholder="150.00" min="0.01" step="0.01" required>
+                        <label for="expense-amount" class="block text-sm font-medium text-secondary mb-2">Amount (DH)</label>
+                        <input type="number" id="expense-amount" class="glass-input w-full rounded-lg p-3" placeholder="150" min="1" step="1" required>
                     </div>
                     <div>
                         <label for="expense-category" class="block text-sm font-medium text-secondary mb-2">Category</label>
@@ -460,8 +460,8 @@
             <h3 class="text-2xl font-semibold text-primary mb-6">Set Monthly Budget</h3>
             <form id="budget-form" class="space-y-4">
                 <div>
-                    <label for="budget-amount" class="block text-sm font-medium text-secondary mb-2">Budget Amount (MAD)</label>
-                    <input type="number" id="budget-amount" class="glass-input w-full rounded-lg p-3" placeholder="5000.00" min="0" step="100">
+                    <label for="budget-amount" class="block text-sm font-medium text-secondary mb-2">Budget Amount (DH)</label>
+                    <input type="number" id="budget-amount" class="glass-input w-full rounded-lg p-3" placeholder="5000" min="0" step="100">
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
                     <button type="button" id="budget-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
@@ -515,8 +515,8 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="income-amount" class="block text-sm font-medium text-secondary mb-2">Amount (MAD)</label>
-                        <input type="number" id="income-amount" class="glass-input w-.full rounded-lg p-3" placeholder="10000.00" min="0.01" step="0.01" required>
+                        <label for="income-amount" class="block text-sm font-medium text-secondary mb-2">Amount (DH)</label>
+                        <input type="number" id="income-amount" class="glass-input w-.full rounded-lg p-3" placeholder="10000" min="1" step="1" required>
                     </div>
                     <div>
                         <label for="income-date" class="block text-sm font-medium text-secondary mb-2">Date</label>
@@ -1029,8 +1029,8 @@
 
             if (periodExpenses.length === 0) {
                 insightTopCategory.innerHTML = `<h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3><p class="text-xl font-semibold text-primary">--</p>`;
-                insightHighestExpense.innerHTML = `<h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p><p class="text-sm text-secondary truncate">--</p>`;
-                insightAvgSpend.innerHTML = `<h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3><p class="text-xl font-semibold text-primary">0.00 MAD</p>`;
+                insightHighestExpense.innerHTML = `<h3 class="text-sm font-medium text-tertiary">HIGHEST EXPENSE</h3><p class="text-xl font-semibold text-primary">0 DH</p><p class="text-sm text-secondary truncate">--</p>`;
+                insightAvgSpend.innerHTML = `<h3 class="text-sm font-medium text-tertiary">AVG. DAILY SPEND</h3><p class="text-xl font-semibold text-primary">0 DH</p>`;
                 return;
             }
 
@@ -2012,10 +2012,22 @@
             // The password you requested
             const CORRECT_PASSWORD = "2417"; 
 
+            // Check session storage first
+            if (sessionStorage.getItem('expenso_auth') === 'true') {
+                // Already authenticated in this session
+                gateEl.classList.add('hidden'); // Hide the gate
+                appEl.classList.remove('hidden'); // Show the app
+                init(); // Initialize the main app
+                return;
+            }
+
+            // If not authenticated, show the gate (it's shown by default)
+            // and add the form listener.
             formEl.addEventListener('submit', (e) => {
                 e.preventDefault();
                 if (inputEl.value === CORRECT_PASSWORD) {
                     // Success
+                    sessionStorage.setItem('expenso_auth', 'true'); // Save auth status to session
                     gateEl.classList.add('hidden'); // Hide the gate
                     appEl.classList.remove('hidden'); // Show the app
                     
