@@ -768,9 +768,30 @@
             });
             return `${numberFormatter.format(amount)} DH`;
         };
-        const formatDate = (dateString) => new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const formatDate = (dateString) => {
+            // dateString is "YYYY-MM-DD". new Date() interprets this as UTC.
+            const date = new Date(dateString); 
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                timeZone: 'UTC' // Tell it to format based on UTC time
+            });
+        };
         const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-        const getTodayString = () => new Date().toISOString().split('T')[0];
+        
+        // --- THIS IS THE FIX ---
+        // Was: const getTodayString = () => new Date().toISOString().split('T')[0];
+        // This was converting local time to UTC, causing the date to roll back.
+        const getTodayString = () => {
+            const today = new Date();
+            const year = today.getFullYear();
+            // getMonth() is 0-indexed, so add 1. Pad with '0' if needed.
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            // getDate() is 1-indexed. Pad with '0' if needed.
+            const day = today.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`; // Returns "YYYY-MM-DD" in local time
+        };
+        // --- END OF FIX ---
 
         const getWeekRange = (date) => {
             const d = new Date(date);
@@ -794,15 +815,25 @@
         // --- DATA FUNCTIONS ---
         const getExpensesForPeriod = (year, month) => {
             return expenses.filter(expense => {
-                const expenseDate = new Date(expense.date + 'T00:00:00');
-                return expenseDate.getFullYear() === year && expenseDate.getMonth() === month;
+                // Manually parse YYYY-MM-DD to avoid timezone issues
+                const dateParts = expense.date.split('-'); // ["2025", "11", "01"]
+                if (dateParts.length !== 3) return false; // Safety check
+                const expenseYear = parseInt(dateParts[0], 10);
+                const expenseMonth = parseInt(dateParts[1], 10) - 1; // JS month is 0-indexed
+                
+                return expenseYear === year && expenseMonth === month;
             });
         };
         
         const getIncomeForPeriod = (year, month) => {
             return income.filter(inc => {
-                const incomeDate = new Date(inc.date + 'T00:00:00');
-                return incomeDate.getFullYear() === year && incomeDate.getMonth() === month;
+                // Manually parse YYYY-MM-DD to avoid timezone issues
+                const dateParts = inc.date.split('-'); // ["2025", "11", "01"]
+                if (dateParts.length !== 3) return false; // Safety check
+                const incomeYear = parseInt(dateParts[0], 10);
+                const incomeMonth = parseInt(dateParts[1], 10) - 1; // JS month is 0-indexed
+                
+                return incomeYear === year && incomeMonth === month;
             });
         };
         
@@ -1031,7 +1062,8 @@
                 .sort((a, b) => {
                     switch (currentSortOrder) {
                         case 'date-asc':
-                            return new Date(a.date) - new Date(b.date);
+                            // Use string compare for YYYY-MM-DD
+                            return a.date.localeCompare(b.date);
                         case 'amount-desc':
                             // Ensure amounts are numbers for correct sorting
                             return parseFloat(b.amount) - parseFloat(a.amount);
@@ -1040,7 +1072,8 @@
                             return parseFloat(a.amount) - parseFloat(b.amount);
                         case 'date-desc':
                         default:
-                            return new Date(b.date) - new Date(a.date);
+                            // Use string compare for YYYY-MM-DD
+                            return b.date.localeCompare(a.date);
                     }
                 });
             
@@ -1203,7 +1236,23 @@
             } else {
                 modalTitle.textContent = 'Add New Expense';
                 expenseIdField.value = '';
-                expenseDateField.value = getTodayString();
+                
+                // --- MODIFIED DATE LOGIC ---
+                // Check if selected month is current real month
+                const today = new Date();
+                const todayYear = today.getFullYear();
+                const todayMonth = today.getMonth();
+                
+                if (currentYear === todayYear && currentMonth === todayMonth) {
+                    // We are in the current real month, default to today
+                    expenseDateField.value = getTodayString();
+                } else {
+                    // We are in a different month, default to the 1st of that selected month
+                    const firstDay = new Date(currentYear, currentMonth, 1);
+                    expenseDateField.value = firstDay.toISOString().split('T')[0];
+                }
+                // --- END MODIFIED DATE LOGIC ---
+                
                 expenseRecurringCheckbox.checked = false;
                 expenseRecurringCheckbox.disabled = false;
             }
@@ -2269,5 +2318,7 @@
     </script>
 </body>
 </html>
+
+
 
 
