@@ -801,7 +801,15 @@
         /** Renders the summary (total + budget) */
         const renderSummary = (periodExpenses) => {
             const total = periodExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-            totalExpensesEl.textContent = formatCurrency(total);
+            
+            // --- USER REQUEST: Make total red and add a minus ---
+            if (total > 0) {
+                totalExpensesEl.textContent = "- " + formatCurrency(total);
+                totalExpensesEl.className = "text-4xl md:text-5xl font-bold text-red-500"; // Red text
+            } else {
+                totalExpensesEl.textContent = formatCurrency(total);
+                totalExpensesEl.className = "text-4xl md:text-5xl font-bold text-primary"; // Back to default
+            }
             
             if (currentBudget > 0) {
                 budgetDisplayEl.textContent = formatCurrency(currentBudget);
@@ -814,11 +822,24 @@
                 else budgetProgressBar.className = 'bg-blue-600 h-2.5 rounded-full';
                 
                 const remaining = currentBudget - total;
-                budgetRemainingTextEl.textContent = remaining >= 0 ? `${formatCurrency(remaining)} remaining` : `${formatCurrency(Math.abs(remaining))} over budget`;
+                
+                // --- USER REQUEST: Make "remaining" text blue, bigger, and more visible ---
+                if (remaining >= 0) {
+                    budgetRemainingTextEl.textContent = `${formatCurrency(remaining)} remaining`;
+                    // Blue, bigger, and visible (font-medium)
+                    budgetRemainingTextEl.className = "text-base font-medium text-blue-400 text-right mt-1";
+                } else {
+                    budgetRemainingTextEl.textContent = `${formatCurrency(Math.abs(remaining))} over budget`;
+                    // I'll make "over budget" red, bigger, and visible, as that's more semantic
+                    budgetRemainingTextEl.className = "text-base font-medium text-red-500 text-right mt-1";
+                }
+
             } else {
                 budgetDisplayEl.textContent = 'Not Set';
                 budgetProgressBar.style.width = '0%';
                 budgetRemainingTextEl.textContent = 'Set a budget to track spending.';
+                // Reset to default class if no budget is set
+                budgetRemainingTextEl.className = "text-sm text-tertiary text-right mt-1";
             }
         };
         
@@ -2092,6 +2113,11 @@
                 "555": "expenso-user-555"    // New unique storage for 555
             };
 
+            // Only allow numbers in the password field
+            inputEl.addEventListener('input', () => {
+                inputEl.value = inputEl.value.replace(/[^0-9]/g, '');
+            });
+
             // Check session storage first
             const authenticatedAppId = sessionStorage.getItem('expenso_app_id');
             if (authenticatedAppId) {
@@ -2136,9 +2162,5 @@
     </script>
 </body>
 </html>
-
-
-
-
 
 
