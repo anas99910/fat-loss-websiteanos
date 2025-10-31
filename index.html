@@ -271,6 +271,7 @@
                     </div>
                 </section>
                 
+                <!-- *** SECTION RESTORED *** -->
                 <!-- Monthly Breakdown Card -->
                 <section class="glass-card p-6">
                     <div class="flex justify-between items-center mb-4">
@@ -300,6 +301,7 @@
                     </div>
                 </section>
                 
+                <!-- *** SECTION RESTORED *** -->
                 <!-- Expense List -->
                 <section>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
@@ -312,7 +314,6 @@
                                 <option value="income">Income</option>
                                 <option value="all">All</option>
                             </select>
-                            <!-- ****** THIS IS THE FIX ****** -->
                             <select id="filter-category" class="glass-input text-sm rounded-lg py-1 px-2">
                                 <option value="all">All Categories</option>
                             </select>
@@ -325,7 +326,7 @@
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto" placeholder="Search or #tag...">
-                            <button id="export-csv-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Export CSV">
+                            <button id="export-json-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Export Backup (JSON)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
@@ -347,6 +348,8 @@
             
             <!-- Right Column (Insights) -->
             <div class="lg:col-span-1 space-y-6 md:space-y-8">
+                
+                <!-- *** SECTION RESTORED *** -->
                 <section class="glass-card p-6">
                     <h2 class="text-lg font-semibold text-primary mb-4">
                         Monthly Insights
@@ -371,7 +374,9 @@
                         </div>
                     </div>
                 </section>
-                <section class="glass-card p-6">
+
+                <!-- "This Week's Summary" section RE-ADDED -->
+                <section id="weekly-summary-card" class="glass-card p-6">
                     <h2 class="text-lg font-semibold text-primary mb-4">
                         This Week's Summary
                     </h2>
@@ -386,6 +391,7 @@
                         </div>
                     </div>
                 </section>
+
                 <section class="glass-card p-6">
                     <button id="manage-categories-btn" class="w-full text-center bg-blue-600/20 text-blue-300 hover:bg-blue-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
                         Manage Categories
@@ -571,18 +577,44 @@
             
             <div class="space-y-4">
                 <div>
-                    <h4 class="text-lg font-medium text-primary mb-2">Import Data</h4>
-                    <p class="text-sm text-secondary mb-2">Import expenses from a CSV file. Format: Title,Amount,CategoryLabel,Date (YYYY-MM-DD)</p>
-                    <input type="file" id="import-csv-input" class="glass-input w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600/20 file:text-blue-300 hover:file:bg-blue-600/40" accept=".csv">
+                    <h4 class="text-lg font-medium text-primary mb-2">Backup & Restore</h4>
+                    <p class="text-sm text-secondary mb-2">Export a JSON backup of all data, or restore from a backup file.</p>
+                    <input type="file" id="import-backup-input" class="glass-input w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600/20 file:text-blue-300 hover:file:bg-blue-600/40" accept=".json">
                 </div>
                 
-                <!-- DANGER ZONE REMOVED -->
+                <!-- DANGER ZONE RE-ADDED -->
+                <div class="pt-4 border-t border-border-primary">
+                    <h4 class="text-lg font-medium text-red-400 mb-2">Danger Zone</h4>
+                    <button id="reset-data-btn" class="w-full text-left bg-red-600/20 text-red-300 hover:bg-red-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
+                        Clear All App Data
+                    </button>
+                    <p class="text-sm text-secondary mt-1">This will permanently delete all data in this mode.</p>
+                </div>
                 
             </div>
             
             <div class="flex justify-end gap-3 pt-6">
                 <button type="button" id="settings-close-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Close</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Reset Data Password Modal -->
+    <div id="reset-password-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
+        <div class="fixed inset-0 bg-overlay backdrop-blur-sm modal-fade-in" id="reset-password-backdrop"></div>
+        <div class="glass-card z-10 w-full max-w-sm p-6 modal-slide-in-up">
+            <h3 class="text-2xl font-semibold text-primary mb-6">Admin Access</h3>
+            <form id="reset-password-form" class="space-y-4">
+                <div>
+                    <label for="reset-password-input" class="block text-sm font-medium text-secondary mb-2">Enter Admin Password to continue</label>
+                    <input type="password" id="reset-password-input" class="glass-input w-full rounded-lg p-3" required>
+                    <p id="reset-password-error" class="text-red-400 text-sm mt-2 hidden">Incorrect password.</p>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" id="reset-password-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Confirm</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -682,7 +714,7 @@
         let deleteModal, deleteModalBackdrop, deleteModalTitle, deleteModalText, deleteCancelBtn, deleteConfirmBtn;
         
         // Search & Export
-        let searchBar, exportCsvBtn;
+        let searchBar, exportJsonBtn;
         
         // Insights
         let insightSavings, insightTopCategory, insightHighestExpense, insightAvgSpend;
@@ -690,7 +722,7 @@
         // Chart
         let chartToggleBarBtn, chartTogglePieBtn, barChartContainer, pieChartContainer, pieChartEl, pieChartLegendEl, categoryBudgetsContainer;
         
-        // Weekly Summary
+        // Weekly Summary (RE-ADDING)
         let weeklyTotalSpendEl, weeklyTopCategoryEl;
         
         // Categories
@@ -707,7 +739,10 @@
         let appView, yearlyReportView, closeYearlyReportBtn;
 
         // Settings Modal
-        let settingsBtn, settingsModal, settingsModalBackdrop, settingsCloseBtn, importCsvInput, resetDataBtn;
+        let settingsBtn, settingsModal, settingsModalBackdrop, settingsCloseBtn, importBackupInput, resetDataBtn;
+        
+        // Reset Password Modal (NEW)
+        let resetPasswordModal, resetPasswordBackdrop, resetPasswordForm, resetPasswordInput, resetPasswordError, resetPasswordCancelBtn;
         
         // Add logout button
         let logoutBtn;
@@ -809,7 +844,7 @@
             renderChart(periodExpenses);
             renderCategoryBudgets(periodExpenses);
             renderInsights(periodExpenses, periodIncome);
-            renderWeeklySummary();
+            renderWeeklySummary(); // RE-ADDED
         };
 
         /** Renders the summary (total + budget) */
@@ -1128,8 +1163,10 @@
             `;
         };
         
-        /** Renders the weekly summary card */
+        /** Renders the weekly summary card (RE-ADDED) */
         const renderWeeklySummary = () => {
+            if (!weeklyTotalSpendEl) return; // Add check in case it's not on the page
+            
             const today = new Date();
             const { start, end } = getWeekRange(today);
             
@@ -1463,23 +1500,28 @@
             render();
         };
 
-        // Export CSV
-        const handleExportCSV = () => {
-            const periodExpenses = getExpensesForPeriod(currentYear, currentMonth);
-            if (periodExpenses.length === 0) return;
+        // Export JSON Backup
+        const handleExportBackup = () => {
+            if (!currentUserId) return showToast('Not authenticated', true);
+
+            const backupData = {
+                expenses: expenses,
+                income: income,
+                recurringExpenses: recurringExpenses,
+                settings: {
+                    budget: currentBudget,
+                    categories: categories
+                }
+            };
             
-            let csv = 'Title,Amount,Category,Date\n';
-            periodExpenses.forEach(exp => {
-                const categoryLabel = categories[exp.category] ? categories[exp.category].label : exp.category;
-                csv += `"${exp.title}","${exp.amount}","${categoryLabel}","${exp.date}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const jsonString = JSON.stringify(backupData, null, 2); // Pretty print JSON
+            const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `expenses_${currentYear}-${currentMonth + 1}.csv`;
+            link.download = `expenso_backup_${appId}_${new Date().toISOString().split('T')[0]}.json`;
             link.click();
             URL.revokeObjectURL(link.href);
+            showToast('Backup exported!');
         };
         
         // Recurring Expenses
@@ -1697,83 +1739,112 @@
         const openSettingsModal = () => settingsModal.classList.remove('hidden');
         const closeSettingsModal = () => settingsModal.classList.add('hidden');
         
-        const handleImportCSV = (e) => {
+        // Import JSON Backup
+        const handleImportBackup = (e) => {
             const file = e.target.files[0];
             if (!file || !currentUserId) return;
             
             const reader = new FileReader();
             reader.onload = async (event) => {
-                const csv = event.target.result;
-                const lines = csv.split('\n').slice(1); // Skip header
-                let importedCount = 0;
-                let errorCount = 0;
+                let importedData;
+                try {
+                    importedData = JSON.parse(event.target.result);
+                    if (!importedData.settings || !importedData.expenses || !importedData.income || !importedData.recurringExpenses) {
+                        throw new Error('Invalid backup file structure.');
+                    }
+                } catch (err) {
+                    console.error("Error parsing backup file: ", err);
+                    showToast(`Error: ${err.message}`, true);
+                    importBackupInput.value = ''; // Reset input
+                    return;
+                }
                 
                 const batch = writeBatch(db);
-                let newCategories = { ...categories };
-                let categoriesChanged = false;
-
-                lines.forEach(line => {
-                    try {
-                        const [title, amount, categoryLabel, date] = line.split(',');
-                        if (title && amount && categoryLabel && date) {
-                            // Find category key by label
-                            let categoryKey = Object.keys(newCategories).find(key => newCategories[key].label.toLowerCase() === categoryLabel.trim().toLowerCase());
-                            if (!categoryKey) {
-                                // If category doesn't exist, create it
-                                const newKey = categoryLabel.trim().toLowerCase().replace(/\s+/g, '_');
-                                if (!newCategories[newKey]) {
-                                    newCategories[newKey] = { label: categoryLabel.trim(), icon: GENERIC_ICON };
-                                    categoriesChanged = true;
-                                }
-                                categoryKey = newKey;
-                            }
-                            
-                            const expenseData = {
-                                title: title.trim().replace(/"/g, ''),
-                                amount: parseFloat(amount.trim().replace(/"/g, '')),
-                                category: categoryKey,
-                                date: date.trim().replace(/"/g, ''), // Assumes YYYY-MM-DD
-                                tags: ['imported']
-                            };
-                            
-                            // --- FIX: Use a more robust date check ---
-                            if (!isNaN(expenseData.amount) && !isNaN(new Date(expenseData.date).getTime())) {
-                                const newDocRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'));
-                                batch.set(newDocRef, expenseData);
-                                importedCount++;
-                            } else {
-                                errorCount++;
-                            }
-                        }
-                    } catch (err) {
-                        errorCount++;
-                    }
-                });
+                const publicDataPath = `artifacts/${appId}/public/data`;
                 
                 try {
-                    if (categoriesChanged) {
-                        const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'userSettings');
-                        batch.set(settingsRef, { categories: newCategories }, { merge: true });
-                    }
+                    // 1. Delete all existing data
+                    const expensesRef = collection(db, publicDataPath, 'expenses');
+                    const incomeRef = collection(db, publicDataPath, 'income');
+                    const recurringRef = collection(db, publicDataPath, 'recurring');
+                    
+                    const expensesSnap = await getDocs(expensesRef);
+                    expensesSnap.forEach(doc => batch.delete(doc.ref));
+                    
+                    const incomeSnap = await getDocs(incomeRef);
+                    incomeSnap.forEach(doc => batch.delete(doc.ref));
+                    
+                    const recurringSnap = await getDocs(recurringRef);
+                    recurringSnap.forEach(doc => batch.delete(doc.ref));
+
+                    // 2. Add new data from backup
+                    importedData.expenses.forEach(exp => {
+                        const newDocRef = doc(collection(db, publicDataPath, 'expenses'));
+                        // Remove 'id' if it exists from old exports
+                        delete exp.id; 
+                        batch.set(newDocRef, exp);
+                    });
+                    
+                    importedData.income.forEach(inc => {
+                        const newDocRef = doc(collection(db, publicDataPath, 'income'));
+                        delete inc.id;
+                        batch.set(newDocRef, inc);
+                    });
+                    
+                    importedData.recurringExpenses.forEach(rex => {
+                        const newDocRef = doc(collection(db, publicDataPath, 'recurring'));
+                        delete rex.id;
+                        batch.set(newDocRef, rex);
+                    });
+
+                    // 3. Set settings
+                    const settingsRef = doc(db, publicDataPath, 'settings', 'userSettings');
+                    batch.set(settingsRef, importedData.settings);
+                    
+                    // 4. Commit batch
                     await batch.commit();
-                    showToast(`Import complete: ${importedCount} added, ${errorCount} failed.`);
+                    showToast('Backup restored successfully!');
+                    // Data will refresh via onSnapshot listeners
+                    
                 } catch (err) {
-                    console.error("Error importing CSV: ", err);
+                    console.error("Error restoring backup: ", err);
                     showToast(`Error: ${err.message}`, true);
                 }
                 
-                importCsvInput.value = ''; // Reset input
+                importBackupInput.value = ''; // Reset input
             };
             reader.readAsText(file);
         };
         
+        // MODIFIED: This now opens the password modal first
         const handleResetDataClick = () => {
-            deleteInfo = { id: null, type: 'all-data' };
-            deleteModalTitle.textContent = 'Clear All App Data?';
-            deleteModalText.textContent = 'This will permanently delete all shared data. This action cannot be undone.';
-            deleteModal.classList.remove('hidden');
+            resetPasswordModal.classList.remove('hidden');
+            resetPasswordInput.value = '';
+            resetPasswordError.classList.add('hidden');
+            resetPasswordInput.focus();
         };
 
+        // NEW: Handler for the reset password modal
+        const handleResetPasswordSubmit = (e) => {
+            e.preventDefault();
+            if (resetPasswordInput.value === "9999") {
+                // Correct password
+                resetPasswordModal.classList.add('hidden');
+                
+                // Now open the *real* delete confirmation
+                deleteInfo = { id: null, type: 'all-data' };
+                deleteModalTitle.textContent = 'Clear All App Data?';
+                deleteModalText.textContent = 'This will permanently delete all shared data. This action cannot be undone.';
+                deleteModal.classList.remove('hidden');
+            } else {
+                // Incorrect password
+                resetPasswordError.classList.remove('hidden');
+                resetPasswordInput.value = '';
+                resetPasswordInput.focus();
+            }
+        };
+
+        // This function is the FINAL confirmation after password
         const handleResetDataConfirm = async () => {
             if (!currentUserId) return;
             
@@ -1946,7 +2017,7 @@
             deleteConfirmBtn = document.getElementById('delete-confirm-btn');
             
             searchBar = document.getElementById('search-bar');
-            exportCsvBtn = document.getElementById('export-csv-btn');
+            exportJsonBtn = document.getElementById('export-json-btn');
             
             insightSavings = document.getElementById('insight-savings');
             insightTopCategory = document.getElementById('insight-top-category');
@@ -1961,8 +2032,8 @@
             pieChartLegendEl = document.getElementById('pie-chart-legend');
             categoryBudgetsContainer = document.getElementById('category-budgets-container');
             
-            weeklyTotalSpendEl = document.getElementById('weekly-total-spend');
-            weeklyTopCategoryEl = document.getElementById('weekly-top-category');
+            weeklyTotalSpendEl = document.getElementById('weekly-total-spend'); // RE-ADDED
+            weeklyTopCategoryEl = document.getElementById('weekly-top-category'); // RE-ADDED
             
             manageCategoriesBtn = document.getElementById('manage-categories-btn');
             categoryModal = document.getElementById('category-modal');
@@ -1993,9 +2064,17 @@
             settingsModal = document.getElementById('settings-modal');
             settingsModalBackdrop = document.getElementById('settings-modal-backdrop');
             settingsCloseBtn = document.getElementById('settings-close-btn');
-            importCsvInput = document.getElementById('import-csv-input');
-            resetDataBtn = document.getElementById('reset-data-btn');
+            importBackupInput = document.getElementById('import-backup-input');
+            resetDataBtn = document.getElementById('reset-data-btn'); // RE-ADDED
             
+            // NEW: Reset Password Modal elements
+            resetPasswordModal = document.getElementById('reset-password-modal');
+            resetPasswordBackdrop = document.getElementById('reset-password-backdrop');
+            resetPasswordForm = document.getElementById('reset-password-form');
+            resetPasswordInput = document.getElementById('reset-password-input');
+            resetPasswordError = document.getElementById('reset-password-error');
+            resetPasswordCancelBtn = document.getElementById('reset-password-cancel-btn');
+
             logoutBtn = document.getElementById('logout-btn'); // Assign logout button
             
             toastEl = document.getElementById('toast');
@@ -2073,7 +2152,7 @@
             
             filterCategoryEl.addEventListener('change', handleFilterChange);
             searchBar.addEventListener('input', handleSearchInput);
-            exportCsvBtn.addEventListener('click', handleExportCSV);
+            exportJsonBtn.addEventListener('click', handleExportBackup);
             
             chartToggleBarBtn.addEventListener('click', () => handleChartToggle('bar'));
             chartTogglePieBtn.addEventListener('click', () => handleChartToggle('pie'));
@@ -2106,12 +2185,20 @@
             settingsBtn.addEventListener('click', openSettingsModal);
             settingsModalBackdrop.addEventListener('click', closeSettingsModal);
             settingsCloseBtn.addEventListener('click', closeSettingsModal);
-            importCsvInput.addEventListener('change', handleImportCSV);
+            importBackupInput.addEventListener('change', handleImportBackup);
+            resetDataBtn.addEventListener('click', handleResetDataClick); // RE-ADDED
+            
+            // NEW: Reset Password Modal listeners
+            resetPasswordBackdrop.addEventListener('click', () => resetPasswordModal.classList.add('hidden'));
+            resetPasswordCancelBtn.addEventListener('click', () => resetPasswordModal.classList.add('hidden'));
+            resetPasswordForm.addEventListener('submit', handleResetPasswordSubmit);
             
             // Only add this listener if resetDataBtn exists (it won't after we remove it)
+            /*
             if (resetDataBtn) {
                 resetDataBtn.addEventListener('click', handleResetDataClick);
             }
+            */
             
             logoutBtn.addEventListener('click', handleLogout); // Add logout listener
         };
@@ -2126,11 +2213,11 @@
             
             // The passwords and their corresponding app IDs
             const PASSWORDS = {
-                "24177": "expenso-e317f",     // Production app ID
+                "2417": "expenso-e317f",     // Production app ID
                 "2222": "expenso-test-mode",  // Test app ID
-                "3333": "expenso-user-333",   // New unique storage for 333
-                "4444": "expenso-user-444",   // New unique storage for 444
-                "5555": "expenso-user-555"    // New unique storage for 555
+                "333": "expenso-user-333",   // New unique storage for 333
+                "444": "expenso-user-444",   // New unique storage for 444
+                "555": "expenso-user-555"    // New unique storage for 555
             };
 
             // Only allow numbers in the password field
@@ -2182,5 +2269,4 @@
     </script>
 </body>
 </html>
-
 
