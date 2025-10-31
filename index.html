@@ -576,13 +576,8 @@
                     <input type="file" id="import-csv-input" class="glass-input w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600/20 file:text-blue-300 hover:file:bg-blue-600/40" accept=".csv">
                 </div>
                 
-                <div class="pt-4 border-t border-border-primary">
-                    <h4 class="text-lg font-medium text-red-400 mb-2">Danger Zone</h4>
-                    <button id="reset-data-btn" class="w-full text-left bg-red-600/20 text-red-300 hover:bg-red-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
-                        Clear All App Data
-                    </button>
-                    <p class="text-sm text-secondary mt-1">This will permanently delete all shared expenses, income, and settings.</p>
-                </div>
+                <!-- DANGER ZONE REMOVED -->
+                
             </div>
             
             <div class="flex justify-end gap-3 pt-6">
@@ -1741,7 +1736,8 @@
                                 tags: ['imported']
                             };
                             
-                            if (!isNaN(expenseData.amount) && new Date(expenseData.date) != 'Invalid Date') {
+                            // --- FIX: Use a more robust date check ---
+                            if (!isNaN(expenseData.amount) && !isNaN(new Date(expenseData.date).getTime())) {
                                 const newDocRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'));
                                 batch.set(newDocRef, expenseData);
                                 importedCount++;
@@ -2111,7 +2107,11 @@
             settingsModalBackdrop.addEventListener('click', closeSettingsModal);
             settingsCloseBtn.addEventListener('click', closeSettingsModal);
             importCsvInput.addEventListener('change', handleImportCSV);
-            resetDataBtn.addEventListener('click', handleResetDataClick);
+            
+            // Only add this listener if resetDataBtn exists (it won't after we remove it)
+            if (resetDataBtn) {
+                resetDataBtn.addEventListener('click', handleResetDataClick);
+            }
             
             logoutBtn.addEventListener('click', handleLogout); // Add logout listener
         };
@@ -2182,9 +2182,4 @@
     </script>
 </body>
 </html>
-
-
-
-
-
 
