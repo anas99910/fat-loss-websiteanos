@@ -142,6 +142,13 @@
             background-color: #F87171; /* Red 400 */
             color: #7F1D1D; /* Red 900 */
         }
+
+        /* New style for scrollable history */
+        .history-container {
+            max-height: 60vh; /* 60% of the viewport height */
+            overflow-y: auto;
+            padding-right: 6px; /* Space for scrollbar */
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased">
@@ -316,11 +323,13 @@
                         </div>
                     </div>
                     
-                    <div id="expense-list" class="space-y-4">
-                        <!-- Expenses injected here -->
-                        <div id="empty-state" class="glass-card p-6 text-center text-tertiary">
-                            <p>No expenses recorded for this month yet.</p>
-                            <p class="text-sm">Click "Add Expense" to get started.</p>
+                    <!-- Scrollable History Container -->
+                    <div class="history-container">
+                        <div id="expense-list" class="space-y-4 pr-1">
+                            <!-- Expenses injected here -->
+                            <div id="empty-state" class="glass-card p-6 text-center text-tertiary">
+                                <p class="text-sm">Click "Add Expense" to get started.</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -2162,5 +2171,6 @@
     </script>
 </body>
 </html>
+
 
 
