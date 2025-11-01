@@ -170,12 +170,12 @@
             <form id="password-form" class="space-y-4">
                 <div>
                     <label for="username-input" class="block text-sm font-medium text-secondary mb-2">Username</label>
-                    <input type="text" id="username-input" class="glass-input w-full rounded-lg p-3" placeholder="" required autocomplete="username">
+                    <input type="text" id="username-input" name="username" class="glass-input w-full rounded-lg p-3" placeholder="" required autocomplete="username">
                 </div>
                 <div>
                     <label for="password-input" class="block text-sm font-medium text-secondary mb-2">Password</label>
                     <div class="relative">
-                        <input type="password" id="password-input" class="glass-input w-full rounded-lg p-3 pr-10" required maxlength="5" autocomplete="current-password">
+                        <input type="password" id="password-input" name="password" class="glass-input w-full rounded-lg p-3 pr-10" required maxlength="5" autocomplete="current-password">
                         <button type="button" id="toggle-password-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-secondary hover:text-primary" title="Show/Hide Password">
                             <!-- Eye Icon (visible by default) -->
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -2385,10 +2385,10 @@
             // Maps a username/password combo to a specific app ID
             const USERS = [
                 { username: "anas9910", password: "24177", appId: "expenso-e317f" },
-                { username: "user2", password: "22222", appId: "expenso-test-mode" },
-                { username: "user3", password: "3333", appId: "expenso-user-333" },
-                { username: "user4", password: "4444", appId: "expenso-user-444" },
-                { username: "user5", password: "5555", appId: "expenso-user-555" }
+                { username: "test", password: "2222", appId: "expenso-test-mode" },
+                { username: "user1", password: "333", appId: "expenso-user-333" },
+                { username: "user2", password: "444", appId: "expenso-user-444" },
+                { username: "user3", password: "555", appId: "expenso-user-555" }
             ];
             // --- END NEW ---
 
@@ -2462,7 +2462,5 @@
     </script>
 </body>
 </html>
-
-
 
 
