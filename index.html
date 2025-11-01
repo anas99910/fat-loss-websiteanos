@@ -326,6 +326,11 @@
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto" placeholder="Search or #tag...">
+                            <button id="export-excel-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Export to Excel (CSV)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </button>
                             <button id="export-json-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Export Backup (JSON)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -714,7 +719,7 @@
         let deleteModal, deleteModalBackdrop, deleteModalTitle, deleteModalText, deleteCancelBtn, deleteConfirmBtn;
         
         // Search & Export
-        let searchBar, exportJsonBtn;
+        let searchBar, exportJsonBtn, exportExcelBtn;
         
         // Insights
         let insightSavings, insightTopCategory, insightHighestExpense, insightAvgSpend;
@@ -1573,6 +1578,55 @@
             showToast('Backup exported!');
         };
         
+        // NEW: Export to Excel (CSV)
+        const handleExportExcel = () => {
+            if (!currentUserId) return showToast('Not authenticated', true);
+            
+            const periodExpenses = getExpensesForPeriod(currentYear, currentMonth);
+            const periodIncome = getIncomeForPeriod(currentYear, currentMonth);
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Date,Type,Description,Amount,Category,Tags\n"; // Header row
+
+            // Add income rows
+            periodIncome.forEach(inc => {
+                const row = [
+                    inc.date,
+                    'Income',
+                    `"${inc.title.replace(/"/g, '""')}"`, // Handle quotes
+                    inc.amount,
+                    '', // No category for income
+                    ''  // No tags for income
+                ].join(',');
+                csvContent += row + "\n";
+            });
+
+            // Add expense rows
+            periodExpenses.forEach(exp => {
+                const categoryLabel = categories[exp.category] ? categories[exp.category].label : 'Other';
+                const tags = exp.tags ? exp.tags.join('; ') : ''; // Join tags with semicolon
+                const row = [
+                    exp.date,
+                    'Expense',
+                    `"${exp.title.replace(/"/g, '""')}"`, // Handle quotes
+                    exp.amount,
+                    categoryLabel,
+                    `"${tags.replace(/"/g, '""')}"` // Handle quotes
+                ].join(',');
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.href = encodedUri;
+            const monthName = new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long' });
+            link.download = `expenso_export_${currentYear}_${monthName}.csv`;
+            document.body.appendChild(link); // Required for Firefox
+            link.click();
+            document.body.removeChild(link); // Clean up
+            showToast('Exported to CSV!');
+        };
+        
         // Recurring Expenses
         const checkRecurringExpenses = async () => {
             if (!currentUserId) return;
@@ -2067,6 +2121,7 @@
             
             searchBar = document.getElementById('search-bar');
             exportJsonBtn = document.getElementById('export-json-btn');
+            exportExcelBtn = document.getElementById('export-excel-btn'); // Add this line
             
             insightSavings = document.getElementById('insight-savings');
             insightTopCategory = document.getElementById('insight-top-category');
@@ -2202,6 +2257,7 @@
             filterCategoryEl.addEventListener('change', handleFilterChange);
             searchBar.addEventListener('input', handleSearchInput);
             exportJsonBtn.addEventListener('click', handleExportBackup);
+            exportExcelBtn.addEventListener('click', handleExportExcel); // Add this line
             
             chartToggleBarBtn.addEventListener('click', () => handleChartToggle('bar'));
             chartTogglePieBtn.addEventListener('click', () => handleChartToggle('pie'));
@@ -2318,6 +2374,7 @@
     </script>
 </body>
 </html>
+
 
 
 
