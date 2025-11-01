@@ -170,12 +170,12 @@
             <form id="password-form" class="space-y-4">
                 <div>
                     <label for="username-input" class="block text-sm font-medium text-secondary mb-2">Username</label>
-                    <input type="text" id="username-input" class="glass-input w-full rounded-lg p-3" placeholder="" required>
+                    <input type="text" id="username-input" class="glass-input w-full rounded-lg p-3" placeholder="" required autocomplete="username">
                 </div>
                 <div>
                     <label for="password-input" class="block text-sm font-medium text-secondary mb-2">Password</label>
                     <div class="relative">
-                        <input type="password" id="password-input" class="glass-input w-full rounded-lg p-3 pr-10" required maxlength="5">
+                        <input type="password" id="password-input" class="glass-input w-full rounded-lg p-3 pr-10" required maxlength="5" autocomplete="current-password">
                         <button type="button" id="toggle-password-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-secondary hover:text-primary" title="Show/Hide Password">
                             <!-- Eye Icon (visible by default) -->
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -2462,6 +2462,7 @@
     </script>
 </body>
 </html>
+
 
 
 
