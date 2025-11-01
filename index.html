@@ -170,7 +170,20 @@
             <form id="password-form" class="space-y-4">
                 <div>
                     <label for="password-input" class="block text-sm font-medium text-secondary mb-2">Enter Password</label>
-                    <input type="password" id="password-input" class="glass-input w-full rounded-lg p-3" required>
+                    <div class="relative">
+                        <input type="password" id="password-input" class="glass-input w-full rounded-lg p-3 pr-10" required maxlength="5">
+                        <button type="button" id="toggle-password-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-secondary hover:text-primary" title="Show/Hide Password">
+                            <!-- Eye Icon (visible by default) -->
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.07.207-.141.414-.214.618m-2.06 3.095A9.002 9.002 0 0112 19c-4.478 0-8.268-2.943-9.542-7 .07-.207.141-.414.214-.618m2.06-3.095l-2.06-3.095m16 0l-2.06 3.095" />
+                            </svg>
+                            <!-- Eye-Off Icon (hidden by default) -->
+                            <svg id="eye-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 .23-.62.5-1.22.814-1.78m3.95 3.95A3 3 0 018.02 14.02l-1.07-1.07m5.92-5.92A3 3 0 0115.98 9.98l1.07 1.07m-5.92 5.92l-1.07-1.07m5.92-5.92l1.07 1.07M3 3l18 18" />
+                            </svg>
+                        </button>
+                    </div>
                     <p id="password-error" class="text-red-400 text-sm mt-2 hidden">Incorrect password. Please try again.</p>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
@@ -2357,6 +2370,12 @@
             const inputEl = document.getElementById('password-input');
             const errorEl = document.getElementById('password-error');
             
+            // --- NEW ELEMENTS FOR EYE ICON ---
+            const toggleBtn = document.getElementById('toggle-password-btn');
+            const eyeIcon = document.getElementById('eye-icon');
+            const eyeOffIcon = document.getElementById('eye-off-icon');
+            // --- END NEW ELEMENTS ---
+            
             // The passwords and their corresponding app IDs
             const PASSWORDS = {
                 "24177": "expenso-e317f",     // Production app ID
@@ -2369,7 +2388,25 @@
             // Only allow numbers in the password field
             inputEl.addEventListener('input', () => {
                 inputEl.value = inputEl.value.replace(/[^0-9]/g, '');
+                // The maxlength="4" in HTML will handle the length limit
             });
+            
+            // --- NEW LISTENER FOR EYE ICON ---
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    if (inputEl.type === 'password') {
+                        inputEl.type = 'text';
+                        eyeIcon.classList.add('hidden');
+                        eyeOffIcon.classList.remove('hidden');
+                    } else {
+                        inputEl.type = 'password';
+                        eyeIcon.classList.remove('hidden');
+                        eyeOffIcon.classList.add('hidden');
+                    }
+                    inputEl.focus(); // Keep focus on the input
+                });
+            }
+            // --- END NEW LISTENER ---
 
             // Check session storage first
             const authenticatedAppId = sessionStorage.getItem('expenso_app_id');
@@ -2415,6 +2452,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
