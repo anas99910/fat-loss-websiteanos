@@ -15,60 +15,99 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Base styles - Apple-inspired Dark Mode */
+        /* Base styles - NEW Dark/Green Theme */
         :root {
-            --bg-primary: #1C1C1E; /* Very dark grey */
-            --bg-secondary: rgba(44, 44, 46, 0.75); /* Dark Material */
-            --bg-tertiary: rgba(60, 60, 62, 0.75); /* Dark Material (inputs) */
-            --bg-overlay: rgba(0, 0, 0, 0.6);
+            --bg-primary: #121212; /* Very dark grey background */
+            --bg-secondary: #1e1e1e; /* Dark panel background */
+            --bg-tertiary: #2a2a2a; /* Lighter panel (inputs) */
+            --bg-overlay: rgba(0, 0, 0, 0.7);
             --text-primary: #FFFFFF;
-            --text-secondary: rgba(235, 235, 245, 0.6); /* Apple secondary */
-            --text-tertiary: rgba(235, 235, 245, 0.3); /* Apple tertiary */
-            --border-primary: rgba(84, 84, 88, 0.65); /* Subtle dark border */
-            --border-focus: rgba(59, 130, 246, 0.7);
-            --scroll-track: #1C1C1E;
-            --scroll-thumb: #3C3C3E;
-            --scroll-thumb-hover: #5C5C5E;
+            --text-secondary: #b3b3b3; /* Light grey */
+            --text-tertiary: #808080; /* Medium grey */
+            --border-primary: #303030; /* Subtle border */
+            --border-focus: #1DB954; /* Green accent */
+            --scroll-track: #121212;
+            --scroll-thumb: #303030;
+            --scroll-thumb-hover: #454545;
+            
+            /* --- ACCENT COLORS --- */
+            --accent-primary: #1DB954; /* Bright Green */
+            --accent-primary-hover: #1ED760;
+            --accent-primary-text: #FFFFFF;
+            --accent-primary-subtle-bg: rgba(29, 185, 84, 0.15);
+            --accent-primary-subtle-text: #1DB954;
+
+            --accent-secondary: #2a2a2a; /* Grey buttons */
+            --accent-secondary-hover: #333333;
+            --accent-secondary-text: #FFFFFF;
+            
+            --accent-danger: #E53E3E; /* Red */
+            --accent-danger-hover: #FC8181;
+            --accent-danger-subtle-bg: rgba(229, 62, 62, 0.15);
+            --accent-danger-subtle-text: #E53E3E;
         }
 
-        /* Apple-inspired Light Mode */
+        /* Light Mode (Kept for toggle, but dark is default) */
         .light {
-            --bg-primary: #FFFFFF; /* Pure white */
-            --bg-secondary: rgba(242, 242, 247, 0.7); /* Light Material */
-            --bg-tertiary: rgba(230, 230, 230, 0.7); /* Light Material (inputs) */
+            --bg-primary: #F3F4F6;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F9FAFB;
             --bg-overlay: rgba(0, 0, 0, 0.4);
-            --text-primary: #1D1D1F; /* Apple primary text (dark) */
-            --text-secondary: rgba(60, 60, 67, 0.6); /* Apple secondary */
-            --text-tertiary: rgba(60, 60, 67, 0.3); /* Apple tertiary */
-            --border-primary: rgba(60, 60, 67, 0.29); /* Subtle light border */
-            --border-focus: rgba(59, 130, 246, 0.7);
+            --text-primary: #1F2937;
+            --text-secondary: #4B5563;
+            --text-tertiary: #9CA3AF;
+            --border-primary: #E5E7EB;
+            --border-focus: #1DB954;
             --scroll-track: #F3F4F6;
             --scroll-thumb: #D1D5DB;
             --scroll-thumb-hover: #9CA3AF;
+            
+            /* --- ACCENT COLORS --- */
+            --accent-primary: #1DB954;
+            --accent-primary-hover: #1ED760;
+            --accent-primary-text: #FFFFFF;
+            --accent-primary-subtle-bg: rgba(29, 185, 84, 0.15);
+            --accent-primary-subtle-text: #1DB954;
+
+            --accent-secondary: #E5E7EB;
+            --accent-secondary-hover: #D1D5DB;
+            --accent-secondary-text: #1F2937;
+            
+            --accent-danger: #E53E3E;
+            --accent-danger-hover: #FC8181;
+            --accent-danger-subtle-bg: rgba(229, 62, 62, 0.15);
+            --accent-danger-subtle-text: #E53E3E;
+        }
+
+        .light body {
+            background-color: var(--bg-primary);
+            background-attachment: fixed;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
+            background-color: var(--bg-primary); /* Solid dark background */
+            background-attachment: fixed;
+            min-height: 100vh;
             color: var(--text-secondary);
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Glassmorphism Card Style - More subtle */
+        /* Solid Card Style (No glass) */
         .glass-card {
             background: var(--bg-secondary);
-            backdrop-filter: blur(15px) saturate(150%);
-            -webkit-backdrop-filter: blur(15px) saturate(150%);
+            /* REMOVED backdrop-filter */
             border: 1px solid var(--border-primary);
             border-radius: 1.25rem; /* 20px */
-            transition: background-color 0.3s, border-color 0.3s;
+            box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1); /* Softer shadow */
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* Glassmorphism Input Style */
+        /* Solid Input Style */
         .glass-input {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-primary);
-            color: var(--text-primary); /* Use primary text for inputs */
+            color: var(--text-primary);
             transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
         .glass-input::placeholder {
@@ -76,8 +115,12 @@
         }
         .glass-input:focus {
             outline: none;
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+            border-color: var(--border-focus); /* Green focus */
+            box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3); /* Green shadow */
+        }
+        
+        .light .glass-input:focus {
+             box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3); /* Green shadow */
         }
 
         /* Custom scrollbar */
@@ -89,7 +132,7 @@
         /* Date picker icon */
         input[type="date"]::-webkit-calendar-picker-indicator {
             /* Invert(1) for dark, Invert(0.2) for light */
-            filter: var(--bg-primary, #1C1C1E) = #1C1C1E ? invert(1) : invert(0.2);
+            filter: var(--bg-primary, #121212) = #121212 ? invert(1) : invert(0.2);
             cursor: pointer;
         }
         
@@ -135,12 +178,12 @@
             bottom: 30px;
         }
         #toast.success {
-            background-color: #34D399; /* Emerald 400 */
-            color: #064E3B; /* Emerald 900 */
+            background-color: var(--accent-primary); /* Green */
+            color: var(--accent-primary-text); /* White */
         }
         #toast.error {
-            background-color: #F87171; /* Red 400 */
-            color: #7F1D1D; /* Red 900 */
+            background-color: var(--accent-danger); /* Red */
+            color: var(--accent-primary-text); /* White */
         }
 
         /* New style for scrollable history */
@@ -191,7 +234,13 @@
                     <p id="password-error" class="text-red-400 text-sm mt-2 hidden">Incorrect username or password. Please try again.</p>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="submit" id="password-submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-5 rounded-full transition-colors duration-200">Unlock</button>
+                    <!-- UPDATED: Button uses accent colors -->
+                    <button type="submit" id="password-submit-btn" class="w-full font-medium py-3 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-primary); color: var(--accent-primary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-primary)'">
+                        Unlock
+                    </button>
                 </div>
             </form>
         </div>
@@ -207,7 +256,7 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-primary tracking-tight">
                     Expenso
                 </h1>
-                <select id="month-selector" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500"></select>
+                <select id="month-selector" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-green-500 focus:border-green-500"></select>
             </div>
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
                 <button id="theme-toggle-btn" class="p-2 rounded-full glass-input" title="Toggle Theme">
@@ -232,19 +281,29 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                 </button>
-                <button id="set-budget-btn" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200">
+                <button id="set-budget-btn" class="font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200"
+                        style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16v2m-6-6H3m6 0H9m6 0h3m-3 0h-3m-6 0H3m6 0H9m6 0h3m-3 0h-3" />
                     </svg>
                     <span class="hidden sm:inline">Budget</span>
                 </button>
-                <button id="add-income-btn" class="bg-green-600 hover:bg-green-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200">
+                <button id="add-income-btn" class="font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200"
+                        style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" />
                     </svg>
                     <span class="hidden sm:inline">Add Income</span>
                 </button>
-                <button id="add-expense-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200">
+                <!-- UPDATED: Main "Add" button is green -->
+                <button id="add-expense-btn" class="font-medium py-2 px-4 rounded-full flex items-center gap-2 transition-all duration-200"
+                        style="background-color: var(--accent-primary); color: var(--accent-primary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-primary)'">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                     </svg>
@@ -281,8 +340,9 @@
                     </div>
                     <!-- Budget Progress Bar -->
                     <div class="mt-4">
-                        <div class="w-full bg-tertiary/30 rounded-full h-2.5">
-                            <div id="budget-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        <div class="w-full bg-tertiary rounded-full h-2.5">
+                            <!-- UPDATED: Progress bar uses green accent -->
+                            <div id="budget-progress-bar" class="h-2.5 rounded-full" style="width: 0%; background-color: var(--accent-primary);"></div>
                         </div>
                         <p id="budget-remaining-text" class="text-sm text-tertiary text-right mt-1"></p>
                     </div>
@@ -296,7 +356,9 @@
                             Monthly Breakdown
                         </h3>
                         <div class="flex gap-2">
-                            <button id="chart-toggle-bar" class="p-2 rounded-lg glass-input bg-blue-600/30 text-blue-300" title="Bar Chart">
+                            <!-- UPDATED: Active button style is green -->
+                            <button id="chart-toggle-bar" class="p-2 rounded-lg glass-input" title="Bar Chart"
+                                    style="background-color: var(--accent-primary-subtle-bg); color: var(--accent-primary);">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                             </button>
                             <button id="chart-toggle-pie" class="p-2 rounded-lg glass-input" title="Pie Chart">
@@ -305,10 +367,10 @@
                         </div>
                     </div>
                     <!-- Chart Area -->
-                    <div id="bar-chart-container" class="h-48 w-full flex items-end gap-4 p-2 sm:p-4 bg-tertiary/20 rounded-xl overflow-x-auto">
+                    <div id="bar-chart-container" class="h-48 w-full flex items-end gap-4 p-2 sm:p-4 bg-tertiary rounded-xl overflow-x-auto">
                         <!-- Bar chart bars will be injected here -->
                     </div>
-                    <div id="pie-chart-container" class="h-auto sm:h-48 w-full hidden flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 p-4 bg-tertiary/20 rounded-xl">
+                    <div id="pie-chart-container" class="h-auto sm:h-48 w-full hidden flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 p-4 bg-tertiary rounded-xl">
                         <div id="pie-chart" class="flex-shrink-0"></div>
                         <div id="pie-chart-legend" class="text-sm space-y-1"></div>
                     </div>
@@ -342,7 +404,7 @@
                             </select>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto" placeholder="Search or #tag...">
+                            <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-green-500 focus:border-green-500 w-full sm:w-auto" placeholder="Search or #tag...">
                             <button id="export-excel-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Export to Excel (CSV)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -379,7 +441,8 @@
                     <div class="space-y-4">
                         <div id="insight-savings">
                             <h3 class="text-sm font-medium text-tertiary">MONTHLY SAVINGS</h3>
-                            <p class="text-xl font-semibold text-green-400">0 DH</p>
+                            <!-- UPDATED: Use green accent color -->
+                            <p class="text-xl font-semibold" style="color: var(--accent-primary);">0 DH</p>
                         </div>
                         <div id="insight-top-category">
                             <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY</h3>
@@ -415,7 +478,11 @@
                 </section>
 
                 <section class="glass-card p-6">
-                    <button id="manage-categories-btn" class="w-full text-center bg-blue-600/20 text-blue-300 hover:bg-blue-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
+                    <!-- UPDATED: Manage categories button style -->
+                    <button id="manage-categories-btn" class="w-full text-center font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+                            style="background-color: var(--accent-primary-subtle-bg); color: var(--accent-primary-subtle-text);"
+                            onmouseover="this.style.backgroundColor='rgba(29, 185, 84, 0.3)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-primary-subtle-bg)'">
                         Manage Categories
                     </button>
                 </section>
@@ -434,7 +501,11 @@
             <h1 class="text-3xl md:text-4xl font-bold text-primary tracking-tight" id="yearly-report-title">
                 Yearly Report
             </h1>
-            <button id="close-yearly-report" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-full transition-colors duration-200">
+            <!-- UPDATED: Yearly report button -->
+            <button id="close-yearly-report" class="font-medium py-2 px-4 rounded-full transition-colors duration-200"
+                    style="background-color: var(--accent-primary); color: var(--accent-primary-text);"
+                    onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'"
+                    onmouseout="this.style.backgroundColor='var(--accent-primary)'">
                 Back to Monthly
             </button>
         </header>
@@ -442,11 +513,11 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="glass-card p-6">
                 <h2 class="text-sm font-medium text-tertiary mb-2">Total Income</h2>
-                <p id="yearly-total-income" class="text-4xl font-bold text-green-400">0 DH</p>
+                <p id="yearly-total-income" class="text-4xl font-bold" style="color: var(--accent-primary);">0 DH</p>
             </div>
             <div class="glass-card p-6">
                 <h2 class="text-sm font-medium text-tertiary mb-2">Total Expenses</h2>
-                <p id="yearly-total-expenses" class="text-4xl font-bold text-red-400">0 DH</p>
+                <p id="yearly-total-expenses" class="text-4xl font-bold" style="color: var(--accent-danger);">0 DH</p>
             </div>
             <div class="glass-card p-6">
                 <h2 class="text-sm font-medium text-tertiary mb-2">Total Savings</h2>
@@ -456,7 +527,7 @@
         
         <div class="glass-card p-6 mt-6">
             <h3 class="text-lg font-semibold text-primary mb-4">Monthly Spending</h3>
-            <div id="yearly-bar-chart" class="h-64 w-full flex justify-around items-end gap-2 p-4 bg-tertiary/20 rounded-xl">
+            <div id="yearly-bar-chart" class="h-64 w-full flex justify-around items-end gap-2 p-4 bg-tertiary rounded-xl">
                 <!-- Yearly bar chart will be injected here -->
             </div>
         </div>
@@ -501,13 +572,23 @@
                 </div>
                 <div class="flex items-center justify-between">
                     <label for="expense-recurring" class="flex items-center gap-2 text-sm text-secondary cursor-pointer">
-                        <input type="checkbox" id="expense-recurring" class="glass-input rounded text-blue-600 focus:ring-blue-500">
+                        <input type="checkbox" id="expense-recurring" class="glass-input rounded" style="color: var(--accent-primary);">
                         Set as recurring (monthly)
                     </label>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" id="cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
-                    <button type="submit" id="save-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Save Expense</button>
+                    <button type="button" id="cancel-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
+                        Cancel
+                    </button>
+                    <button type="submit" id="save-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-primary); color: var(--accent-primary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-primary)'">
+                        Save Expense
+                    </button>
                 </div>
             </form>
         </div>
@@ -524,8 +605,18 @@
                     <input type="number" id="budget-amount" class="glass-input w-full rounded-lg p-3" placeholder="5000" min="0" step="100">
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" id="budget-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
-                    <button type="submit" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Set Budget</button>
+                    <button type="button" id="budget-cancel-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
+                        Cancel
+                    </button>
+                    <button type="submit" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-primary); color: var(--accent-primary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-primary)'">
+                        Set Budget
+                    </button>
                 </div>
             </form>
         </div>
@@ -538,8 +629,18 @@
             <h3 id="delete-modal-title" class="text-xl font-semibold text-primary mb-4">Delete Transaction</h3>
             <p id="delete-modal-text" class="text-secondary mb-6">Are you sure? This action cannot be undone.</p>
             <div class="flex justify-end gap-3">
-                <button type="button" id="delete-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
-                <button type="button" id="delete-confirm-btn" class="bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Delete</button>
+                <button type="button" id="delete-cancel-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                        style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
+                    Cancel
+                </button>
+                <button type="button" id="delete-confirm-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                        style="background-color: var(--accent-danger); color: var(--accent-primary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-danger-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-danger)'">
+                    Delete
+                </button>
             </div>
         </div>
     </div>
@@ -551,13 +652,23 @@
             <h3 class="text-2xl font-semibold text-primary mb-6">Manage Categories</h3>
             <form id="category-form" class="flex gap-2 mb-4">
                 <input type="text" id="category-name-input" class="glass-input w-full rounded-lg p-3" placeholder="New category name" required>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">Add</button>
+                <button type="submit" class="font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                        style="background-color: var(--accent-primary); color: var(--accent-primary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-primary)'">
+                    Add
+                </button>
             </form>
             <div id="category-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
                 <!-- Category list will be injected here -->
             </div>
             <div class="flex justify-end gap-3 pt-6">
-                <button type="button" id="category-close-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Done</button>
+                <button type="button" id="category-close-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                        style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
+                    Done
+                </button>
             </div>
         </div>
     </div>
@@ -584,8 +695,18 @@
                     </div>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" id="income-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
-                    <button type="submit" id="income-save-btn" class="bg-green-600 hover:bg-green-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Save Income</button>
+                    <button type="button" id="income-cancel-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
+                        Cancel
+                    </button>
+                    <button type="submit" id="income-save-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-primary); color: var(--accent-primary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-primary)'">
+                        Save Income
+                    </button>
                 </div>
             </form>
         </div>
@@ -601,13 +722,20 @@
                 <div>
                     <h4 class="text-lg font-medium text-primary mb-2">Backup & Restore</h4>
                     <p class="text-sm text-secondary mb-2">Export a JSON backup of all data, or restore from a backup file.</p>
-                    <input type="file" id="import-backup-input" class="glass-input w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600/20 file:text-blue-300 hover:file:bg-blue-600/40" accept=".json">
+                    <input type="file" id="import-backup-input" class="glass-input w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold"
+                           style="file:background-color: var(--accent-primary-subtle-bg); file:color: var(--accent-primary-subtle-text); cursor: pointer;"
+                           onmouseover="this.style.fileBackgroundColor='rgba(29, 185, 84, 0.3)'"
+                           onmouseout="this.style.fileBackgroundColor='var(--accent-primary-subtle-bg)'"
+                           accept=".json">
                 </div>
                 
                 <!-- DANGER ZONE RE-ADDED -->
                 <div class="pt-4 border-t border-border-primary">
                     <h4 class="text-lg font-medium text-red-400 mb-2">Danger Zone</h4>
-                    <button id="reset-data-btn" class="w-full text-left bg-red-600/20 text-red-300 hover:bg-red-600/40 font-medium py-3 px-4 rounded-lg transition-colors duration-200">
+                    <button id="reset-data-btn" class="w-full text-left font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+                            style="background-color: var(--accent-danger-subtle-bg); color: var(--accent-danger-subtle-text);"
+                            onmouseover="this.style.backgroundColor='rgba(229, 62, 62, 0.3)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-danger-subtle-bg)'">
                         Clear All App Data
                     </button>
                     <p class="text-sm text-secondary mt-1">This will permanently delete all data in this mode.</p>
@@ -616,7 +744,12 @@
             </div>
             
             <div class="flex justify-end gap-3 pt-6">
-                <button type="button" id="settings-close-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Close</button>
+                <button type="button" id="settings-close-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                        style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                        onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
+                    Close
+                </button>
             </div>
         </div>
     </div>
@@ -633,8 +766,18 @@
                     <p id="reset-password-error" class="text-red-400 text-sm mt-2 hidden">Incorrect password.</p>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" id="reset-password-cancel-btn" class="bg-tertiary/80 hover:bg-tertiary text-primary font-medium py-2 px-5 rounded-full transition-colors duration-200">Cancel</button>
-                    <button type="submit" class="bg-red-600 hover:bg-red-500 text-white font-medium py-2 px-5 rounded-full transition-colors duration-200">Confirm</button>
+                    <button type="button" id="reset-password-cancel-btn" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-secondary); color: var(--accent-secondary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-secondary-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-secondary)'">
+                        Cancel
+                    </button>
+                    <button type="submit" class="font-medium py-2 px-5 rounded-full transition-colors duration-200"
+                            style="background-color: var(--accent-danger); color: var(--accent-primary-text);"
+                            onmouseover="this.style.backgroundColor='var(--accent-danger-hover)'"
+                            onmouseout="this.style.backgroundColor='var(--accent-danger)'">
+                        Confirm
+                    </button>
                 </div>
             </form>
         </div>
@@ -922,17 +1065,17 @@
                 budgetProgressBar.style.width = `${percentage}%`;
                 
                 // Change color based on percentage
-                if (percentage > 90) budgetProgressBar.className = 'bg-red-600 h-2.5 rounded-full';
-                else if (percentage > 70) budgetProgressBar.className = 'bg-yellow-500 h-2.5 rounded-full';
-                else budgetProgressBar.className = 'bg-blue-600 h-2.5 rounded-full';
+                if (percentage > 90) budgetProgressBar.style.backgroundColor = 'var(--accent-danger)';
+                else if (percentage > 70) budgetProgressBar.style.backgroundColor = '#F59E0B'; // Yellow
+                else budgetProgressBar.style.backgroundColor = 'var(--accent-primary)'; // Green
                 
                 const remaining = currentBudget - total;
                 
                 // --- USER REQUEST: Make "remaining" text blue, bigger, and more visible ---
                 if (remaining >= 0) {
                     budgetRemainingTextEl.textContent = `${formatCurrency(remaining)} remaining`;
-                    // Blue, bigger, and visible (font-medium)
-                    budgetRemainingTextEl.className = "text-base font-medium text-blue-400 text-right mt-1";
+                    // Green, bigger, and visible (font-medium)
+                    budgetRemainingTextEl.className = "text-base font-medium text-green-400 text-right mt-1";
                 } else {
                     budgetRemainingTextEl.textContent = `${formatCurrency(Math.abs(remaining))} over budget`;
                     // I'll make "over budget" red, bigger, and visible, as that's more semantic
@@ -978,7 +1121,7 @@
                 barEl.className = "flex flex-col items-center justify-end h-full"; // Removed w-full
                 barEl.style.minWidth = "40px"; // Added min-width
                 barEl.innerHTML = `
-                    <div class="chart-bar w-1/2 md:w-3/5 bg-blue-600 rounded-t-md" style="height: ${heightPercentage}%" title="${categories[key].label}: ${formatCurrency(total)}"></div>
+                    <div class="chart-bar w-1/2 md:w-3/5 rounded-t-md" style="height: ${heightPercentage}%; background-color: var(--accent-primary);" title="${categories[key].label}: ${formatCurrency(total)}"></div>
                     <span class="text-xs text-tertiary mt-1 sm:mt-2">${categories[key].label}</span>
                 `;
                 barChartContainer.appendChild(barEl);
@@ -994,7 +1137,7 @@
                 return;
             }
 
-            const pieColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1', '#F9C851', '#E67E22', '#3498DB', '#2ECC71'];
+            const pieColors = ['#1DB954', '#1ED760', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1', '#F9C851', '#E67E22', '#3498DB', '#2ECC71'];
             let gradientString = 'conic-gradient(';
             let currentAngle = 0;
             let legendHTML = '';
@@ -1036,9 +1179,9 @@
                     const totalSpent = totals[key] ? totals[key].total : 0;
                     const percentage = Math.min((totalSpent / category.budget) * 100, 100);
                     
-                    let barColor = 'bg-blue-600';
-                    if (percentage > 90) barColor = 'bg-red-600';
-                    else if (percentage > 70) barColor = 'bg-yellow-500';
+                    let barColor = 'var(--accent-primary)'; // Green
+                    if (percentage > 90) barColor = 'var(--accent-danger)'; // Red
+                    else if (percentage > 70) barColor = '#F59E0B'; // Yellow
                     
                     const el = document.createElement('div');
                     el.innerHTML = `
@@ -1046,8 +1189,8 @@
                             <span class="text-tertiary">${category.label}</span>
                             <span class="text-primary">${formatCurrency(totalSpent)} / ${formatCurrency(category.budget)}</span>
                         </div>
-                        <div class="w-full bg-tertiary/30 rounded-full h-1.5">
-                            <div class="${barColor} h-1.5 rounded-full" style="width: ${percentage}%"></div>
+                        <div class="w-full bg-tertiary rounded-full h-1.5">
+                            <div class="h-1.5 rounded-full" style="width: ${percentage}%; background-color: ${barColor}"></div>
                         </div>
                     `;
                     categoryBudgetsContainer.appendChild(el);
@@ -1106,7 +1249,7 @@
 
             filteredList.forEach(item => {
                 const el = document.createElement('div');
-                el.className = 'glass-card p-4 transition-all duration-200 hover:border-primary/20';
+                el.className = 'glass-card p-4 transition-all duration-200 hover:border-border-primary/50';
                 
                 if (item.type === 'expense') {
                     const category = categories[item.category];
@@ -1115,7 +1258,7 @@
                     el.innerHTML = `
                         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
                             <div class="flex items-center gap-4 mb-2 sm:mb-0 clickable-area cursor-pointer" data-id="${item.id}" data-type="expense">
-                                <div class="p-3 bg-tertiary/60 rounded-xl text-primary">
+                                <div class="p-3 bg-tertiary rounded-xl text-primary">
                                     ${categoryIcon}
                                 </div>
                                 <div>
@@ -1128,7 +1271,7 @@
                                     - ${formatCurrency(item.amount)}
                                 </p>
                                 <div class="flex gap-2">
-                                    <button class="edit-btn p-2 text-secondary hover:text-blue-400 transition-colors" data-id="${item.id}" title="Edit Expense">
+                                    <button class="edit-btn p-2 text-secondary hover:text-green-400 transition-colors" data-id="${item.id}" title="Edit Expense">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                     </button>
                                     <button class="delete-btn p-2 text-secondary hover:text-red-400 transition-colors" data-id="${item.id}" title="Delete Expense">
@@ -1138,14 +1281,14 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-1 mt-2 pl-0 sm:pl-16">
-                            ${(item.tags && item.tags.map(tag => `<span class="text-xs bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded-full">${tag}</span>`).join('')) || ''}
+                            ${(item.tags && item.tags.map(tag => `<span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--accent-primary-subtle-bg); color: var(--accent-primary-subtle-text);">${tag}</span>`).join('')) || ''}
                         </div>
                     `;
                 } else { // Income
                     el.innerHTML = `
                         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
                             <div class="flex items-center gap-4 mb-2 sm:mb-0 clickable-area cursor-pointer" data-id="${item.id}" data-type="income">
-                                <div class="p-3 bg-tertiary/60 rounded-xl text-green-400">
+                                <div class="p-3 bg-tertiary rounded-xl text-green-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" /></svg>
                                 </div>
                                 <div>
@@ -1158,7 +1301,7 @@
                                     + ${formatCurrency(item.amount)}
                                 </p>
                                 <div class="flex gap-2">
-                                    <button class="edit-income-btn p-2 text-secondary hover:text-blue-400 transition-colors" data-id="${item.id}" title="Edit Income">
+                                    <button class="edit-income-btn p-2 text-secondary hover:text-green-400 transition-colors" data-id="${item.id}" title="Edit Income">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                     </button>
                                     <button class="delete-income-btn p-2 text-secondary hover:text-red-400 transition-colors" data-id="${item.id}" title="Delete Income">
@@ -1576,15 +1719,23 @@
         const handleChartToggle = (type) => {
             chartType = type;
             if (type === 'bar') {
-                chartToggleBarBtn.classList.add('bg-blue-600/30', 'text-blue-300');
-                chartTogglePieBtn.classList.remove('bg-blue-600/30', 'text-blue-300');
+                // Update Bar Button Style (Active)
+                chartToggleBarBtn.style.backgroundColor = 'var(--accent-primary-subtle-bg)';
+                chartToggleBarBtn.style.color = 'var(--accent-primary-subtle-text)';
+                // Update Pie Button Style (Inactive)
+                chartTogglePieBtn.style.backgroundColor = 'var(--bg-tertiary)';
+                chartTogglePieBtn.style.color = 'var(--text-tertiary)';
             } else {
-                chartTogglePieBtn.classList.add('bg-blue-600/30', 'text-blue-300');
-                chartToggleBarBtn.classList.remove('bg-blue-600/30', 'text-blue-300');
+                // Update Pie Button Style (Active)
+                chartTogglePieBtn.style.backgroundColor = 'var(--accent-primary-subtle-bg)';
+                chartTogglePieBtn.style.color = 'var(--accent-primary-subtle-text)';
+                // Update Bar Button Style (Inactive)
+                chartToggleBarBtn.style.backgroundColor = 'var(--bg-tertiary)';
+                chartToggleBarBtn.style.color = 'var(--text-tertiary)';
             }
             render();
         };
-
+        
         // Export JSON Backup
         const handleExportBackup = () => {
             if (!currentUserId) return showToast('Not authenticated', true);
@@ -1862,7 +2013,7 @@
                 const height = (total / maxMonthly) * 100;
                 yearlyChartEl.innerHTML += `
                     <div class="flex flex-col items-center justify-end w-full h-full">
-                        <div class="chart-bar w-1/2 md:w-3/5 bg-teal-600 rounded-t-md" style="height: ${height}%" title="${months[index]}: ${formatCurrency(total)}"></div>
+                        <div class="chart-bar w-1/2 md:w-3/5 rounded-t-md" style="height: ${height}%; background-color: var(--accent-primary);" title="${months[index]}: ${formatCurrency(total)}"></div>
                         <span class="text-xs text-tertiary mt-2">${months[index]}</span>
                     </div>
                 `;
@@ -2334,7 +2485,7 @@
             });
             
             historySortToggle.addEventListener('change', (e) => { // Add this block
-                currentSortOrder = e.target.value;
+                currentSortOrder = e.targe.value;
                 render();
             });
             
@@ -2385,10 +2536,10 @@
             // Maps a username/password combo to a specific app ID
             const USERS = [
                 { username: "anas9910", password: "24177", appId: "expenso-e317f" },
-                { username: "test", password: "2222", appId: "expenso-test-mode" },
-                { username: "user1", password: "333", appId: "expenso-user-333" },
-                { username: "user2", password: "444", appId: "expenso-user-444" },
-                { username: "user3", password: "555", appId: "expenso-user-555" }
+                { username: "user2", password: "22222", appId: "expenso-test-mode" },
+                { username: "user3", password: "3333", appId: "expenso-user-333" },
+                { username: "user4", password: "4444", appId: "expenso-user-444" },
+                { username: "user5", password: "5555", appId: "expenso-user-555" }
             ];
             // --- END NEW ---
 
@@ -2462,5 +2613,4 @@
     </script>
 </body>
 </html>
-
 
