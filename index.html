@@ -14,6 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- *** NEW: html2canvas library for downloading images *** -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfH+v/OHV+HyaL/SZQ/TGOiYneBpaXwiQe9T/cNPURwfYClqbeS/KjLJjHLi-bcA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
     <style>
         /* Base styles - NEW Dark/Green Theme */
         :root {
@@ -275,6 +278,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </button>
+                <!-- *** NEW: Download Report Button *** -->
+                <button id="download-report-btn" class="p-2 rounded-full glass-input" title="Download Report as Image">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
                 <!-- Add Logout Button -->
                 <button id="logout-btn" class="p-2 rounded-full glass-input" title="Logout">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -313,7 +323,7 @@
         </header>
 
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <div id="main-content-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
             <!-- Main Column (Summary, Chart, List) -->
             <div class="lg:col-span-2 space-y-6 md:space-y-8">
@@ -465,10 +475,16 @@
                     <h2 class="text-lg font-semibold text-primary mb-4">
                         This Week's Summary
                     </h2>
-                    <div class="space-y-2">
+                    <!-- MODIFIED: Changed space-y-2 to space-y-3 -->
+                    <div class="space-y-3">
                         <div>
                             <h3 class="text-sm font-medium text-tertiary">TOTAL SPENT (Mon-Sun)</h3>
                             <p id="weekly-total-spend" class="text-2xl font-semibold text-primary">0 DH</p>
+                        </div>
+                        <!-- *** NEW: Today Spent *** -->
+                        <div>
+                            <h3 class="text-sm font-medium text-tertiary">TODAY SPENT</h3>
+                            <p id="today-total-spend" class="text-2xl font-semibold text-primary">0 DH</p>
                         </div>
                         <div>
                             <h3 class="text-sm font-medium text-tertiary">TOP CATEGORY (This Week)</h3>
@@ -895,7 +911,7 @@
         let chartToggleBarBtn, chartTogglePieBtn, barChartContainer, pieChartContainer, pieChartEl, pieChartLegendEl, categoryBudgetsContainer;
         
         // Weekly Summary (RE-ADDING)
-        let weeklyTotalSpendEl, weeklyTopCategoryEl;
+        let weeklyTotalSpendEl, weeklyTopCategoryEl, todayTotalSpendEl; // *** ADDED todayTotalSpendEl ***
         
         // Categories
         let manageCategoriesBtn, categoryModal, categoryModalBackdrop, categoryCloseBtn, categoryForm, categoryNameInput, categoryListEl;
@@ -915,6 +931,9 @@
         
         // Reset Password Modal (NEW)
         let resetPasswordModal, resetPasswordBackdrop, resetPasswordForm, resetPasswordInput, resetPasswordError, resetPasswordCancelBtn;
+        
+        // *** NEW: Download Button ***
+        let downloadReportBtn;
         
         // Add logout button
         let logoutBtn;
@@ -1381,6 +1400,7 @@
             const today = new Date();
             const { start, end } = getWeekRange(today);
             
+            // --- Weekly Calculation (existing) ---
             const weeklyExpenses = expenses.filter(exp => {
                 return exp.date >= start && exp.date <= end;
             });
@@ -1394,6 +1414,23 @@
                 weeklyTopCategoryEl.textContent = (totals[topCategory] && totals[topCategory].total > 0) ? categories[topCategory].label : '--';
             } else {
                 weeklyTopCategoryEl.textContent = '--';
+            }
+
+            // --- *** NEW: Today's Spend Calculation *** ---
+            const todayString = getTodayString();
+            const todayExpenses = expenses.filter(exp => exp.date === todayString);
+            const todayTotal = todayExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+
+            if (todayTotalSpendEl) {
+                todayTotalSpendEl.textContent = formatCurrency(todayTotal);
+                // Make it green if > 0, default color if 0
+                if (todayTotal > 0) {
+                    todayTotalSpendEl.className = "text-2xl font-semibold";
+                    todayTotalSpendEl.style.color = 'var(--accent-primary)'; // Use accent color
+                } else {
+                    todayTotalSpendEl.className = "text-2xl font-semibold text-primary";
+                    todayTotalSpendEl.style.color = ''; // Use default text color
+                }
             }
         };
         
@@ -1409,8 +1446,22 @@
                 expenseCategoryField.value = expense.category;
                 expenseDateField.value = expense.date;
                 expenseTagsField.value = expense.tags ? expense.tags.join(', ') : '';
-                expenseRecurringCheckbox.checked = false;
-                expenseRecurringCheckbox.disabled = false;
+                
+                // --- MODIFIED RECURRING LOGIC ---
+                // Check if this expense already started a recurring chain
+                const isRecurringStarter = expense.tags && expense.tags.includes('recurring-starter');
+                
+                expenseRecurringCheckbox.checked = false; // Always start unchecked
+                expenseRecurringCheckbox.disabled = isRecurringStarter; // Disable if it already started one
+                
+                if (isRecurringStarter) {
+                    // Add a title to explain *why* it's disabled
+                    expenseRecurringCheckbox.parentElement.title = "This expense has already been used to start a recurring expense.";
+                } else {
+                    expenseRecurringCheckbox.parentElement.title = "";
+                }
+                // --- END MODIFIED LOGIC ---
+
             } else {
                 modalTitle.textContent = 'Add New Expense';
                 expenseIdField.value = '';
@@ -1433,6 +1484,7 @@
                 
                 expenseRecurringCheckbox.checked = false;
                 expenseRecurringCheckbox.disabled = false;
+                expenseRecurringCheckbox.parentElement.title = ""; // Clear title
             }
             modal.classList.remove('hidden');
         };
@@ -1461,37 +1513,66 @@
                 if (id) {
                     // We are EDITING an existing expense
                     if (isRecurring) {
-                        // User wants to convert this one-time expense to a recurring one
+                        // *** NEW LOGIC: "Start a new recurring expense" ***
+                        // This NO LONGER converts. It now starts a new recurring
+                        // expense based on this one, beginning *next* month.
                         
-                        // 1. Add to recurring collection
-                        const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
+                        const batch = writeBatch(db);
+
+                        // 1. Add to recurring collection, starting next month
+                        const recurringRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'recurring'));
                         const recurringData = { ...expenseData }; // copy data
-                        recurringData.nextDueDate = recurringData.date; // Set first due date
-                        await addDoc(recurringRef, recurringData);
                         
-                        // 2. Delete from one-time expenses collection
+                        // Calculate next month's date
+                        // Use T00:00:00 to avoid timezone day changes
+                        const firstDueDate = new Date(recurringData.date + 'T00:00:00');
+                        firstDueDate.setMonth(firstDueDate.getMonth() + 1);
+                        recurringData.nextDueDate = firstDueDate.toISOString().split('T')[0];
+                        
+                        // We don't need the tags for the recurring template
+                        delete recurringData.tags; 
+                        
+                        batch.set(recurringRef, recurringData);
+                        
+                        // 2. Update the *current* one-time expense to mark it
+                        //    and add a '#recurring-starter' tag
                         const expenseRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
-                        await deleteDoc(expenseRef);
+                        const updatedTags = tags.includes('recurring-starter') ? tags : [...tags, 'recurring-starter'];
+                        batch.update(expenseRef, { ...expenseData, tags: updatedTags });
                         
-                        showToast('Expense converted to recurring!');
+                        await batch.commit();
+                        showToast('Recurring expense created, starting next month!');
                         
                     } else {
-                        // Just a normal update
+                        // *** FIX: This was missing ***
+                        // Just a normal update (and not recurring)
                         const expenseRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
                         await updateDoc(expenseRef, expenseData);
                         showToast('Expense updated!');
                     }
-                } else if (isRecurring) {
-                    // Add to recurring list
-                    const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
-                    expenseData.nextDueDate = expenseData.date; // Set first due date
-                    await addDoc(recurringRef, expenseData);
-                    showToast('Recurring expense added!');
                 } else {
-                    // Add to main list
-                    const expensesRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
-                    await addDoc(expensesRef, expenseData);
-                    showToast('Expense added!');
+                    // *** FIX: This was also missing ***
+                    // We are ADDING a new expense
+                    if (isRecurring) {
+                        // Add to *recurring* collection
+                        const recurringRef = collection(db, 'artifacts', appId, 'public', 'data', 'recurring');
+                        const recurringData = { ...expenseData };
+                        recurringData.nextDueDate = recurringData.date; // Starts today/on this date
+                        delete recurringData.tags; // No tags for the template
+                        await addDoc(recurringRef, recurringData);
+                        
+                        // Also add the *first instance* to the main expenses list
+                        const expenseRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
+                        const firstExpenseData = { ...expenseData, tags: [...tags, 'recurring'] }; // Tag as recurring
+                        await addDoc(expenseRef, firstExpenseData);
+                        
+                        showToast('New recurring expense added!');
+                    } else {
+                        // Just a normal new one-time expense
+                        const expenseRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
+                        await addDoc(expenseRef, expenseData);
+                        showToast('Expense added!');
+                    }
                 }
                 
                 // No need to save to local array, onSnapshot will handle it.
@@ -1817,6 +1898,72 @@
             link.click();
             document.body.removeChild(link); // Clean up
             showToast('Exported to CSV!');
+        };
+        
+        // *** NEW: Download Report as Image ***
+        const handleDownloadReport = async () => {
+            const elementToCapture = document.getElementById('main-content-grid');
+            if (!elementToCapture) {
+                showToast('Could not find report content.', true);
+                return;
+            }
+
+            // Show loading state
+            const originalIcon = downloadReportBtn.innerHTML;
+            downloadReportBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            `;
+            downloadReportBtn.disabled = true;
+
+            try {
+                // Get the computed background color
+                const computedStyle = getComputedStyle(document.body);
+                const bgColor = computedStyle.getPropertyValue('--bg-primary').trim() || '#121212'; // Default to dark bg
+
+                const canvas = await html2canvas(elementToCapture, {
+                    backgroundColor: bgColor, // Use the app's bg color
+                    scale: 2, // Increase resolution for better quality
+                    useCORS: true, // For any potential images
+                    logging: false,
+                    onclone: (clonedDoc) => {
+                        // --- FIX FOR SCROLLABLE HISTORY ---
+                        // Find the scrollable history container in the *cloned* document
+                        const clonedHistoryContainer = clonedDoc.querySelector('.history-container');
+                        if (clonedHistoryContainer) {
+                            // Remove the max-height and overflow properties to capture all content
+                            clonedHistoryContainer.style.maxHeight = 'none';
+                            clonedHistoryContainer.style.overflowY = 'visible';
+                        }
+                        // --- FIX FOR SCROLLABLE BAR CHART ---
+                        const clonedBarChartContainer = clonedDoc.querySelector('#bar-chart-container');
+                        if (clonedBarChartContainer) {
+                            clonedBarChartContainer.style.overflowX = 'visible';
+                            clonedBarChartContainer.style.padding = '1rem'; // Ensure padding is visible
+                        }
+                    }
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                
+                const monthName = new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long' });
+                link.download = `Expenso_Report_${currentYear}_${monthName}.png`;
+                link.href = imgData;
+                link.click();
+                
+                showToast('Report downloaded!');
+
+            } catch (err) {
+                console.error("Error generating report image: ", err);
+                showToast('Error generating report image.', true);
+            } finally {
+                // Reset button
+                downloadReportBtn.innerHTML = originalIcon;
+                downloadReportBtn.disabled = false;
+            }
         };
         
         // Recurring Expenses
@@ -2365,6 +2512,7 @@
             
             weeklyTotalSpendEl = document.getElementById('weekly-total-spend'); // RE-ADDED
             weeklyTopCategoryEl = document.getElementById('weekly-top-category'); // RE-ADDED
+            todayTotalSpendEl = document.getElementById('today-total-spend'); // *** ADD THIS LINE ***
             
             manageCategoriesBtn = document.getElementById('manage-categories-btn');
             categoryModal = document.getElementById('category-modal');
@@ -2390,6 +2538,9 @@
             appView = document.getElementById('app');
             yearlyReportView = document.getElementById('yearly-report');
             closeYearlyReportBtn = document.getElementById('close-yearly-report');
+            
+            // *** NEW: Assign download button ***
+            downloadReportBtn = document.getElementById('download-report-btn'); 
 
             settingsBtn = document.getElementById('settings-btn');
             settingsModal = document.getElementById('settings-modal');
@@ -2503,7 +2654,7 @@
             });
             
             historySortToggle.addEventListener('change', (e) => { // Add this block
-                currentSortOrder = e.targe.value;
+                currentSortOrder = e.target.value; // *** FIX: Fixed typo e.targe -> e.target ***
                 render();
             });
             
@@ -2512,6 +2663,9 @@
                 appView.classList.remove('hidden');
                 monthSelector.value = `${currentYear}-${currentMonth}`; // Reset selector
             });
+            
+            // *** NEW: Add listener for download button ***
+            downloadReportBtn.addEventListener('click', handleDownloadReport);
             
             // Settings Listeners
             settingsBtn.addEventListener('click', openSettingsModal);
