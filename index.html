@@ -412,6 +412,12 @@
                                 <option value="amount-desc">Sort by Amount (High)</option>
                                 <option value="amount-asc">Sort by Amount (Low)</option>
                             </select>
+                            <!-- *** NEW: Recurring Filter Button *** -->
+                            <button id="filter-recurring-btn" class="p-2 rounded-lg glass-input text-tertiary hover:text-primary" title="Show Recurring Only">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2.582a10.003 10.003 0 01-15.356-1.06M19.582 15H19v5a10.003 10.003 0 01-16.06-2.582" />
+                                </svg>
+                            </button>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <input type="search" id="search-bar" class="glass-input text-sm rounded-lg py-2 px-3 focus:ring-green-500 focus:border-green-500 w-full sm:w-auto" placeholder="Search or #tag...">
@@ -875,6 +881,7 @@
         let deleteInfo = { id: null, type: null }; // To track what to delete
         let currentHistoryType = 'expenses';
         let currentSortOrder = 'date-desc'; // Add this line
+        let isRecurringFilterActive = false; // *** NEW ***
         let currentUserId = null; // No longer used for path, but good for auth status
 
         // --- DOM ELEMENTS ---
@@ -922,6 +929,7 @@
         // History Toggle
         let historyTypeToggle;
         let historySortToggle; // Add this line
+        let filterRecurringBtn; // *** NEW ***
 
         // Yearly Report
         let appView, yearlyReportView, closeYearlyReportBtn;
@@ -1246,8 +1254,22 @@
                 filterCategoryEl.disabled = true;
             }
 
+            // --- *** MODIFIED: Handle Recurring Filter *** ---
+            if (isRecurringFilterActive) {
+                // If recurring filter is on, override other filters
+                combinedList = expensesWithTag.filter(item => 
+                    item.tags && (item.tags.includes('recurring') || item.tags.includes('recurring-starter'))
+                );
+                // Also override the history type display text
+                document.getElementById('history-type-toggle').value = 'expenses';
+            }
+            // --- *** END MODIFICATION *** ---
+
             const filteredList = combinedList
                 .filter(item => {
+                    // *** MODIFIED: Don't filter if recurring is active (already filtered) ***
+                    if (isRecurringFilterActive) return true;
+                    
                     if (currentHistoryType === 'expenses' && (currentFilter !== 'all' && item.category !== currentFilter)) return false;
                     
                     const searchTerm = currentSearchTerm.toLowerCase();
@@ -1805,6 +1827,29 @@
         // Search & Filter
         const handleFilterChange = (e) => { currentFilter = e.target.value; render(); };
         const handleSearchInput = (e) => { currentSearchTerm = e.target.value; render(); };
+
+        // *** NEW: Recurring Filter Toggle ***
+        const handleRecurringFilterToggle = () => {
+            isRecurringFilterActive = !isRecurringFilterActive;
+            
+            if (isRecurringFilterActive) {
+                // Set button to "active" state (green)
+                filterRecurringBtn.style.backgroundColor = 'var(--accent-primary-subtle-bg)';
+                filterRecurringBtn.style.color = 'var(--accent-primary-subtle-text)';
+                // Disable other filters that don't make sense
+                historyTypeToggle.disabled = true;
+                filterCategoryEl.disabled = true;
+            } else {
+                // Set button to "inactive" state (default)
+                filterRecurringBtn.style.backgroundColor = 'var(--bg-tertiary)';
+                filterRecurringBtn.style.color = 'var(--text-tertiary)';
+                // Re-enable other filters
+                historyTypeToggle.disabled = false;
+                filterCategoryEl.disabled = (currentHistoryType !== 'expenses');
+            }
+            
+            render();
+        };
 
         // Chart Toggle
         const handleChartToggle = (type) => {
@@ -2534,6 +2579,7 @@
 
             historyTypeToggle = document.getElementById('history-type-toggle');
             historySortToggle = document.getElementById('history-sort-toggle'); // Add this line
+            filterRecurringBtn = document.getElementById('filter-recurring-btn'); // *** NEW ***
 
             appView = document.getElementById('app');
             yearlyReportView = document.getElementById('yearly-report');
@@ -2657,6 +2703,8 @@
                 currentSortOrder = e.target.value; // *** FIX: Fixed typo e.targe -> e.target ***
                 render();
             });
+            
+            filterRecurringBtn.addEventListener('click', handleRecurringFilterToggle); // *** NEW ***
             
             closeYearlyReportBtn.addEventListener('click', () => {
                 yearlyReportView.classList.add('hidden');
